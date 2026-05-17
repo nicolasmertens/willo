@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#fff7e6">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
+  html, body { margin: 0; padding: 0; background: #fff7e6; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Avenir Next", system-ui, sans-serif; min-height: 100vh; min-height: 100dvh; overscroll-behavior: none; }
+  body { padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: max(16px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; }
+
+  .home-btn { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: 64px; height: 64px; border-radius: 50%; border: 3px solid #fff; overflow: hidden; padding: 0; cursor: pointer; background: #fff7e6; box-shadow: 0 2px 8px rgba(0,0,0,0.18); z-index: 100; }
+  .home-btn:active { transform: scale(0.92); }
+  .home-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .home-btn .fallback { display: none; width: 100%; height: 100%; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; color: #2b2b2b; }
+  .home-btn img.missing + .fallback { display: flex; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; max-width: 900px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; max-width: 480px; } }
+
+  a.tile { display: flex; align-items: center; justify-content: center; aspect-ratio: 1 / 1; border-radius: 26px; background: #fff; text-decoration: none; color: #2b2b2b; font-weight: 900; font-size: clamp(28px, 4.5vw, 44px); letter-spacing: -0.02em; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); transition: transform .08s ease, box-shadow .08s ease; }
+  a.tile:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08); }
+
+  a.tile-boeken   { background: linear-gradient(135deg, #ffe4a8, #ffc14d); }
+  a.tile-liedjes  { background: linear-gradient(135deg, #c0e8b6, #5fc34c); }
+  a.tile-verhalen { background: linear-gradient(135deg, #c9d6ff, #6c8cff); }
+</style>
+</head>
+<body>
+  <button class="home-btn" onclick="window.location='/'" aria-label="terug naar home">
+    <img src="/home/klas.jpg" alt="" onerror="this.classList.add('missing')">
+    <div class="fallback">Klas</div>
+  </button>
+  <main class="grid">
+    <a class="tile tile-boeken"   href="/klas/boeken/">Boeken</a>
+    <a class="tile tile-liedjes"  href="/klas/liedjes/">Liedjes</a>
+    <a class="tile tile-verhalen" href="/klas/verhalen/">Verhalen</a>
+  </main>
+</body>
+</html>
