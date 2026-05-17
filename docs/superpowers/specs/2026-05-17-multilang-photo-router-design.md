@@ -63,17 +63,17 @@ heeft de video al gestript. Deze update voegt twee dingen toe:
 /mama/                     FR landing: 3 categorie-tiles
   /mama/boeken/            FR-boeken grid (v1: lege grid + "Binnenkort" tekst)
   /mama/liedjes/           FR-liedjes grid (NIEUW, YouTube-stripped)
-  /mama/verhalen/          FR-verhalen grid (1 verhaal in v1)
+  /mama/verhalen/          FR-verhalen grid (Trois Petits Cochons + Petit Chaperon Rouge)
 
 /papa/                     VL landing: 3 categorie-tiles
   /papa/boeken/            VL-boeken grid. 1 tile = "Alle Eendjes" → /eendjes/
   /papa/liedjes/           VL-liedjes grid (NIEUW)
-  /papa/verhalen/          VL-verhalen grid (1 verhaal in v1)
+  /papa/verhalen/          VL-verhalen grid (Drie Biggetjes + Roodkapje)
 
-/klas/                     EN landing: 3 categorie-tiles
+/klas/                     EN landing: 3 categorie-tiles (v1: tile zonder klasfoto = tekst-placeholder)
   /klas/boeken/            EN-boeken grid (v1: lege grid + "Binnenkort" tekst)
   /klas/liedjes/           Redirect → /rhymes/ (canonical blijft /rhymes/)
-  /klas/verhalen/          EN-verhalen grid (1 verhaal in v1)
+  /klas/verhalen/          EN-verhalen grid (Three Little Pigs + Little Red Riding Hood)
 
 /eendjes/                  Ongewijzigd. Gelinkt vanuit /papa/boeken/.
 /rhymes/                   Ongewijzigd qua URL. Inhoud uitgebreid met 5-7
@@ -94,8 +94,8 @@ heeft de video al gestript. Deze update voegt twee dingen toe:
 ### Foto-cirkel hoek-knop
 
 Op elke pagina onder een taal (`/mama/`, `/papa/liedjes/`, etc.):
-- Linksboven (of rechtsboven — bepaal in implementatie): ronde knop, 64×64 px,
-  bevat dezelfde foto als op de home-tile (mama / papa / klas).
+- **Rechtsboven**: ronde knop, 64×64 px, bevat dezelfde foto als op de
+  home-tile (mama / papa / klas). Pad: `position: fixed; top: env(safe-area-inset-top, 12px); right: 12px;` zodat de notch op iPhone niets afdekt.
 - Tap = `window.location = "/"` (naar home).
 - Geen "back" pijl, geen tekst — alleen het gezicht, want William herkent dat
   visueel.
@@ -112,7 +112,7 @@ Bij tap op een liedje-tile:
 2. Cover-image van dat liedje wordt full-screen getoond, `object-fit: contain`,
    gecentreerd, zwarte achtergrond.
 3. Audio start (huidige pipeline: HTMLAudioElement, prefetched mp3).
-4. Linksboven blijft de foto-cirkel-hoek-knop staan (terug naar home + stop).
+4. Rechtsboven blijft de foto-cirkel-hoek-knop staan (terug naar home + stop).
 5. Een tap *anywhere* op het scherm = stop audio + fade terug naar grid (200ms).
 6. Bij natural end van het liedje: same — fade terug naar grid.
 
@@ -149,18 +149,27 @@ hardcoded parts naar variabelen en hergebruiken.
 
 ### Build/render
 
-Geen build-systeem nodig. Drie opties:
+**Gekozen: optie 1 — Python `render.py` script** (Nick liet de keuze aan
+implementatie over).
 
-1. **(Recommended)** Eén Python `render.py` script in repo-root dat één
-   `templates/grid.html` + `tracks/<lang>-<category>.json` leest en
-   `<lang>/<category>/index.html` schrijft. Run lokaal voor publish.
-2. Pure copy-paste — elke pagina is eigen index.html met duplicate styling.
-   Snel om mee te starten maar drift-risico.
-3. Inline `<script>` dat client-side renderet uit JSON. Werkt maar verhoogt
-   first-paint en bemoeilijkt SW-caching.
+Eén script in repo-root dat:
+- `templates/grid.html` (één canonieke template) leest
+- `tracks/<lang>-<category>.json` (één per grid-pagina) leest
+- Schrijft naar `<lang>/<category>/index.html`
+- Schrijft een matched `<lang>/<category>/service-worker.js`
 
-Optie 1: een 80-regel script. Voordeel: één plek waar UX-aanpassingen
-neerkomen. Nadeel: nu introduceer je een build-stap die er nog niet is.
+Geactiveerd handmatig vóór commit (`python render.py`). Geen CI/CD
+build-pipeline — Nick draait het lokaal en pusht de gerenderde HTML mee.
+
+Reden voor keuze boven copy-paste: we voegen 9+ grid-paginas toe en de
+playback-UX, foto-cirkel-knop, en SW-prefetch-logica moeten 1:1 identiek
+zijn over alle pagina's. Drift van handmatige copies wordt na 3 UX-tweaks
+onbeheersbaar. 80-regel script is goedkoper dan 9× synchroon houden.
+
+Bestaande `/eendjes/index.html` en `/rhymes/index.html` worden óók opnieuw
+gerenderd uit dezelfde template (zodat de full-screen still playback overal
+geldt). Hun bestaande URLs + content blijven, alleen de template
+onderliggend uniformeert.
 
 ### Service workers
 
@@ -173,18 +182,28 @@ neerkomen. Nadeel: nu introduceer je een build-stap die er nog niet is.
 
 ### Foto's (mama/papa/klas)
 
-Nick levert drie vierkante foto's aan:
-- `home/mama.jpg` — square, min 512×512 (1024×1024 ideaal)
-- `home/papa.jpg`
-- `home/klas.jpg`
+**Status (2026-05-17):**
+- `home/mama.jpg` — 374×374, gecrop't van Eline-portretfoto, gezicht-gericht ✅
+- `home/papa.jpg` — 360×360, gecrop't van Nick+William-foto, beide gezichten ✅
+- `home/klas.jpg` — **komt later**, Nick maakt foto in daycare
+
+Resoluties zijn lager dan de oorspronkelijke "min 512×512" target omdat de
+Photos Library derivatives op deze maat staan. Acceptabel voor v1 (tile is
+max ~halve scherm op iPad portrait); higher-res master swap kan later
+zonder code-changes.
 
 Zelfde foto wordt gebruikt voor:
 - Home-tile
 - Hoek-cirkel-knop op alle pagina's onder die taal
 
-Als William bv. mama-foto tapt, ziet hij dezelfde foto klein in de hoek op elk
-subscherm tot hij terug naar home gaat. Visuele continuïteit = "ik ben in
-mama's wereld".
+Als William bv. mama-foto tapt, ziet hij dezelfde foto klein in de hoek
+rechtsboven op elk subscherm tot hij terug naar home gaat. Visuele
+continuïteit = "ik ben in mama's wereld".
+
+**Klas-fallback tot foto er is:** home toont een 3e tile met tekst "Klas"
+op effen achtergrond (vergelijkbaar kleurpalet als mama/papa tiles). De
+subschermen `/klas/`, `/klas/liedjes/`, `/klas/verhalen/` werken normaal;
+de cirkel-knop rechtsboven toont tekst "Klas" in cirkel-vorm i.p.v. foto.
 
 ---
 
@@ -211,14 +230,23 @@ There Was An Old Woman · This Little Piggy.
 | yWirdnSDsV4 | The Wheels On The Bus | Super Simple Songs | |
 | w_lCi8U49mY | Itsy Bitsy Spider | Twinkle Little Songs | **Reeds in /rhymes/ #06** — niet dubbel toevoegen |
 
-Netto: +7 tracks (5 nieuwe video's + 2 extra uit de compilatie) → /rhymes/ van
-10 naar 17. Suggestie: behoud max 12 in initial release om grid hanteerbaar te
-houden; reserveer 5 als reserve.
+Netto: +7 tracks (5 nieuwe video's + 2 extra uit de compilatie) → `/rhymes/`
+van 10 naar 17. **Beslissing: dynamisch, geen cap** — alle 17 in de grid.
+De grid-CSS is responsief (5 kolommen desktop, 2 kolommen mobile/iPad
+portrait), dus 17 tiles = 9 rijen × 2 op iPad portrait, vereist scroll
+maar past in het patroon.
 
 ### papa (VL) — `/papa/liedjes/` nieuw
 
-**Candidate-lijst** (klassieke Nederlandstalige kinderliedjes; Nick selecteert
-8-12 + levert YouTube-IDs aan, of we zoeken bekende uitvoeringen):
+**Aanpak (Nick koos "zoek bekende uitvoeringen"):** Claude doorzoekt YouTube
+voor elke kandidaat-titel, kiest een uitvoering met goede audio-kwaliteit
+(voorkeur: K3, Samson & Gert, Studio 100, of bekende kinderliedjes-kanalen
+zoals "Kinderliedjes TV", "Klein Maar Dapper", "Junior Songs"). Per liedje:
+yt-dlp → Whisper → trim → 96 kbps mono mp3. Mapping van titel naar YouTube-ID
++ trim-bounds gaat in `tracks/papa-liedjes.json`.
+
+**Candidate-lijst** (klassieke Nederlandstalige kinderliedjes — alle 14
+worden bekeken, finale 8-12 hangt af van vindbare kwaliteit):
 
 - In de maneschijn
 - Olifantje in het bos
@@ -239,7 +267,11 @@ houden; reserveer 5 als reserve.
 
 ### mama (FR) — `/mama/liedjes/` nieuw
 
-**Candidate-lijst** (klassieke comptines):
+**Aanpak (zoals papa):** Claude zoekt bekende FR-uitvoeringen op YouTube.
+Voorkeurs-kanalen: "Le Monde des Titounis", "Hervé Cristiani", "Henri Dès",
+"Comptines avec Pinpin et Lili", "Comptine TV".
+
+**Candidate-lijst** (klassieke comptines — finale selectie 8-12):
 
 - Frère Jacques
 - Au clair de la lune
@@ -258,19 +290,21 @@ houden; reserveer 5 als reserve.
 
 **Voor `/mama/boeken/`:** leeg in v1, of 1 boek als Nick een Frans boek heeft.
 
-### Verhalen (1 per taal, v1)
+### Verhalen (2 per taal, v1)
 
-**Suggestie:**
-- `/mama/verhalen/` — Les Trois Petits Cochons (Three Little Pigs in FR)
-- `/papa/verhalen/` — De Drie Biggetjes
-- `/klas/verhalen/` — The Three Little Pigs
+**Beslissing: beide verhalen in alle 3 talen** (Nick: "biggetjes en roodkapje"):
 
-Eén bekend verhaal, drie talen — Nick kan zelf bepalen welke uitvoering / kanaal
-op YouTube de beste audio-kwaliteit heeft. Trim-bounds via Whisper zoals
-liedjes-pipeline (start = eerste woord − 2s, eind = natuurlijke afsluiting).
+| Taal | Verhaal 1 | Verhaal 2 |
+|---|---|---|
+| FR (`/mama/verhalen/`) | Les Trois Petits Cochons | Le Petit Chaperon Rouge |
+| VL (`/papa/verhalen/`) | De Drie Biggetjes | Roodkapje |
+| EN (`/klas/verhalen/`) | The Three Little Pigs | Little Red Riding Hood |
 
-Alternatief: Roodkapje / Le petit chaperon rouge / Little Red Riding Hood
-(zelfde drie-talen-koppeling).
+= 6 verhalen totaal. Claude zoekt per verhaal een YouTube-narratie met goede
+audio-kwaliteit (voorkeur: officiële kinderboek-audioversies, Vlaamse/Belgische
+publishers, of bekende narratie-kanalen). Trim-bounds via Whisper zoals
+liedjes-pipeline. Verhaal-mp3s mogen 3-8 min duren — pre-fetch in SW dus
+zwaarder (~3-6 MB per file), maar slechts 2 per grid.
 
 ---
 
@@ -373,20 +407,22 @@ Home
 
 ---
 
-## Open punten (Nick beslist)
+## Open punten — beslist (2026-05-17)
 
-1. **Foto's**: aanleveren van `home/mama.jpg`, `home/papa.jpg`, `home/klas.jpg`
-   — vierkant, min 512×512.
-2. **VL-liedjes selectie**: 8-12 titels uit de candidate-lijst kiezen +
-   YouTube-IDs aanleveren (of: laat Claude bekende uitvoeringen voorstellen).
-3. **FR-liedjes selectie**: idem.
-4. **Verhalen selectie**: kiezen tussen Drie Biggetjes-trio of Roodkapje-trio
-   (of beide).
-5. **Klas-grid maximum**: 12 of 17 tracks?
-6. **Render-aanpak**: Python `render.py` (optie 1) of pure copy-paste (optie 2).
-7. **Hoek-cirkel positie**: linksboven of rechtsboven? (Mogelijk RTL/LTR
-   conventie — voor 1-kindgebruik niet relevant, kies wat Nick zelf logisch
-   vindt.)
+| # | Punt | Beslissing |
+|---|---|---|
+| 1 | Foto's | mama + papa gecrop't & opgeslagen; klasfoto komt later, tekst-placeholder tot dan |
+| 2 | VL-liedjes selectie | Claude zoekt bekende uitvoeringen uit candidate-lijst |
+| 3 | FR-liedjes selectie | Claude zoekt bekende uitvoeringen uit candidate-lijst |
+| 4 | Verhalen selectie | Beide (Biggetjes + Roodkapje) in alle 3 talen — 6 verhalen totaal |
+| 5 | Klas-grid maximum | Dynamisch (geen cap), alle 17 EN-tracks |
+| 6 | Render-aanpak | Python `render.py` met `templates/grid.html` |
+| 7 | Cirkel-hoek positie | Rechtsboven |
+
+Nog wel afhankelijk van implementatie:
+- Klas-fallback styling (achtergrond-kleur voor tekst-tile) — wordt in
+  implementatie bepaald op basis van bestaande color palette.
+- Trim-bounds per verhaal — vereist Whisper-run, gebeurt tijdens implementatie.
 
 ---
 
