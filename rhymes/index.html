@@ -14,213 +14,48 @@
 <link rel="manifest" href="manifest.json">
 <title>Rhymes</title>
 <style>
-  * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: pan-y;          /* allow vertical scroll, block pinch */
-  }
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: #fff7e6;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Avenir Next", system-ui, sans-serif;
-    overscroll-behavior: none;
-    overflow-x: hidden;
-    -webkit-text-size-adjust: 100%;
-  }
-  body {
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: 16px;
-    padding-top: max(16px, env(safe-area-inset-top));
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 16px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  /* Phones + iPad portrait: 2 columns × 5 rows for big tap targets */
-  @media (max-width: 900px) {
-    .grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-      max-width: 760px;
-    }
-  }
-  .tile {
-    aspect-ratio: 1 / 1;
-    border: 4px solid transparent;
-    border-radius: 26px;
-    padding: 0;
-    background: #fff;
-    cursor: pointer;
-    overflow: hidden;
-    position: relative;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08);
-    transition: transform .08s ease, box-shadow .08s ease, border-color .15s ease;
-    font-family: inherit;
-  }
-  .tile:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08);
-  }
-  .tile img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    pointer-events: none;
-  }
-  .tile .num {
-    position: absolute;
-    top: 8px;
-    left: 14px;
-    font-size: clamp(28px, 4vw, 40px);
-    font-weight: 900;
-    color: #fff;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.7), 0 0 3px rgba(0,0,0,0.9);
-    letter-spacing: -0.02em;
-    pointer-events: none;
-  }
-  .tile.pressing {
-    transform: scale(0.94);
-    filter: brightness(1.12);
-  }
-  .tile.playing {
-    border-color: #ff6b6b;
-    animation: pulse 1.2s ease-in-out infinite;
-  }
-  .tile.playing::after {
-    content: "";
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: #ff6b6b;
-    box-shadow: 0 0 0 0 rgba(255,107,107,0.7);
-    animation: dot 1s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-  }
-  @keyframes dot {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.6); }
-    50% { box-shadow: 0 0 0 10px rgba(255,255,255,0); }
-  }
-  .stopbar {
-    position: fixed;
-    left: 0; right: 0;
-    bottom: 0;
-    padding: 12px max(16px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-right));
-    background: linear-gradient(to top, rgba(255,247,230,0.98), rgba(255,247,230,0.85) 70%, rgba(255,247,230,0));
-    display: flex;
-    justify-content: center;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity .2s ease;
-  }
-  .stopbar.visible { opacity: 1; pointer-events: auto; }
-  .stopbtn {
-    border: none;
-    background: #2b2b2b;
-    color: #fff;
-    font-family: inherit;
-    font-weight: 800;
-    font-size: 18px;
-    padding: 16px 32px;
-    border-radius: 999px;
-    cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.18), 0 10px 20px rgba(0,0,0,0.15);
-  }
-  .stopbtn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.18); }
-  #debug {
-    position: fixed;
-    top: 8px; right: 8px;
-    max-width: 60vw;
-    padding: 8px 10px;
-    background: rgba(0,0,0,0.72);
-    color: rgba(255,255,255,0.85);
-    font: 11px/1.4 ui-monospace, Menlo, monospace;
-    white-space: pre;
-    border-radius: 8px;
-    z-index: 9999;
-    pointer-events: none;
-  }
-  #debugbar {
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    padding: 4px max(8px, env(safe-area-inset-left)) max(4px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
-    pointer-events: none;
-    z-index: 9999;
-  }
-  #debugbar button {
-    pointer-events: auto;
-    border: none;
-    background: transparent;
-    color: rgba(0,0,0,0.28);
-    font: 10px/1 ui-monospace, Menlo, monospace;
-    letter-spacing: 0.04em;
-    padding: 4px 6px;
-    cursor: pointer;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  #debugbar button:active { color: rgba(0,0,0,0.55); }
-  #dbgtoggle {
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 2px;
-    border: none;
-    background: transparent;
-    color: rgba(0,0,0,0.18);
-    font: 9px/1 ui-monospace, Menlo, monospace;
-    letter-spacing: 0.05em;
-    padding: 4px 8px;
-    cursor: pointer;
-    z-index: 9999;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  #dbgtoggle:active { color: rgba(0,0,0,0.45); }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
+  html, body { margin: 0; padding: 0; background: #fff7e6; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Avenir Next", system-ui, sans-serif; overscroll-behavior: none; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+  body { min-height: 100vh; min-height: 100dvh; padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+
+  /* --- Grid --- */
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; max-width: 1200px; margin: 0 auto; transition: opacity .2s ease; }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 760px; } }
+  .grid.dim { opacity: 0; pointer-events: none; }
+  .tile { aspect-ratio: 1 / 1; border: 4px solid transparent; border-radius: 26px; padding: 0; background: #fff; cursor: pointer; overflow: hidden; position: relative; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); transition: transform .08s ease, box-shadow .08s ease; font-family: inherit; }
+  .tile:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08); }
+  .tile img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+  .tile .num { position: absolute; top: 8px; left: 14px; font-size: clamp(28px, 4vw, 40px); font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.7), 0 0 3px rgba(0,0,0,0.9); letter-spacing: -0.02em; pointer-events: none; }
+  .tile.pressing { transform: scale(0.94); filter: brightness(1.12); }
+
+  /* --- Foto-cirkel-hoek-knop (rechtsboven, op alle sub-paginas) --- */
+  .home-btn { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: 64px; height: 64px; border-radius: 50%; border: 3px solid #fff; overflow: hidden; padding: 0; cursor: pointer; background: #fff7e6; box-shadow: 0 2px 8px rgba(0,0,0,0.18); z-index: 100; }
+  .home-btn:active { transform: scale(0.92); }
+  .home-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .home-btn .fallback { display: none; width: 100%; height: 100%; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; color: #2b2b2b; }
+  .home-btn img.missing + .fallback { display: flex; }
+
+  /* --- Full-screen still playback overlay --- */
+  .player { position: fixed; inset: 0; background: #000; display: none; z-index: 50; cursor: pointer; }
+  .player.visible { display: block; }
+  .player img { width: 100%; height: 100%; object-fit: contain; display: block; }
 </style>
 </head>
 <body>
+  <button class="home-btn" id="homebtn" aria-label="terug naar home">
+    <img src="/home/klas.jpg" alt="" onerror="this.classList.add('missing')">
+    <div class="fallback">Rhymes</div>
+  </button>
   <main class="grid" id="grid"></main>
-  <div class="stopbar" id="stopbar"><button class="stopbtn" id="stopbtn">Stop</button></div>
-  <pre id="debug" hidden></pre>
-  <div id="debugbar" hidden>
-    <button id="dbg-share" type="button">send logs</button>
-    <button id="dbg-clear" type="button">clear logs</button>
-  </div>
-  <button id="dbgtoggle" type="button" aria-label="debug">·</button>
+  <div class="player" id="player"><img id="player-img" alt=""></div>
 
 <script>
-// --- Service worker: auto-update HTML on next visit, offline fallback ---
+// --- Service worker ---
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./service-worker.js")
       .then(() => schedulePrefetch())
       .catch(() => {});
-  });
-  navigator.serviceWorker.addEventListener("message", (e) => {
-    const m = e.data || {};
-    if (m.type === "prefetch-progress") {
-      debugLog(`prefetch ${m.done}/${m.total}`);
-    } else if (m.type === "prefetch-done") {
-      debugLog(`prefetch done: ${m.cached}/${m.total} cached`);
-    }
   });
 }
 
@@ -236,72 +71,41 @@ document.addEventListener("touchend", e => {
   lastTouchEnd = now;
 }, { passive: false });
 
-document.addEventListener("touchstart", e => {
-  if (e.touches.length > 1) e.preventDefault();
-}, { passive: false });
-document.addEventListener("touchmove", e => {
-  if (e.touches.length > 1) e.preventDefault();
-}, { passive: false });
-
+document.addEventListener("touchstart", e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+document.addEventListener("touchmove", e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 document.addEventListener("contextmenu", e => e.preventDefault());
 document.addEventListener("dblclick", e => e.preventDefault());
 
-const songs = [
-  { n:  1, title: "Twinkle, Twinkle, Little Star",                  file: "audio/01.mp3" },
-  { n:  2, title: "Hey Diddle Diddle",                              file: "audio/02.mp3" },
-  { n:  3, title: "Hickory Dickory Dock",                           file: "audio/03.mp3" },
-  { n:  4, title: "Mary Had a Little Lamb",                         file: "audio/04.mp3" },
-  { n:  5, title: "Humpty Dumpty",                                  file: "audio/05.mp3" },
-  { n:  6, title: "The Itsy Bitsy Spider",                          file: "audio/06.mp3" },
-  { n:  7, title: "Jack and Jill",                                  file: "audio/07.mp3" },
-  { n:  8, title: "Little Bo-Peep",                                 file: "audio/08.mp3" },
-  { n:  9, title: "There Was an Old Woman Who Lived in a Shoe",     file: "audio/09.mp3" },
-  { n: 10, title: "This Little Piggy",                              file: "audio/10.mp3" },
-];
-
-const BASE = "";
+const TRACKS = [{"n": 1, "title": "Twinkle, Twinkle, Little Star", "audio": "audio/01.mp3", "icon": "icons/01.jpg"}, {"n": 2, "title": "Hey Diddle Diddle", "audio": "audio/02.mp3", "icon": "icons/02.jpg"}, {"n": 3, "title": "Hickory Dickory Dock", "audio": "audio/03.mp3", "icon": "icons/03.jpg"}, {"n": 4, "title": "Mary Had a Little Lamb", "audio": "audio/04.mp3", "icon": "icons/04.jpg"}, {"n": 5, "title": "Humpty Dumpty", "audio": "audio/05.mp3", "icon": "icons/05.jpg"}, {"n": 6, "title": "The Itsy Bitsy Spider", "audio": "audio/06.mp3", "icon": "icons/06.jpg"}, {"n": 7, "title": "Jack and Jill", "audio": "audio/07.mp3", "icon": "icons/07.jpg"}, {"n": 8, "title": "Little Bo-Peep", "audio": "audio/08.mp3", "icon": "icons/08.jpg"}, {"n": 9, "title": "There Was an Old Woman Who Lived in a Shoe", "audio": "audio/09.mp3", "icon": "icons/09.jpg"}, {"n": 10, "title": "This Little Piggy", "audio": "audio/10.mp3", "icon": "icons/10.jpg"}];
+const SEED_ORDER = [1, 6, 2, 7, 4];
+const PARENT_HREF = "/";
+const STORAGE_PREFIX = "rhymes";
+const APP_VERSION = "rhymes-v2";
 
 const audio = new Audio();
 audio.preload = "none";
 audio.playsInline = true;
 let currentTile = null;
+let currentTrack = null;
 
 // --- Popularity tracking ---
-// Each play is logged with a timestamp. Rolling 14-day window determines
-// the prefetch order. New devices fall back to a seed shipped in popularity.json.
-const POP_KEY = "rhymes_plays_v1";
+const POP_KEY = STORAGE_PREFIX + "_plays_v1";
 const POP_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
-let seedOrder = [];
 
-function loadPlays() {
-  try { return JSON.parse(localStorage.getItem(POP_KEY) || "[]"); }
-  catch { return []; }
-}
-
-function savePlays(arr) {
-  try { localStorage.setItem(POP_KEY, JSON.stringify(arr)); } catch {}
-}
-
+function loadPlays() { try { return JSON.parse(localStorage.getItem(POP_KEY) || "[]"); } catch { return []; } }
+function savePlays(arr) { try { localStorage.setItem(POP_KEY, JSON.stringify(arr)); } catch {} }
 function recordPlay(n) {
-  const now = Date.now();
-  const cutoff = now - POP_WINDOW_MS;
+  const now = Date.now(); const cutoff = now - POP_WINDOW_MS;
   const arr = loadPlays().filter(e => e.t >= cutoff);
-  arr.push({ n, t: now });
-  savePlays(arr);
+  arr.push({ n, t: now }); savePlays(arr);
 }
-
 function downloadOrder() {
   const cutoff = Date.now() - POP_WINDOW_MS;
   const arr = loadPlays().filter(e => e.t >= cutoff);
-  savePlays(arr); // housekeeping: drop expired entries
-
-  const counts = {};
-  for (const e of arr) counts[e.n] = (counts[e.n] || 0) + 1;
-
-  const seedRank = {};
-  seedOrder.forEach((n, i) => { seedRank[n] = i; });
-
-  const all = songs.map(s => s.n);
+  savePlays(arr);
+  const counts = {}; for (const e of arr) counts[e.n] = (counts[e.n] || 0) + 1;
+  const seedRank = {}; SEED_ORDER.forEach((n, i) => { seedRank[n] = i; });
+  const all = TRACKS.map(s => s.n);
   all.sort((a, b) => {
     const ca = counts[a] || 0, cb = counts[b] || 0;
     if (cb !== ca) return cb - ca;
@@ -311,36 +115,25 @@ function downloadOrder() {
   });
   return all;
 }
-
-function songByNum(n) { return songs.find(s => s.n === n); }
+function trackByNum(n) { return TRACKS.find(s => s.n === n); }
 
 // --- Telemetry ---
-// Events buffered in localStorage and POSTed to the Cloudflare Worker which
-// commits them as JSONL files under logs/<date>/. Shared logger with eendjes;
-// app_version filters the two apps apart.
 const TEL_URL = "https://liedjes-logger.super-mud-e2ef.workers.dev/log";
-const TEL_BUFFER_KEY = "rhymes_tel_buffer_v1";
-const TEL_DEVICE_KEY = "rhymes_device_id_v1";
+const TEL_BUFFER_KEY = STORAGE_PREFIX + "_tel_buffer_v1";
+const TEL_DEVICE_KEY = STORAGE_PREFIX + "_device_id_v1";
 const TEL_FLUSH_INTERVAL_MS = 30000;
 const TEL_MAX_BUFFER = 2000;
-const APP_VERSION = "rhymes-v1";
 
 const SESSION_ID = ((crypto.randomUUID && crypto.randomUUID()) || (Date.now() + "-" + Math.random())).slice(0, 36);
 let DEVICE_ID = "";
 try {
   DEVICE_ID = localStorage.getItem(TEL_DEVICE_KEY) || "";
-  if (!DEVICE_ID) {
-    DEVICE_ID = (crypto.randomUUID && crypto.randomUUID()) || (Date.now() + "-" + Math.random());
-    localStorage.setItem(TEL_DEVICE_KEY, DEVICE_ID);
-  }
+  if (!DEVICE_ID) { DEVICE_ID = (crypto.randomUUID && crypto.randomUUID()) || (Date.now() + "-" + Math.random()); localStorage.setItem(TEL_DEVICE_KEY, DEVICE_ID); }
 } catch {}
 
 let telBuffer = [];
 try { telBuffer = JSON.parse(localStorage.getItem(TEL_BUFFER_KEY) || "[]"); } catch {}
-function saveTelBuffer() {
-  try { localStorage.setItem(TEL_BUFFER_KEY, JSON.stringify(telBuffer)); } catch {}
-}
-
+function saveTelBuffer() { try { localStorage.setItem(TEL_BUFFER_KEY, JSON.stringify(telBuffer)); } catch {} }
 function tel(type, payload) {
   telBuffer.push({ t: Date.now(), type, ...(payload || {}) });
   if (telBuffer.length > TEL_MAX_BUFFER) telBuffer.splice(0, telBuffer.length - TEL_MAX_BUFFER);
@@ -357,61 +150,42 @@ async function flushTel(useKeepalive) {
     const resp = await fetch(TEL_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        events: batch,
-        session_id: SESSION_ID,
-        device_id: DEVICE_ID,
-        app_version: APP_VERSION,
-      }),
+      body: JSON.stringify({ events: batch, session_id: SESSION_ID, device_id: DEVICE_ID, app_version: APP_VERSION }),
       keepalive: !!useKeepalive,
     });
-    if (resp && resp.ok) {
-      telBuffer.splice(0, batchLen);
-      saveTelBuffer();
-    }
+    if (resp && resp.ok) { telBuffer.splice(0, batchLen); saveTelBuffer(); }
   } catch {}
   telFlushing = false;
 }
-
 setInterval(() => flushTel(false), TEL_FLUSH_INTERVAL_MS);
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") flushTel(true);
-});
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushTel(true); });
 window.addEventListener("pagehide", () => flushTel(true));
+tel("session_start", { ua: navigator.userAgent, vw: window.innerWidth, vh: window.innerHeight, dpr: window.devicePixelRatio || 1, standalone: !!(navigator.standalone || window.matchMedia("(display-mode: standalone)").matches) });
 
-tel("session_start", {
-  ua: navigator.userAgent,
-  vw: window.innerWidth,
-  vh: window.innerHeight,
-  dpr: window.devicePixelRatio || 1,
-  standalone: !!(navigator.standalone || window.matchMedia("(display-mode: standalone)").matches),
-});
-
+// --- Prefetch ---
 async function schedulePrefetch() {
-  // Eager prefetch: kick off immediately after the SW is reachable. Home-WiFi
-  // can absorb ~4 MB of mp3s in 1-2 s; no need to wait for idle.
   let worker = navigator.serviceWorker.controller;
-  if (!worker) {
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      worker = navigator.serviceWorker.controller || reg.active;
-    } catch {}
-  }
+  if (!worker) { try { const reg = await navigator.serviceWorker.ready; worker = navigator.serviceWorker.controller || reg.active; } catch {} }
   if (!worker) return;
   const order = downloadOrder();
-  const urls = order.map(n => {
-    const s = songByNum(n);
-    return s ? encodeURI(BASE + s.file) : null;
-  }).filter(Boolean);
+  const urls = order.map(n => { const s = trackByNum(n); return s ? encodeURI(s.audio) : null; }).filter(Boolean);
   worker.postMessage({ type: "prefetch-mp3s", urls });
-  debugLog(`prefetch order: ${order.join(",")}`);
 }
 
-function setPlaying(tile) {
-  if (currentTile && currentTile !== tile) currentTile.classList.remove("playing");
-  currentTile = tile;
-  if (tile) tile.classList.add("playing");
-  document.getElementById("stopbar").classList.toggle("visible", !!tile);
+// --- Full-screen still playback ---
+const grid = document.getElementById("grid");
+const player = document.getElementById("player");
+const playerImg = document.getElementById("player-img");
+
+function showPlayer(track) {
+  playerImg.src = encodeURI(track.icon);
+  player.classList.add("visible");
+  grid.classList.add("dim");
+}
+function hidePlayer() {
+  player.classList.remove("visible");
+  grid.classList.remove("dim");
+  playerImg.src = "";
 }
 
 let currentSongNum = null;
@@ -422,14 +196,7 @@ function emitPlayEnd(reason) {
   const dur = audio.duration || 0;
   const cur = audio.currentTime || 0;
   const pct = dur > 0 ? +(cur / dur).toFixed(3) : 0;
-  tel("play_end", {
-    n: currentSongNum,
-    elapsed_ms: Math.round(cur * 1000),
-    duration_ms: Math.round(dur * 1000),
-    pct,
-    reason,
-    real_tap: pct >= 0.4,
-  });
+  tel("play_end", { n: currentSongNum, elapsed_ms: Math.round(cur * 1000), duration_ms: Math.round(dur * 1000), pct, reason, real_tap: pct >= 0.4 });
   currentSongNum = null;
 }
 
@@ -437,120 +204,55 @@ function stop() {
   emitPlayEnd("stop");
   audio.pause();
   audio.currentTime = 0;
-  setPlaying(null);
+  currentTrack = null;
+  currentTile = null;
+  hidePlayer();
 }
 
-function play(song, tile) {
-  if (currentTile === tile) { stop(); return; }
+function play(track, tile) {
+  if (currentTrack === track) { stop(); return; }
   emitPlayEnd("replaced");
-  audio.src = encodeURI(BASE + song.file);
+  audio.src = encodeURI(track.audio);
   audio.play().then(() => {
-    setPlaying(tile);
-    recordPlay(song.n);
-    currentSongNum = song.n;
-    tel("play_start", { n: song.n });
+    currentTile = tile;
+    currentTrack = track;
+    currentSongNum = track.n;
+    showPlayer(track);
+    recordPlay(track.n);
+    tel("play_start", { n: track.n });
   }).catch((err) => {
-    setPlaying(null);
-    tel("play_fail", { n: song.n, err: String(err && err.message || err).slice(0, 120) });
+    hidePlayer();
+    tel("play_fail", { n: track.n, err: String(err && err.message || err).slice(0, 120) });
   });
 }
 
-audio.addEventListener("ended", () => { emitPlayEnd("ended"); setPlaying(null); });
+audio.addEventListener("ended", () => { emitPlayEnd("ended"); hidePlayer(); currentTrack = null; });
 audio.addEventListener("timeupdate", () => {
   const now = Date.now();
-  if (now - lastProgressLog < 2000) return;
-  if (currentSongNum == null) return;
+  if (now - lastProgressLog < 2000 || currentSongNum == null) return;
   lastProgressLog = now;
-  const dur = audio.duration || 0;
-  const cur = audio.currentTime || 0;
-  tel("play_progress", {
-    n: currentSongNum,
-    elapsed_ms: Math.round(cur * 1000),
-    duration_ms: Math.round(dur * 1000),
-    pct: dur > 0 ? +(cur / dur).toFixed(3) : 0,
-  });
+  const dur = audio.duration || 0, cur = audio.currentTime || 0;
+  tel("play_progress", { n: currentSongNum, elapsed_ms: Math.round(cur * 1000), duration_ms: Math.round(dur * 1000), pct: dur > 0 ? +(cur / dur).toFixed(3) : 0 });
 });
 
-const grid = document.getElementById("grid");
+// Tap-anywhere on player = stop. Tap on home button = also stop (and go home).
+player.addEventListener("click", stop, { passive: true });
+player.addEventListener("touchend", e => { e.preventDefault(); stop(); }, { passive: false });
 
-// Tap detection tuned for a 19-month-old + accidental brush rejection.
-const MIN_TAP_MS = 65;            // ignore brushes shorter than this (pickup grazes)
-const MAX_TAP_MS = 1500;          // ignore long holds (palm resting)
-const MAX_TAP_DRIFT_PX = 50;      // ignore drags
+// --- Tile tap detection (toddler-tuned, unchanged from rhymes/) ---
+const MIN_TAP_MS = 65;
+const MAX_TAP_MS = 1500;
+const MAX_TAP_DRIFT_PX = 50;
 
-const DEBUG_KEY = "rhymes_debug_on";
-let DEBUG = new URLSearchParams(location.search).has("debug")
-        || localStorage.getItem(DEBUG_KEY) === "1";
-
-function setDebug(on) {
-  DEBUG = on;
-  if (on) localStorage.setItem(DEBUG_KEY, "1");
-  else localStorage.removeItem(DEBUG_KEY);
-  const dbg = document.getElementById("debug");
-  const bar = document.getElementById("debugbar");
-  if (dbg) dbg.hidden = !on;
-  if (bar) bar.hidden = !on;
-}
-const LOG_KEY = "rhymes_debug_log";
-const MAX_PERSISTED_LOGS = 500;
-
-function persistLog(line) {
-  try {
-    const arr = JSON.parse(localStorage.getItem(LOG_KEY) || "[]");
-    arr.push(`${new Date().toISOString()} ${line}`);
-    if (arr.length > MAX_PERSISTED_LOGS) arr.splice(0, arr.length - MAX_PERSISTED_LOGS);
-    localStorage.setItem(LOG_KEY, JSON.stringify(arr));
-  } catch {}
-}
-
-const debugLog = (...args) => {
-  if (!DEBUG) return;
-  const line = args.join(" ");
-  persistLog(line);
-  const el = document.getElementById("debug");
-  if (!el) return;
-  el.textContent = (line + "\n" + el.textContent).split("\n").slice(0, 12).join("\n");
-};
-
-async function shareLogs() {
-  let arr = [];
-  try { arr = JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); } catch {}
-  const ua = navigator.userAgent;
-  const screen = `${window.innerWidth}x${window.innerHeight} dpr=${window.devicePixelRatio}`;
-  const body = `# Rhymes debug log\n\nDevice: ${ua}\nScreen: ${screen}\nEntries: ${arr.length}\n\n` + arr.join("\n");
-  if (navigator.share) {
-    try { await navigator.share({ title: "Rhymes debug logs", text: body }); return; } catch {}
-  }
-  const subject = encodeURIComponent("Rhymes debug logs");
-  const mailBody = encodeURIComponent(body.slice(0, 6000));
-  location.href = `mailto:nicolas@mrtns.io?subject=${subject}&body=${mailBody}`;
-}
-
-function clearLogs() {
-  localStorage.removeItem(LOG_KEY);
-  const el = document.getElementById("debug");
-  if (el) el.textContent = "(cleared)";
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (DEBUG) {
-    document.getElementById("debug").hidden = false;
-    document.getElementById("debugbar").hidden = false;
-  }
-  document.getElementById("dbg-share")?.addEventListener("click", shareLogs);
-  document.getElementById("dbg-clear")?.addEventListener("click", clearLogs);
-  document.getElementById("dbgtoggle")?.addEventListener("click", () => setDebug(!DEBUG));
-});
-
-function attachTileHandlers(btn, song) {
-  const candidates = new Map(); // touchId -> {t0, x0, y0, r0, maxDrift, drifted}
+function attachTileHandlers(btn, track) {
+  const candidates = new Map();
 
   btn.addEventListener("touchstart", e => {
     for (const t of e.changedTouches) {
       const r0 = Math.max(t.radiusX || 0, t.radiusY || 0);
       candidates.set(t.identifier, { t0: Date.now(), x0: t.clientX, y0: t.clientY, r0, maxDrift: 0, drifted: false });
       btn.classList.add("pressing");
-      tel("touchstart", { n: song.n, x: Math.round(t.clientX), y: Math.round(t.clientY), r: Math.round(r0), touches: e.touches.length });
+      tel("touchstart", { n: track.n, x: Math.round(t.clientX), y: Math.round(t.clientY), r: Math.round(r0), touches: e.touches.length });
     }
   }, { passive: true });
 
@@ -560,10 +262,7 @@ function attachTileHandlers(btn, song) {
       if (!c) continue;
       const d = Math.hypot(t.clientX - c.x0, t.clientY - c.y0);
       if (d > c.maxDrift) c.maxDrift = d;
-      if (!c.drifted && d > MAX_TAP_DRIFT_PX) {
-        c.drifted = true;
-        debugLog(`#${song.n} drift cancel`);
-      }
+      if (!c.drifted && d > MAX_TAP_DRIFT_PX) c.drifted = true;
     }
   }, { passive: true });
 
@@ -585,22 +284,9 @@ function attachTileHandlers(btn, song) {
       else if (dur > MAX_TAP_MS)  decision = "too_long";
       else                        decision = "play";
 
-      debugLog(`#${song.n} dur=${dur}ms r=${r.toFixed(0)} onTile=${onTile} ${decision}`);
-      tel("touchend", {
-        n: song.n,
-        dur_ms: dur,
-        r_start: Math.round(c.r0),
-        r_end: Math.round(r),
-        drift_max: Math.round(c.maxDrift),
-        on_tile: onTile,
-        decision,
-      });
+      tel("touchend", { n: track.n, dur_ms: dur, r_start: Math.round(c.r0), r_end: Math.round(r), drift_max: Math.round(c.maxDrift), on_tile: onTile, decision });
 
-      if (decision === "play") {
-        e.preventDefault();
-        play(song, btn);
-        return;
-      }
+      if (decision === "play") { e.preventDefault(); play(track, btn); return; }
     }
   }, { passive: false });
 
@@ -608,39 +294,37 @@ function attachTileHandlers(btn, song) {
     for (const t of e.changedTouches) {
       const c = candidates.get(t.identifier);
       candidates.delete(t.identifier);
-      tel("touchcancel", { n: song.n, dur_ms: c ? Date.now() - c.t0 : null, drift_max: c ? Math.round(c.maxDrift) : null });
+      tel("touchcancel", { n: track.n, dur_ms: c ? Date.now() - c.t0 : null, drift_max: c ? Math.round(c.maxDrift) : null });
     }
     if (candidates.size === 0) btn.classList.remove("pressing");
   }, { passive: true });
 
-  // Desktop fallback (mouse clicks).
   btn.addEventListener("click", e => {
     if ("ontouchstart" in window) return;
     if (e.detail === 0) return;
-    tel("click", { n: song.n });
-    play(song, btn);
+    tel("click", { n: track.n });
+    play(track, btn);
   });
 }
 
 function build() {
-  songs.forEach((s) => {
+  TRACKS.forEach(track => {
     const btn = document.createElement("button");
     btn.className = "tile";
-    const key = String(s.n).padStart(2, "0");
-    btn.setAttribute("aria-label", `${s.n}. ${s.title}`);
-    btn.innerHTML = `<img src="icons/${key}.jpg" alt=""><div class="num">${s.n}</div>`;
-    attachTileHandlers(btn, s);
+    btn.setAttribute("aria-label", `${track.n}. ${track.title}`);
+    btn.innerHTML = `<img src="${encodeURI(track.icon)}" alt=""><div class="num">${track.n}</div>`;
+    attachTileHandlers(btn, track);
     grid.appendChild(btn);
   });
 }
 
-fetch("popularity.json").then(r => r.ok ? r.json() : {}).catch(() => ({}))
-  .then((pop) => {
-    seedOrder = Array.isArray(pop?.seed) ? pop.seed : [];
-    build();
-  });
+// Home button → navigate to parent (configured per-grid)
+document.getElementById("homebtn").addEventListener("click", () => {
+  stop();
+  window.location = PARENT_HREF;
+});
 
-document.getElementById("stopbtn").addEventListener("click", stop);
+build();
 </script>
 </body>
 </html>
