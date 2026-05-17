@@ -5,8 +5,8 @@
   "parent_href": "/",
   "app_version": "rhymes-v2",
   "storage_prefix": "rhymes",
-  "cache_name": "rhymes-v10",
-  "mp3_cache_name": "rhymes-mp3-v10",
+  "cache_name": "rhymes-v11",
+  "mp3_cache_name": "rhymes-mp3-v11",
   "manifest_name": "Rhymes",
   "seed_order": [1, 6, 2, 7, 4],
   "tracks": [
@@ -19,6 +19,13 @@
     {"n":  7, "title": "Jack and Jill",                              "audio": "audio/07.mp3", "icon": "icons/07.jpg"},
     {"n":  8, "title": "Little Bo-Peep",                             "audio": "audio/08.mp3", "icon": "icons/08.jpg"},
     {"n":  9, "title": "There Was an Old Woman Who Lived in a Shoe", "audio": "audio/09.mp3", "icon": "icons/09.jpg"},
-    {"n": 10, "title": "This Little Piggy",                          "audio": "audio/10.mp3", "icon": "icons/10.jpg"}
+    {"n": 10, "title": "This Little Piggy",                          "audio": "audio/10.mp3", "icon": "icons/10.jpg"},
+    {"n": 11, "title": "Vroom Vroom",                                "audio": "audio/11.mp3", "icon": "icons/11.jpg"},
+    {"n": 12, "title": "I Love My Garbage Truck",                    "audio": "audio/12.mp3", "icon": "icons/12.jpg"},
+    {"n": 13, "title": "Driving In My Car",                          "audio": "audio/13.mp3", "icon": "icons/13.jpg"},
+    {"n": 14, "title": "Here Comes The Firetruck",                   "audio": "audio/14.mp3", "icon": "icons/14.jpg"},
+    {"n": 15, "title": "Baby Shark",                                 "audio": "audio/15.mp3", "icon": "icons/15.jpg"},
+    {"n": 16, "title": "One Little Finger",                          "audio": "audio/16.mp3", "icon": "icons/16.jpg"},
+    {"n": 17, "title": "The Wheels On The Bus",                      "audio": "audio/17.mp3", "icon": "icons/17.jpg"}
   ]
 }
