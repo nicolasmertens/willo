@@ -1,8 +1,8 @@
 {
   "title": "Rhymes",
   "lang": "en",
-  "parent_photo": "/home/klas.jpg",
-  "parent_href": "/",
+  "parent_photo": "/liedjes/home/klas.jpg",
+  "parent_href": "/liedjes/",
   "app_version": "rhymes-v2",
   "storage_prefix": "rhymes",
   "cache_name": "rhymes-v11",

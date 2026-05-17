@@ -27,9 +27,9 @@ GRIDS = {
 
 # Landing pages = 3-category tile pages per language.
 LANDINGS = {
-    "mama": {"out_dir": "mama", "lang": "fr", "photo": "/home/mama.jpg", "title_fallback": "Mama"},
-    "papa": {"out_dir": "papa", "lang": "nl", "photo": "/home/papa.jpg", "title_fallback": "Papa"},
-    "klas": {"out_dir": "klas", "lang": "en", "photo": "/home/klas.jpg", "title_fallback": "Klas"},
+    "mama": {"out_dir": "mama", "lang": "fr", "photo": "/liedjes/home/mama.jpg", "title_fallback": "Mama"},
+    "papa": {"out_dir": "papa", "lang": "nl", "photo": "/liedjes/home/papa.jpg", "title_fallback": "Papa"},
+    "klas": {"out_dir": "klas", "lang": "en", "photo": "/liedjes/home/klas.jpg", "title_fallback": "Klas"},
 }
 
 
@@ -48,7 +48,7 @@ def render_grid(name, config):
         .replace("__GRID_TITLE__",     spec["title"])
         .replace("__HTML_LANG__",      spec["lang"])
         .replace("__PARENT_PHOTO__",   spec["parent_photo"])
-        .replace("__PARENT_HREF__",    spec.get("parent_href", "/"))
+        .replace("__PARENT_HREF__",    spec.get("parent_href", "/liedjes/"))
         .replace("__APP_VERSION__",    spec["app_version"])
         .replace("__STORAGE_PREFIX__", spec["storage_prefix"])
         .replace("__TRACKS_JSON__",    json.dumps(spec["tracks"], ensure_ascii=False))
