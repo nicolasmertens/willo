@@ -2,7 +2,7 @@
   "title": "Rhymes",
   "lang": "en",
   "parent_photo": "/liedjes/home/klas.jpg",
-  "parent_href": "/liedjes/klas/boeken/",
+  "parent_href": "/liedjes/klas/",
   "app_version": "rhymes-v2",
   "storage_prefix": "rhymes",
   "cache_name": "rhymes-v13",

@@ -10,12 +10,12 @@
   "manifest_name": "Klas Liedjes",
   "seed_order": [1, 7, 5, 6, 2],
   "tracks": [
-    {"n": 1, "title": "Vroom Vroom",              "audio": "audio/01.mp3", "icon": "icons/01.jpg"},
-    {"n": 2, "title": "I Love My Garbage Truck",  "audio": "audio/02.mp3", "icon": "icons/02.jpg"},
-    {"n": 3, "title": "Driving In My Car",        "audio": "audio/03.mp3", "icon": "icons/03.jpg"},
-    {"n": 4, "title": "Here Comes The Firetruck", "audio": "audio/04.mp3", "icon": "icons/04.jpg"},
-    {"n": 5, "title": "Baby Shark",               "audio": "audio/05.mp3", "icon": "icons/05.jpg"},
-    {"n": 6, "title": "One Little Finger",        "audio": "audio/06.mp3", "icon": "icons/06.jpg"},
-    {"n": 7, "title": "The Wheels On The Bus",    "audio": "audio/07.mp3", "icon": "icons/07.jpg"}
+    {"n": 1, "title": "Vroom Vroom",              "audio": "liedjes/audio/01.mp3", "icon": "liedjes/icons/01.jpg"},
+    {"n": 2, "title": "I Love My Garbage Truck",  "audio": "liedjes/audio/02.mp3", "icon": "liedjes/icons/02.jpg"},
+    {"n": 3, "title": "Driving In My Car",        "audio": "liedjes/audio/03.mp3", "icon": "liedjes/icons/03.jpg"},
+    {"n": 4, "title": "Here Comes The Firetruck", "audio": "liedjes/audio/04.mp3", "icon": "liedjes/icons/04.jpg"},
+    {"n": 5, "title": "Baby Shark",               "audio": "liedjes/audio/05.mp3", "icon": "liedjes/icons/05.jpg"},
+    {"n": 6, "title": "One Little Finger",        "audio": "liedjes/audio/06.mp3", "icon": "liedjes/icons/06.jpg"},
+    {"n": 7, "title": "The Wheels On The Bus",    "audio": "liedjes/audio/07.mp3", "icon": "liedjes/icons/07.jpg"}
   ]
 }

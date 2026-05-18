@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Render grid + landing pages from templates/ + tracks/.
+"""Render grid + taal pages from templates/ + tracks/.
 
 Usage:
   python render.py                # render everything
-  python render.py rhymes papa-liedjes  # render named grids only
+  python render.py rhymes klas    # render named grids/talen only
 """
 
 import json
@@ -12,25 +12,53 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 
-# Grid pages = anything that lists tracks/songs/stories with tile playback.
-# Each entry: tracks/<name>.json must define its own metadata + tracks array.
-# out_dir is the relative path under repo root where files are written.
+# Grid pages = standalone playback grids (rhymes, eendjes).
 GRIDS = {
-    "rhymes":         {"tracks": "tracks/rhymes.json",         "out_dir": "rhymes"},
-    "eendjes":        {"tracks": "tracks/eendjes.json",        "out_dir": "eendjes"},
-    "papa-liedjes":   {"tracks": "tracks/papa-liedjes.json",   "out_dir": "papa/liedjes"},
-    "papa-verhalen":  {"tracks": "tracks/papa-verhalen.json",  "out_dir": "papa/verhalen"},
-    "mama-liedjes":   {"tracks": "tracks/mama-liedjes.json",   "out_dir": "mama/liedjes"},
-    "mama-verhalen":  {"tracks": "tracks/mama-verhalen.json",  "out_dir": "mama/verhalen"},
-    "klas-liedjes":   {"tracks": "tracks/klas-liedjes.json",   "out_dir": "klas/liedjes"},
-    "klas-verhalen":  {"tracks": "tracks/klas-verhalen.json",  "out_dir": "klas/verhalen"},
+    "rhymes":  {"tracks": "tracks/rhymes.json",  "out_dir": "rhymes"},
+    "eendjes": {"tracks": "tracks/eendjes.json",  "out_dir": "eendjes"},
 }
 
-# Landing pages = 3-category tile pages per language.
-LANDINGS = {
-    "mama": {"out_dir": "mama", "lang": "fr", "photo": "/liedjes/home/mama.jpg", "title_fallback": "Mama"},
-    "papa": {"out_dir": "papa", "lang": "nl", "photo": "/liedjes/home/papa.jpg", "title_fallback": "Papa"},
-    "klas": {"out_dir": "klas", "lang": "en", "photo": "/liedjes/home/klas.jpg", "title_fallback": "Klas"},
+# Taal pages = single multi-section pages (boeken / liedjes / verhalen stacked).
+TALEN = {
+    "mama": {
+        "out_dir": "mama",
+        "lang": "fr",
+        "parent_photo": "/liedjes/home/mama.jpg",
+        "parent_href": "/liedjes/",
+        "title_fallback": "Mama",
+        "app_version": "mama-v1",
+        "storage_prefix": "mama",
+        "cache_name": "mama-v1",
+        "mp3_cache_name": "mama-mp3-v1",
+        "manifest_name": "Mama",
+        "sections": ["boeken", "liedjes", "verhalen"],
+    },
+    "papa": {
+        "out_dir": "papa",
+        "lang": "nl",
+        "parent_photo": "/liedjes/home/papa.jpg",
+        "parent_href": "/liedjes/",
+        "title_fallback": "Papa",
+        "app_version": "papa-v1",
+        "storage_prefix": "papa",
+        "cache_name": "papa-v1",
+        "mp3_cache_name": "papa-mp3-v1",
+        "manifest_name": "Papa",
+        "sections": ["boeken", "liedjes", "verhalen"],
+    },
+    "klas": {
+        "out_dir": "klas",
+        "lang": "en",
+        "parent_photo": "/liedjes/home/klas.jpg",
+        "parent_href": "/liedjes/",
+        "title_fallback": "Klas",
+        "app_version": "klas-v1",
+        "storage_prefix": "klas",
+        "cache_name": "klas-v1",
+        "mp3_cache_name": "klas-mp3-v1",
+        "manifest_name": "Klas",
+        "sections": ["boeken", "liedjes", "verhalen"],
+    },
 }
 
 
@@ -92,19 +120,72 @@ def render_grid(name, config):
     print(f"[ok]  {name} → {config['out_dir']}/  ({len(spec['tracks'])} tracks)")
 
 
-def render_landing(name, config):
-    template = (ROOT / "templates/landing.html").read_text()
+def render_taal(name, config):
+    template = (ROOT / "templates/taal.html").read_text()
     out_dir = ROOT / config["out_dir"]
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    # Collect tracks from all sections, tagged with _section
+    all_tracks = []
+    for section in config["sections"]:
+        path = ROOT / f"tracks/{name}-{section}.json"
+        if not path.exists():
+            continue
+        data = json.loads(path.read_text())
+        for t in data.get("tracks", []):
+            t["_section"] = section
+            all_tracks.append(t)
+
+    # Seed order: first 5 tracks across all sections (audio tiles only)
+    audio_keys = [f"{t['_section']}:{t['n']}" for t in all_tracks if t.get("audio")][:5]
+
     html = (template
-        .replace("__HTML_LANG__",      config["lang"])
-        .replace("__PARENT_PHOTO__",   config["photo"])
-        .replace("__TITLE_FALLBACK__", config["title_fallback"])
-        .replace("__LANG_PATH__",      name)
+        .replace("__HTML_LANG__",       config["lang"])
+        .replace("__PARENT_PHOTO__",    config["parent_photo"])
+        .replace("__PARENT_HREF__",     config["parent_href"])
+        .replace("__TITLE_FALLBACK__",  config["title_fallback"])
+        .replace("__APP_VERSION__",     config["app_version"])
+        .replace("__STORAGE_PREFIX__",  config["storage_prefix"])
+        .replace("__ALL_TRACKS_JSON__", json.dumps(all_tracks, ensure_ascii=False))
+        .replace("__SEED_ORDER__",      json.dumps(audio_keys))
     )
     (out_dir / "index.html").write_text(html, encoding="utf-8")
-    print(f"[ok]  landing {name} → {config['out_dir']}/")
+
+    # Service worker (reuse existing template)
+    sw_template = (ROOT / "templates/service-worker.js").read_text()
+    sw = (sw_template
+        .replace("__CACHE_NAME__",     config["cache_name"])
+        .replace("__MP3_CACHE_NAME__", config["mp3_cache_name"])
+    )
+    (out_dir / "service-worker.js").write_text(sw, encoding="utf-8")
+
+    # popularity.json (seed = audio_keys joined as "section:n" strings)
+    (out_dir / "popularity.json").write_text(
+        json.dumps({"seed": audio_keys, "note": f"Generated by render.py for taal {name}"}, indent=2),
+        encoding="utf-8",
+    )
+
+    # manifest.json
+    manifest = {
+        "name": config["manifest_name"],
+        "short_name": config["manifest_name"],
+        "start_url": "./",
+        "display": "standalone",
+        "background_color": "#fff7e6",
+        "theme_color": "#fff7e6",
+        "icons": [
+            {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
+            {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+        ],
+    }
+    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+
+    non_empty = len([
+        s for s in config["sections"]
+        if (ROOT / f"tracks/{name}-{s}.json").exists()
+        and json.loads((ROOT / f"tracks/{name}-{s}.json").read_text()).get("tracks")
+    ])
+    print(f"[ok]  taal {name} → {config['out_dir']}/  ({len(all_tracks)} tracks across {non_empty} non-empty sections)")
 
 
 def main():
@@ -112,9 +193,9 @@ def main():
     for name, cfg in GRIDS.items():
         if not selected or name in selected:
             render_grid(name, cfg)
-    for name, cfg in LANDINGS.items():
+    for name, cfg in TALEN.items():
         if not selected or name in selected:
-            render_landing(name, cfg)
+            render_taal(name, cfg)
 
 
 if __name__ == "__main__":
