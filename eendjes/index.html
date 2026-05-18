@@ -188,9 +188,15 @@
     appearance: none;
   }
   #dbgtoggle:active { color: rgba(0,0,0,0.45); }
+  .home-btn { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: 64px; height: 64px; border-radius: 50%; border: 3px solid #fff; overflow: hidden; padding: 0; cursor: pointer; background: #fff7e6; box-shadow: 0 2px 8px rgba(0,0,0,0.18); z-index: 100; }
+  .home-btn:active { transform: scale(0.92); }
+  .home-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
 </style>
 </head>
 <body>
+  <button class="home-btn" onclick="window.location='/liedjes/papa/boeken/'" aria-label="terug">
+    <img src="/liedjes/home/papa.jpg" alt="">
+  </button>
   <main class="grid" id="grid"></main>
   <div class="stopbar" id="stopbar"><button class="stopbtn" id="stopbtn">Stop</button></div>
   <pre id="debug" hidden></pre>
