@@ -5,8 +5,8 @@
   "parent_href": "/liedjes/",
   "app_version": "rhymes-v2",
   "storage_prefix": "rhymes",
-  "cache_name": "rhymes-v11",
-  "mp3_cache_name": "rhymes-mp3-v11",
+  "cache_name": "rhymes-v12",
+  "mp3_cache_name": "rhymes-mp3-v12",
   "manifest_name": "Rhymes",
   "seed_order": [1, 6, 2, 7, 4],
   "tracks": [
