@@ -22,6 +22,7 @@ GRIDS = {
     "papa-verhalen":  {"tracks": "tracks/papa-verhalen.json",  "out_dir": "papa/verhalen"},
     "mama-liedjes":   {"tracks": "tracks/mama-liedjes.json",   "out_dir": "mama/liedjes"},
     "mama-verhalen":  {"tracks": "tracks/mama-verhalen.json",  "out_dir": "mama/verhalen"},
+    "klas-liedjes":   {"tracks": "tracks/klas-liedjes.json",   "out_dir": "klas/liedjes"},
     "klas-verhalen":  {"tracks": "tracks/klas-verhalen.json",  "out_dir": "klas/verhalen"},
 }
 

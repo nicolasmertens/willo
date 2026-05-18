@@ -1,0 +1,21 @@
+{
+  "title": "Liedjes",
+  "lang": "en",
+  "parent_photo": "/liedjes/home/klas.jpg",
+  "parent_href": "/liedjes/klas/",
+  "app_version": "klas-liedjes-v1",
+  "storage_prefix": "klas_liedjes",
+  "cache_name": "klas-liedjes-v1",
+  "mp3_cache_name": "klas-liedjes-mp3-v1",
+  "manifest_name": "Klas Liedjes",
+  "seed_order": [1, 7, 5, 6, 2],
+  "tracks": [
+    {"n": 1, "title": "Vroom Vroom",              "audio": "audio/01.mp3", "icon": "icons/01.jpg"},
+    {"n": 2, "title": "I Love My Garbage Truck",  "audio": "audio/02.mp3", "icon": "icons/02.jpg"},
+    {"n": 3, "title": "Driving In My Car",        "audio": "audio/03.mp3", "icon": "icons/03.jpg"},
+    {"n": 4, "title": "Here Comes The Firetruck", "audio": "audio/04.mp3", "icon": "icons/04.jpg"},
+    {"n": 5, "title": "Baby Shark",               "audio": "audio/05.mp3", "icon": "icons/05.jpg"},
+    {"n": 6, "title": "One Little Finger",        "audio": "audio/06.mp3", "icon": "icons/06.jpg"},
+    {"n": 7, "title": "The Wheels On The Bus",    "audio": "audio/07.mp3", "icon": "icons/07.jpg"}
+  ]
+}
