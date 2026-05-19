@@ -18,6 +18,13 @@ GRIDS = {
     "eendjes": {"tracks": "tracks/eendjes.json",  "out_dir": "eendjes"},
 }
 
+# Section header labels per language.
+SECTION_LABELS = {
+    "nl": {"boeken": "Boeken", "liedjes": "Liedjes", "verhalen": "Verhalen"},
+    "fr": {"boeken": "Livres", "liedjes": "Chansons", "verhalen": "Histoires"},
+    "en": {"boeken": "Books",  "liedjes": "Songs",    "verhalen": "Stories"},
+}
+
 # Taal pages = single multi-section pages (boeken / liedjes / verhalen stacked).
 TALEN = {
     "mama": {
@@ -139,6 +146,7 @@ def render_taal(name, config):
     # Seed order: first 5 tracks across all sections (audio tiles only)
     audio_keys = [f"{t['_section']}:{t['n']}" for t in all_tracks if t.get("audio")][:5]
 
+    labels = SECTION_LABELS.get(config["lang"], SECTION_LABELS["nl"])
     html = (template
         .replace("__HTML_LANG__",       config["lang"])
         .replace("__PARENT_PHOTO__",    config["parent_photo"])
@@ -146,6 +154,9 @@ def render_taal(name, config):
         .replace("__TITLE_FALLBACK__",  config["title_fallback"])
         .replace("__APP_VERSION__",     config["app_version"])
         .replace("__STORAGE_PREFIX__",  config["storage_prefix"])
+        .replace("__LABEL_BOEKEN__",    labels["boeken"])
+        .replace("__LABEL_LIEDJES__",   labels["liedjes"])
+        .replace("__LABEL_VERHALEN__",  labels["verhalen"])
         .replace("__ALL_TRACKS_JSON__", json.dumps(all_tracks, ensure_ascii=False))
         .replace("__SEED_ORDER__",      json.dumps(audio_keys))
     )
