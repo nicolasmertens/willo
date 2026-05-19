@@ -38,25 +38,50 @@
   .tile .label { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 14px 12px; background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0)); color: #fff; font-weight: 800; font-size: clamp(15px, 2vw, 19px); text-shadow: 0 2px 6px rgba(0,0,0,0.5); letter-spacing: -0.01em; }
   .tile.pressing { transform: scale(0.94); filter: brightness(1.12); }
 
-  /* --- Foto-cirkel-hoek-knop (rechtsboven) --- */
-  .home-btn { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: 64px; height: 64px; border-radius: 50%; border: 3px solid #fff; overflow: hidden; padding: 0; cursor: pointer; background: #fff7e6; box-shadow: 0 2px 8px rgba(0,0,0,0.18); z-index: 100; }
-  .home-btn:active { transform: scale(0.92); }
-  .home-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .home-btn .fallback { display: none; width: 100%; height: 100%; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; color: #2b2b2b; }
-  .home-btn img.missing + .fallback { display: flex; }
+  /* --- Bottom navigation banner --- */
+  :root { --bar-h: 92px; --bar-pad: 10px; --bar-gap: 8px; }
+  body { padding-bottom: calc(var(--bar-h) + var(--bar-pad) * 2 + max(8px, env(safe-area-inset-bottom))); }
 
-  /* --- Full-screen still playback overlay --- */
-  .player { position: fixed; inset: 0; background: #000; display: none; z-index: 50; cursor: pointer; }
+  .bottombar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+    padding: var(--bar-pad) var(--bar-pad) max(var(--bar-pad), env(safe-area-inset-bottom)) var(--bar-pad);
+    background: rgba(255, 247, 230, 0.96);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.10);
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: var(--bar-gap);
+  }
+  .bottombar > button {
+    height: var(--bar-h); padding: 0; border-radius: 18px; border: 3px solid #fff;
+    background: #fff; overflow: hidden; cursor: pointer; font-family: inherit;
+    position: relative;
+  }
+  .bottombar .navtile img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+  .bottombar .navtile.active { border-color: #ff7043; box-shadow: 0 0 0 3px rgba(255,112,67,0.25); }
+  .bottombar .stopbtn { background: #e53935; border-color: #fff; display: flex; align-items: center; justify-content: center; }
+  .bottombar .stopbtn svg { width: 56%; height: 56%; fill: #fff; pointer-events: none; }
+  .bottombar > button.pressing { transform: scale(0.94); filter: brightness(1.12); }
+
+  /* --- Playing-mode lockdown: nav-tiles dimmed, stop pulses --- */
+  body.playing .bottombar { background: rgba(0,0,0,0.85); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+  body.playing .bottombar .navtile { opacity: 0.18; filter: grayscale(1); pointer-events: none; transition: opacity .2s, filter .2s; }
+  body.playing .bottombar .stopbtn { animation: stoppulse 1.2s ease-in-out infinite; }
+  @keyframes stoppulse {
+    0%   { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7); transform: scale(1.0); }
+    50%  { box-shadow: 0 0 0 22px rgba(229, 57, 53, 0); transform: scale(1.05); }
+    100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); transform: scale(1.0); }
+  }
+
+  /* --- Full-screen still playback overlay (sits above grid, BELOW bottombar) --- */
+  .player {
+    position: fixed; left: 0; right: 0; top: 0;
+    bottom: calc(var(--bar-h) + var(--bar-pad) * 2 + max(8px, env(safe-area-inset-bottom)));
+    background: #000; display: none; z-index: 50;
+  }
   .player.visible { display: block; }
-  .player img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .player img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
 </style>
 </head>
-<body>
-  <button class="home-btn" id="homebtn" aria-label="terug naar home">
-    <img src="/liedjes/home/klas.jpg" alt="" onerror="this.classList.add('missing')">
-    <div class="fallback">Klas</div>
-  </button>
-
+<body data-page="klas">
   <section class="taal-section boeken" data-section="boeken">
     <h2>Boeken</h2>
     <div class="grid" data-grid="boeken"></div>
@@ -71,6 +96,13 @@
   </section>
 
   <div class="player" id="player"><img id="player-img" alt=""></div>
+
+  <nav class="bottombar" id="bottombar" aria-label="navigatie">
+    <button class="navtile" id="nav-mama" data-href="/liedjes/mama/" data-nav="mama" aria-label="mama"><img src="/liedjes/home/mama.jpg" alt=""></button>
+    <button class="navtile" id="nav-papa" data-href="/liedjes/papa/" data-nav="papa" aria-label="papa"><img src="/liedjes/home/papa.jpg" alt=""></button>
+    <button class="navtile" id="nav-klas" data-href="/liedjes/klas/" data-nav="klas" aria-label="klas"><img src="/liedjes/home/klas.jpg" alt=""></button>
+    <button class="stopbtn" id="stopbtn" aria-label="stop"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
+  </nav>
 
 <script>
 // --- Service worker ---
@@ -187,9 +219,10 @@ async function schedulePrefetch() {
 const player = document.getElementById("player");
 const playerImg = document.getElementById("player-img");
 
-function showPlayer(track) { playerImg.src = encodeURI(track.icon); player.classList.add("visible"); document.querySelectorAll('section.taal-section').forEach(s => s.classList.add('dim')); }
-function hidePlayer() { player.classList.remove("visible"); document.querySelectorAll('section.taal-section').forEach(s => s.classList.remove('dim')); playerImg.src = ""; }
+function showPlayer(track) { playerImg.src = encodeURI(track.icon); player.classList.add("visible"); document.body.classList.add("playing"); document.querySelectorAll('section.taal-section').forEach(s => s.classList.add('dim')); }
+function hidePlayer() { player.classList.remove("visible"); document.body.classList.remove("playing"); document.querySelectorAll('section.taal-section').forEach(s => s.classList.remove('dim')); playerImg.src = ""; }
 
+let isPlaying = false;
 let currentSongKey = null;
 let lastProgressLog = 0;
 
@@ -205,24 +238,30 @@ function stop() {
   emitPlayEnd("stop");
   audio.pause(); audio.currentTime = 0;
   currentTrack = null; currentTile = null;
+  isPlaying = false;
   hidePlayer();
 }
 
 function play(track, tile) {
-  if (currentTrack === track) { stop(); return; }
+  // No toggle: re-tap on same tile during play is ignored (player overlay covers tiles anyway).
+  if (isPlaying) return;
   emitPlayEnd("replaced");
   audio.src = encodeURI(track.audio);
+  isPlaying = true;  // optimistic — covers the load window between tap and audio.play resolving
+  document.body.classList.add("playing");
   audio.play().then(() => {
     currentTile = tile; currentTrack = track; currentSongKey = trackKey(track);
     showPlayer(track); recordPlay(track);
     tel("play_start", { k: currentSongKey });
   }).catch((err) => {
+    isPlaying = false;
+    document.body.classList.remove("playing");
     hidePlayer();
     tel("play_fail", { k: trackKey(track), err: String(err && err.message || err).slice(0, 120) });
   });
 }
 
-audio.addEventListener("ended", () => { emitPlayEnd("ended"); hidePlayer(); currentTrack = null; });
+audio.addEventListener("ended", () => { emitPlayEnd("ended"); isPlaying = false; hidePlayer(); currentTrack = null; });
 audio.addEventListener("timeupdate", () => {
   const now = Date.now();
   if (now - lastProgressLog < 2000 || currentSongKey == null) return;
@@ -231,19 +270,25 @@ audio.addEventListener("timeupdate", () => {
   tel("play_progress", { k: currentSongKey, elapsed_ms: Math.round(cur * 1000), duration_ms: Math.round(dur * 1000), pct: dur > 0 ? +(cur / dur).toFixed(3) : 0 });
 });
 
-player.addEventListener("click", stop, { passive: true });
-player.addEventListener("touchend", e => { e.preventDefault(); stop(); }, { passive: false });
+// Player overlay has NO tap handler — tapping the song image does nothing.
+// The only way to stop a playing song is the red stop button in the bottombar.
 
 // --- Tile tap detection (same thresholds as rhymes/) ---
 const MIN_TAP_MS = 65;
 const MAX_TAP_MS = 1500;
 const MAX_TAP_DRIFT_PX = 50;
+const PALM_RADIUS_PX = 60;  // touches above this radius are treated as palm and ignored
 
 function attachTileHandlers(btn, track) {
   const candidates = new Map();
   btn.addEventListener("touchstart", e => {
+    if (isPlaying) return;  // grid is locked while a song plays
     for (const t of e.changedTouches) {
       const r0 = Math.max(t.radiusX || 0, t.radiusY || 0);
+      if (r0 > PALM_RADIUS_PX) {
+        tel("palm_reject", { where: "tile", k: trackKey(track), r: Math.round(r0), x: Math.round(t.clientX), y: Math.round(t.clientY) });
+        continue;
+      }
       candidates.set(t.identifier, { t0: Date.now(), x0: t.clientX, y0: t.clientY, r0, maxDrift: 0, drifted: false });
       btn.classList.add("pressing");
       tel("touchstart", { k: trackKey(track), x: Math.round(t.clientX), y: Math.round(t.clientY), r: Math.round(r0), touches: e.touches.length });
@@ -294,9 +339,85 @@ function attachTileHandlers(btn, track) {
   btn.addEventListener("click", e => {
     if ("ontouchstart" in window) return;
     if (e.detail === 0) return;
+    if (isPlaying) return;
     tel("click", { k: trackKey(track) });
     if (track.href) window.location = track.href;
     else if (track.audio) play(track, btn);
+  });
+}
+
+// --- Bottom-bar handlers (nav + stop) ---
+function attachBarButton(btn, opts) {
+  // opts: { kind: "nav" | "stop", href, label, lockable }
+  const candidates = new Map();
+  btn.addEventListener("touchstart", e => {
+    if (opts.lockable && isPlaying) return;  // nav locked during play
+    for (const t of e.changedTouches) {
+      const r0 = Math.max(t.radiusX || 0, t.radiusY || 0);
+      if (r0 > PALM_RADIUS_PX) {
+        tel("palm_reject", { where: opts.kind, label: opts.label, r: Math.round(r0) });
+        continue;
+      }
+      candidates.set(t.identifier, { t0: Date.now(), x0: t.clientX, y0: t.clientY, drifted: false, r0 });
+      btn.classList.add("pressing");
+      tel("bar_touchstart", { kind: opts.kind, label: opts.label, r: Math.round(r0) });
+    }
+  }, { passive: true });
+  btn.addEventListener("touchmove", e => {
+    for (const t of e.changedTouches) {
+      const c = candidates.get(t.identifier);
+      if (!c) continue;
+      const d = Math.hypot(t.clientX - c.x0, t.clientY - c.y0);
+      if (d > MAX_TAP_DRIFT_PX) c.drifted = true;
+    }
+  }, { passive: true });
+  btn.addEventListener("touchend", e => {
+    for (const t of e.changedTouches) {
+      const c = candidates.get(t.identifier);
+      candidates.delete(t.identifier);
+      if (candidates.size === 0) btn.classList.remove("pressing");
+      if (!c) continue;
+      const dur = Date.now() - c.t0;
+      const r = Math.max(t.radiusX || 0, t.radiusY || 0);
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const onBtn = el === btn || btn.contains(el);
+      let decision;
+      if (c.drifted)              decision = "drifted";
+      else if (!onBtn)            decision = "off_tile";
+      else if (dur < MIN_TAP_MS)  decision = "too_short";
+      else if (dur > MAX_TAP_MS)  decision = "too_long";
+      else                        decision = "fire";
+      tel("bar_touchend", { kind: opts.kind, label: opts.label, dur_ms: dur, r_start: Math.round(c.r0), r_end: Math.round(r), on_btn: onBtn, decision });
+      if (decision === "fire") {
+        e.preventDefault();
+        if (opts.kind === "stop") {
+          if (isPlaying) { stop(); }
+          else { window.location = PARENT_HREF; }
+        } else if (opts.kind === "nav" && opts.href) {
+          if (isPlaying) return;  // double-safety
+          window.location = opts.href;
+        }
+        return;
+      }
+    }
+  }, { passive: false });
+  btn.addEventListener("touchcancel", e => {
+    for (const t of e.changedTouches) {
+      candidates.delete(t.identifier);
+    }
+    if (candidates.size === 0) btn.classList.remove("pressing");
+  }, { passive: true });
+  btn.addEventListener("click", e => {
+    if ("ontouchstart" in window) return;
+    if (e.detail === 0) return;
+    if (opts.lockable && isPlaying) return;
+    tel("bar_click", { kind: opts.kind, label: opts.label });
+    if (opts.kind === "stop") {
+      if (isPlaying) { stop(); }
+      else { window.location = PARENT_HREF; }
+    } else if (opts.kind === "nav" && opts.href) {
+      window.location = opts.href;
+    }
   });
 }
 
@@ -322,7 +443,15 @@ function build() {
   }
 }
 
-document.getElementById("homebtn").addEventListener("click", () => { stop(); window.location = PARENT_HREF; });
+// Wire bottom-bar buttons
+const PAGE = document.body.dataset.page;  // "mama" | "papa" | "klas"
+["mama", "papa", "klas"].forEach(name => {
+  const btn = document.getElementById("nav-" + name);
+  if (!btn) return;
+  if (name === PAGE) btn.classList.add("active");
+  attachBarButton(btn, { kind: "nav", href: btn.dataset.href, label: name, lockable: true });
+});
+attachBarButton(document.getElementById("stopbtn"), { kind: "stop", label: "stop", lockable: false });
 
 build();
 </script>
