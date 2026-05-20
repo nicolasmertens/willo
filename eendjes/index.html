@@ -6,231 +6,97 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Liedjes">
+<meta name="apple-mobile-web-app-title" content="Alle Eendjes">
 <meta name="theme-color" content="#fff7e6">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link rel="manifest" href="manifest.json">
-<title>Liedjes</title>
+<title>Alle Eendjes</title>
 <style>
-  * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    user-select: none;
-    -webkit-user-select: none;
-    touch-action: pan-y;          /* allow vertical scroll, block pinch */
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
+  html, body { margin: 0; padding: 0; background: #fff7e6; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Avenir Next", system-ui, sans-serif; overscroll-behavior: none; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+  body { min-height: 100vh; min-height: 100dvh; padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); max-width: 1200px; margin: 0 auto; }
+
+  /* --- Grid --- */
+  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; max-width: 1200px; margin: 0 auto; transition: opacity .2s ease; }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 760px; } }
+  .grid.dim { opacity: 0; pointer-events: none; }
+  .tile { aspect-ratio: 1 / 1; border: 4px solid transparent; border-radius: 26px; padding: 0; background: #fff; cursor: pointer; overflow: hidden; position: relative; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); transition: transform .08s ease, box-shadow .08s ease; font-family: inherit; }
+  .tile:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08); }
+  .tile img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+  .tile .num { position: absolute; top: 8px; left: 14px; font-size: clamp(28px, 4vw, 40px); font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.7), 0 0 3px rgba(0,0,0,0.9); letter-spacing: -0.02em; pointer-events: none; }
+  .tile.pressing { transform: scale(0.94); filter: brightness(1.12); }
+
+  /* --- Bottom navigation banner (matches taal pages) --- */
+  :root { --bar-h: 92px; --bar-pad: 10px; --bar-gap: 8px; }
+  body { padding-bottom: calc(var(--bar-h) + var(--bar-pad) * 2 + max(8px, env(safe-area-inset-bottom))); }
+
+  .bottombar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
+    padding: var(--bar-pad) var(--bar-pad) max(var(--bar-pad), env(safe-area-inset-bottom)) var(--bar-pad);
+    background: rgba(255, 247, 230, 0.96);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.10);
+    display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: var(--bar-gap);
   }
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: #fff7e6;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Avenir Next", system-ui, sans-serif;
-    overscroll-behavior: none;
-    overflow-x: hidden;
-    -webkit-text-size-adjust: 100%;
-  }
-  body {
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: 16px;
-    padding-top: max(16px, env(safe-area-inset-top));
-    padding-bottom: max(16px, env(safe-area-inset-bottom));
-  }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 14px;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-  @media (max-width: 820px) { .grid { grid-template-columns: repeat(4, 1fr); } }
-  @media (max-width: 560px) { .grid { grid-template-columns: repeat(3, 1fr); gap: 10px; } }
-  .tile {
-    aspect-ratio: 1 / 1;
-    border: 4px solid transparent;
-    border-radius: 22px;
-    padding: 0;
-    background: #fff;
-    cursor: pointer;
-    overflow: hidden;
+  .bottombar > button {
+    height: var(--bar-h); padding: 0; border-radius: 18px; border: 3px solid #fff;
+    background: #fff; overflow: hidden; cursor: pointer; font-family: inherit;
     position: relative;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08);
-    transition: transform .08s ease, box-shadow .08s ease, border-color .15s ease;
-    font-family: inherit;
   }
-  .tile:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08);
+  .bottombar .navtile img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+  .bottombar .navtile.active { border-color: #ff7043; box-shadow: 0 0 0 3px rgba(255,112,67,0.25); }
+  .bottombar .stopbtn { background: #e53935; border-color: #fff; display: flex; align-items: center; justify-content: center; }
+  .bottombar .stopbtn svg { width: 56%; height: 56%; fill: #fff; pointer-events: none; }
+  .bottombar > button.pressing { transform: scale(0.94); filter: brightness(1.12); }
+
+  /* --- Playing-mode lockdown: nav-tiles dimmed, stop pulses --- */
+  body.playing .bottombar { background: rgba(0,0,0,0.85); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+  body.playing .bottombar .navtile { opacity: 0.18; filter: grayscale(1); pointer-events: none; transition: opacity .2s, filter .2s; }
+  body.playing .bottombar .stopbtn { animation: stoppulse 1.2s ease-in-out infinite; }
+  @keyframes stoppulse {
+    0%   { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7); transform: scale(1.0); }
+    50%  { box-shadow: 0 0 0 22px rgba(229, 57, 53, 0); transform: scale(1.05); }
+    100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); transform: scale(1.0); }
   }
-  .tile img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    pointer-events: none;
+
+  /* --- Full-screen still playback overlay (sits above grid, BELOW bottombar) --- */
+  .player {
+    position: fixed; left: 0; right: 0; top: 0;
+    bottom: calc(var(--bar-h) + var(--bar-pad) * 2 + max(8px, env(safe-area-inset-bottom)));
+    background: #000; display: none; z-index: 50;
   }
-  .tile .num {
-    position: absolute;
-    top: 6px;
-    left: 10px;
-    font-size: clamp(20px, 2.4vw, 28px);
-    font-weight: 900;
-    color: #fff;
-    text-shadow: 0 2px 6px rgba(0,0,0,0.6), 0 0 2px rgba(0,0,0,0.8);
-    letter-spacing: -0.02em;
-    pointer-events: none;
-  }
-  .tile.pressing {
-    transform: scale(0.94);
-    filter: brightness(1.12);
-  }
-  .tile.playing {
-    border-color: #ff6b6b;
-    animation: pulse 1.2s ease-in-out infinite;
-  }
-  .tile.playing::after {
-    content: "";
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: #ff6b6b;
-    box-shadow: 0 0 0 0 rgba(255,107,107,0.7);
-    animation: dot 1s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-  }
-  @keyframes dot {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.6); }
-    50% { box-shadow: 0 0 0 10px rgba(255,255,255,0); }
-  }
-  .stopbar {
-    position: fixed;
-    left: 0; right: 0;
-    bottom: 0;
-    padding: 12px max(16px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-right));
-    background: linear-gradient(to top, rgba(255,247,230,0.98), rgba(255,247,230,0.85) 70%, rgba(255,247,230,0));
-    display: flex;
-    justify-content: center;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity .2s ease;
-  }
-  .stopbar.visible { opacity: 1; pointer-events: auto; }
-  .stopbtn {
-    border: none;
-    background: #2b2b2b;
-    color: #fff;
-    font-family: inherit;
-    font-weight: 800;
-    font-size: 18px;
-    padding: 16px 32px;
-    border-radius: 999px;
-    cursor: pointer;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.18), 0 10px 20px rgba(0,0,0,0.15);
-  }
-  .stopbtn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.18); }
-  #debug {
-    position: fixed;
-    top: 8px; right: 8px;
-    max-width: 60vw;
-    padding: 8px 10px;
-    background: rgba(0,0,0,0.72);
-    color: rgba(255,255,255,0.85);
-    font: 11px/1.4 ui-monospace, Menlo, monospace;
-    white-space: pre;
-    border-radius: 8px;
-    z-index: 9999;
-    pointer-events: none;
-  }
-  #debugbar {
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    display: flex;
-    justify-content: center;
-    gap: 12px;
-    padding: 4px max(8px, env(safe-area-inset-left)) max(4px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
-    pointer-events: none;
-    z-index: 9999;
-  }
-  #debugbar button {
-    pointer-events: auto;
-    border: none;
-    background: transparent;
-    color: rgba(0,0,0,0.28);
-    font: 10px/1 ui-monospace, Menlo, monospace;
-    letter-spacing: 0.04em;
-    padding: 4px 6px;
-    cursor: pointer;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  #debugbar button:active { color: rgba(0,0,0,0.55); }
-  #dbgtoggle {
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 2px;
-    border: none;
-    background: transparent;
-    color: rgba(0,0,0,0.18);
-    font: 9px/1 ui-monospace, Menlo, monospace;
-    letter-spacing: 0.05em;
-    padding: 4px 8px;
-    cursor: pointer;
-    z-index: 9999;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-  #dbgtoggle:active { color: rgba(0,0,0,0.45); }
-  .home-btn { position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: 64px; height: 64px; border-radius: 50%; border: 3px solid #fff; overflow: hidden; padding: 0; cursor: pointer; background: #fff7e6; box-shadow: 0 2px 8px rgba(0,0,0,0.18); z-index: 100; }
-  .home-btn:active { transform: scale(0.92); }
-  .home-btn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .player.visible { display: block; }
+  .player img { width: 100%; height: 100%; object-fit: contain; display: block; pointer-events: none; }
 </style>
 </head>
-<body>
-  <button class="home-btn" onclick="window.location='/liedjes/papa/'" aria-label="terug">
-    <img src="/liedjes/home/papa.jpg" alt="">
-  </button>
+<body data-page="eendjes" data-active-taal="papa">
   <main class="grid" id="grid"></main>
-  <div class="stopbar" id="stopbar"><button class="stopbtn" id="stopbtn">Stop</button></div>
-  <pre id="debug" hidden></pre>
-  <div id="debugbar" hidden>
-    <button id="dbg-share" type="button">stuur logs</button>
-    <button id="dbg-clear" type="button">wis logs</button>
-  </div>
-  <button id="dbgtoggle" type="button" aria-label="debug">·</button>
+  <div class="player" id="player"><img id="player-img" alt=""></div>
+
+  <nav class="bottombar" id="bottombar" aria-label="navigatie">
+    <button class="navtile" id="nav-mama" data-href="/liedjes/mama/" data-nav="mama" aria-label="mama"><img src="/liedjes/home/mama.jpg" alt=""></button>
+    <button class="navtile" id="nav-papa" data-href="/liedjes/papa/" data-nav="papa" aria-label="papa"><img src="/liedjes/home/papa.jpg" alt=""></button>
+    <button class="navtile" id="nav-klas" data-href="/liedjes/klas/" data-nav="klas" aria-label="klas"><img src="/liedjes/home/klas.jpg" alt=""></button>
+    <button class="stopbtn" id="stopbtn" aria-label="stop"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
+  </nav>
 
 <script>
-// --- Service worker: auto-update HTML on next visit, offline fallback ---
+// --- Service worker ---
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./service-worker.js")
       .then(() => schedulePrefetch())
       .catch(() => {});
   });
-  navigator.serviceWorker.addEventListener("message", (e) => {
-    const m = e.data || {};
-    if (m.type === "prefetch-progress") {
-      debugLog(`prefetch ${m.done}/${m.total}`);
-    } else if (m.type === "prefetch-done") {
-      debugLog(`prefetch done: ${m.cached}/${m.total} cached`);
-    }
-  });
 }
 
 // --- Toddler-proofing: kill all browser gestures ---
-// 1. Block iOS Safari pinch-zoom gestures completely
 document.addEventListener("gesturestart", e => e.preventDefault(), { passive: false });
 document.addEventListener("gesturechange", e => e.preventDefault(), { passive: false });
 document.addEventListener("gestureend", e => e.preventDefault(), { passive: false });
 
-// 2. Block double-tap-to-zoom (only fire click on single-tap)
 let lastTouchEnd = 0;
 document.addEventListener("touchend", e => {
   const now = Date.now();
@@ -238,93 +104,41 @@ document.addEventListener("touchend", e => {
   lastTouchEnd = now;
 }, { passive: false });
 
-// 3. If more than one finger touches, cancel the touch — prevents palm + finger
-//    triggering pinch / weird states
-document.addEventListener("touchstart", e => {
-  if (e.touches.length > 1) e.preventDefault();
-}, { passive: false });
-document.addEventListener("touchmove", e => {
-  if (e.touches.length > 1) e.preventDefault();
-}, { passive: false });
-
-// 4. Block context menu / long-press callout
+document.addEventListener("touchstart", e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+document.addEventListener("touchmove", e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
 document.addEventListener("contextmenu", e => e.preventDefault());
 document.addEventListener("dblclick", e => e.preventDefault());
 
-const songs = [
-  { n: 1,  title: "Alle Eendjes",              file: "2019/04/01-Alle-EenDJes.mp3" },
-  { n: 2,  title: "Parapluutje",               file: "2019/04/02-Parapluutje.mp3" },
-  { n: 3,  title: "Twee Handjes",              file: "2019/07/03-Twee-HanDJes.mp3" },
-  { n: 4,  title: "Op Een Grote Paddenstoel",  file: "2019/07/04-Op-Een-Grote-Paddenstoel.mp3" },
-  { n: 5,  title: "Dit Zijn Mijn Wangetjes",   file: "2019/04/05-Dit-Zijn-Mijn-Wangetjes.mp3" },
-  { n: 6,  title: "Onder Moeders Paraplu",     file: "2019/04/06-Onder-Moeders-Paraplu.mp3" },
-  { n: 7,  title: "Eén, Twee, Drie",           file: "2019/04/07-Eén-Twee-Drie.mp3" },
-  { n: 8,  title: "Slaap Kindje, Slaap",       file: "2019/04/08-Slaap-KinDJe-Slaap.mp3" },
-  { n: 9,  title: "Klein, Klein Kleutertje",   file: "2019/04/09-Klein-Klein-Kleutertje.mp3" },
-  { n:10,  title: "Hoofd En Schouders",        file: "2019/04/10-Hoofd-En-Schouders.mp3" },
-  { n:11,  title: "Kom Wat Dichter",           file: "2019/04/11-Kom-Wat-Dichter.mp3" },
-  { n:12,  title: "In Een Klein Stationnetje", file: "2019/04/12-In-Een-Klein-Stationnetje.mp3" },
-  { n:13,  title: "We Stegen Met Een Zucht",   file: "2019/04/13-We-Stegen-Met-Een-Zucht.mp3" },
-  { n:14,  title: "In Het Bos",                file: "2019/04/14-In-Het-Bos.mp3" },
-  { n:15,  title: "Eén, Twee, Drie, Vier",     file: "2019/04/15-Eén-Twee-Drie-Vier.mp3" },
-  { n:16,  title: "De Kikkertjes",             file: "2019/04/16-De-Kikkertjes.mp3" },
-  { n:17,  title: "'k Zag Twee Beren",         file: "2019/04/17-k-Zag-Twee-Beren.mp3" },
-  { n:18,  title: "'k Heb De Zon Zien Zakken", file: "2019/04/18-k-Heb-De-Zon-Zien-Zakken.mp3" },
-  { n:19,  title: "De Zevensprong",            file: "2019/04/19-De-Zevensprong.mp3" },
-  { n:20,  title: "In De Maneschijn",          file: "2019/04/20-In-De-Maneschijn.mp3" },
-  { n:21,  title: "'t Regent Op De Brug",      file: "2019/04/21-t-Regent-Op-De-Brug.mp3" },
-  { n:22,  title: "'k Heb Een Roosje",         file: "2019/04/22-k-Heb-Een-Roosje.mp3" },
-  { n:23,  title: "Roodkapje",                 file: "2019/04/23-Roodkapje.mp3" },
-  { n:24,  title: "Zakdoek Leggen",            file: "2019/04/24-Zakdoek-Leggen.mp3" },
-  { n:25,  title: "Lang Zal Zij Leven",        file: "2019/04/25-Lang-Zal-Zij-Leven.mp3" },
-  { n:26,  title: "O, Wat Zijn We Heden Blij", file: "2019/04/26-O-Wat-Zijn-We-Heden-Blij.mp3" },
-];
+const TRACKS = [{"n": 1, "title": "Alle Eendjes", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/01-Alle-EenDJes.mp3", "icon": "icons/01.jpg"}, {"n": 2, "title": "Parapluutje", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/02-Parapluutje.mp3", "icon": "icons/02.jpg"}, {"n": 3, "title": "Twee Handjes", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/07/03-Twee-HanDJes.mp3", "icon": "icons/03.jpg"}, {"n": 4, "title": "Op Een Grote Paddenstoel", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/07/04-Op-Een-Grote-Paddenstoel.mp3", "icon": "icons/04.jpg"}, {"n": 5, "title": "Dit Zijn Mijn Wangetjes", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/05-Dit-Zijn-Mijn-Wangetjes.mp3", "icon": "icons/05.jpg"}, {"n": 6, "title": "Onder Moeders Paraplu", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/06-Onder-Moeders-Paraplu.mp3", "icon": "icons/06.jpg"}, {"n": 7, "title": "Eén, Twee, Drie", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/07-Eén-Twee-Drie.mp3", "icon": "icons/07.jpg"}, {"n": 8, "title": "Slaap Kindje, Slaap", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/08-Slaap-KinDJe-Slaap.mp3", "icon": "icons/08.jpg"}, {"n": 9, "title": "Klein, Klein Kleutertje", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/09-Klein-Klein-Kleutertje.mp3", "icon": "icons/09.jpg"}, {"n": 10, "title": "Hoofd En Schouders", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/10-Hoofd-En-Schouders.mp3", "icon": "icons/10.jpg"}, {"n": 11, "title": "Kom Wat Dichter", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/11-Kom-Wat-Dichter.mp3", "icon": "icons/11.jpg"}, {"n": 12, "title": "In Een Klein Stationnetje", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/12-In-Een-Klein-Stationnetje.mp3", "icon": "icons/12.jpg"}, {"n": 13, "title": "We Stegen Met Een Zucht", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/13-We-Stegen-Met-Een-Zucht.mp3", "icon": "icons/13.jpg"}, {"n": 14, "title": "In Het Bos", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/14-In-Het-Bos.mp3", "icon": "icons/14.jpg"}, {"n": 15, "title": "Eén, Twee, Drie, Vier", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/15-Eén-Twee-Drie-Vier.mp3", "icon": "icons/15.jpg"}, {"n": 16, "title": "De Kikkertjes", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/16-De-Kikkertjes.mp3", "icon": "icons/16.jpg"}, {"n": 17, "title": "'k Zag Twee Beren", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/17-k-Zag-Twee-Beren.mp3", "icon": "icons/17.jpg"}, {"n": 18, "title": "'k Heb De Zon Zien Zakken", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/18-k-Heb-De-Zon-Zien-Zakken.mp3", "icon": "icons/18.jpg"}, {"n": 19, "title": "De Zevensprong", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/19-De-Zevensprong.mp3", "icon": "icons/19.jpg"}, {"n": 20, "title": "In De Maneschijn", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/20-In-De-Maneschijn.mp3", "icon": "icons/20.jpg"}, {"n": 21, "title": "'t Regent Op De Brug", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/21-t-Regent-Op-De-Brug.mp3", "icon": "icons/21.jpg"}, {"n": 22, "title": "'k Heb Een Roosje", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/22-k-Heb-Een-Roosje.mp3", "icon": "icons/22.jpg"}, {"n": 23, "title": "Roodkapje", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/23-Roodkapje.mp3", "icon": "icons/23.jpg"}, {"n": 24, "title": "Zakdoek Leggen", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/24-Zakdoek-Leggen.mp3", "icon": "icons/24.jpg"}, {"n": 25, "title": "Lang Zal Zij Leven", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/25-Lang-Zal-Zij-Leven.mp3", "icon": "icons/25.jpg"}, {"n": 26, "title": "O, Wat Zijn We Heden Blij", "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/26-O-Wat-Zijn-We-Heden-Blij.mp3", "icon": "icons/26.jpg"}];
+const SEED_ORDER = [1, 4, 12, 13, 17];
+const PARENT_HREF = "/liedjes/papa/";
+const STORAGE_PREFIX = "eendjes";
+const APP_VERSION = "eendjes-v2";
 
-const FALLBACK_COLOR = "#f06595";
-const BASE = "https://www.standaarduitgeverij.be/wp-content/uploads/";
-
-let colorMap = {};
 const audio = new Audio();
 audio.preload = "none";
 audio.playsInline = true;
 let currentTile = null;
+let currentTrack = null;
 
 // --- Popularity tracking ---
-// Each play is logged with a timestamp. Rolling 14-day window determines
-// the prefetch order. New devices fall back to a seed shipped in popularity.json.
-const POP_KEY = "liedjes_plays_v1";
+const POP_KEY = STORAGE_PREFIX + "_plays_v1";
 const POP_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
-let seedOrder = [];
 
-function loadPlays() {
-  try { return JSON.parse(localStorage.getItem(POP_KEY) || "[]"); }
-  catch { return []; }
-}
-
-function savePlays(arr) {
-  try { localStorage.setItem(POP_KEY, JSON.stringify(arr)); } catch {}
-}
-
+function loadPlays() { try { return JSON.parse(localStorage.getItem(POP_KEY) || "[]"); } catch { return []; } }
+function savePlays(arr) { try { localStorage.setItem(POP_KEY, JSON.stringify(arr)); } catch {} }
 function recordPlay(n) {
-  const now = Date.now();
-  const cutoff = now - POP_WINDOW_MS;
+  const now = Date.now(); const cutoff = now - POP_WINDOW_MS;
   const arr = loadPlays().filter(e => e.t >= cutoff);
-  arr.push({ n, t: now });
-  savePlays(arr);
+  arr.push({ n, t: now }); savePlays(arr);
 }
-
 function downloadOrder() {
   const cutoff = Date.now() - POP_WINDOW_MS;
   const arr = loadPlays().filter(e => e.t >= cutoff);
-  savePlays(arr); // housekeeping: drop expired entries
-
-  const counts = {};
-  for (const e of arr) counts[e.n] = (counts[e.n] || 0) + 1;
-
-  const seedRank = {};
-  seedOrder.forEach((n, i) => { seedRank[n] = i; });
-
-  const all = songs.map(s => s.n);
+  savePlays(arr);
+  const counts = {}; for (const e of arr) counts[e.n] = (counts[e.n] || 0) + 1;
+  const seedRank = {}; SEED_ORDER.forEach((n, i) => { seedRank[n] = i; });
+  const all = TRACKS.map(s => s.n);
   all.sort((a, b) => {
     const ca = counts[a] || 0, cb = counts[b] || 0;
     if (cb !== ca) return cb - ca;
@@ -334,36 +148,25 @@ function downloadOrder() {
   });
   return all;
 }
-
-function songByNum(n) { return songs.find(s => s.n === n); }
+function trackByNum(n) { return TRACKS.find(s => s.n === n); }
 
 // --- Telemetry ---
-// Events are buffered in localStorage and POSTed to a Cloudflare Worker which
-// commits them as JSONL files in nicolasmertens/liedjes under logs/<date>/.
-// Used to tune tap thresholds against real toddler interaction.
 const TEL_URL = "https://liedjes-logger.super-mud-e2ef.workers.dev/log";
-const TEL_BUFFER_KEY = "liedjes_tel_buffer_v1";
-const TEL_DEVICE_KEY = "liedjes_device_id_v1";
+const TEL_BUFFER_KEY = STORAGE_PREFIX + "_tel_buffer_v1";
+const TEL_DEVICE_KEY = STORAGE_PREFIX + "_device_id_v1";
 const TEL_FLUSH_INTERVAL_MS = 30000;
 const TEL_MAX_BUFFER = 2000;
-const APP_VERSION = "v3";
 
 const SESSION_ID = ((crypto.randomUUID && crypto.randomUUID()) || (Date.now() + "-" + Math.random())).slice(0, 36);
 let DEVICE_ID = "";
 try {
   DEVICE_ID = localStorage.getItem(TEL_DEVICE_KEY) || "";
-  if (!DEVICE_ID) {
-    DEVICE_ID = (crypto.randomUUID && crypto.randomUUID()) || (Date.now() + "-" + Math.random());
-    localStorage.setItem(TEL_DEVICE_KEY, DEVICE_ID);
-  }
+  if (!DEVICE_ID) { DEVICE_ID = (crypto.randomUUID && crypto.randomUUID()) || (Date.now() + "-" + Math.random()); localStorage.setItem(TEL_DEVICE_KEY, DEVICE_ID); }
 } catch {}
 
 let telBuffer = [];
 try { telBuffer = JSON.parse(localStorage.getItem(TEL_BUFFER_KEY) || "[]"); } catch {}
-function saveTelBuffer() {
-  try { localStorage.setItem(TEL_BUFFER_KEY, JSON.stringify(telBuffer)); } catch {}
-}
-
+function saveTelBuffer() { try { localStorage.setItem(TEL_BUFFER_KEY, JSON.stringify(telBuffer)); } catch {} }
 function tel(type, payload) {
   telBuffer.push({ t: Date.now(), type, ...(payload || {}) });
   if (telBuffer.length > TEL_MAX_BUFFER) telBuffer.splice(0, telBuffer.length - TEL_MAX_BUFFER);
@@ -380,67 +183,47 @@ async function flushTel(useKeepalive) {
     const resp = await fetch(TEL_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        events: batch,
-        session_id: SESSION_ID,
-        device_id: DEVICE_ID,
-        app_version: APP_VERSION,
-      }),
+      body: JSON.stringify({ events: batch, session_id: SESSION_ID, device_id: DEVICE_ID, app_version: APP_VERSION }),
       keepalive: !!useKeepalive,
     });
-    if (resp && resp.ok) {
-      telBuffer.splice(0, batchLen);
-      saveTelBuffer();
-    }
+    if (resp && resp.ok) { telBuffer.splice(0, batchLen); saveTelBuffer(); }
   } catch {}
   telFlushing = false;
 }
-
 setInterval(() => flushTel(false), TEL_FLUSH_INTERVAL_MS);
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "hidden") flushTel(true);
-});
+document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") flushTel(true); });
 window.addEventListener("pagehide", () => flushTel(true));
+tel("session_start", { ua: navigator.userAgent, vw: window.innerWidth, vh: window.innerHeight, dpr: window.devicePixelRatio || 1, standalone: !!(navigator.standalone || window.matchMedia("(display-mode: standalone)").matches) });
 
-tel("session_start", {
-  ua: navigator.userAgent,
-  vw: window.innerWidth,
-  vh: window.innerHeight,
-  dpr: window.devicePixelRatio || 1,
-  standalone: !!(navigator.standalone || window.matchMedia("(display-mode: standalone)").matches),
-});
-
+// --- Prefetch ---
 async function schedulePrefetch() {
-  // Defer to idle so it doesn't fight first paint
-  await new Promise(r => {
-    if ("requestIdleCallback" in window) requestIdleCallback(() => r(), { timeout: 3000 });
-    else setTimeout(r, 1500);
-  });
   let worker = navigator.serviceWorker.controller;
-  if (!worker) {
-    // First install — controller becomes non-null after activate; wait briefly
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      worker = navigator.serviceWorker.controller || reg.active;
-    } catch {}
-  }
+  if (!worker) { try { const reg = await navigator.serviceWorker.ready; worker = navigator.serviceWorker.controller || reg.active; } catch {} }
   if (!worker) return;
   const order = downloadOrder();
-  const urls = order.map(n => {
-    const s = songByNum(n);
-    return s ? encodeURI(BASE + s.file) : null;
-  }).filter(Boolean);
+  const urls = order.map(n => { const s = trackByNum(n); return s ? encodeURI(s.audio) : null; }).filter(Boolean);
   worker.postMessage({ type: "prefetch-mp3s", urls });
-  debugLog(`prefetch order: ${order.join(",")}`);
 }
 
-function setPlaying(tile) {
-  if (currentTile && currentTile !== tile) currentTile.classList.remove("playing");
-  currentTile = tile;
-  if (tile) tile.classList.add("playing");
-  document.getElementById("stopbar").classList.toggle("visible", !!tile);
+// --- Full-screen still playback ---
+const grid = document.getElementById("grid");
+const player = document.getElementById("player");
+const playerImg = document.getElementById("player-img");
+
+function showPlayer(track) {
+  playerImg.src = encodeURI(track.icon);
+  player.classList.add("visible");
+  document.body.classList.add("playing");
+  grid.classList.add("dim");
+}
+function hidePlayer() {
+  player.classList.remove("visible");
+  document.body.classList.remove("playing");
+  grid.classList.remove("dim");
+  playerImg.src = "";
 }
 
+let isPlaying = false;
 let currentSongNum = null;
 let lastProgressLog = 0;
 
@@ -449,14 +232,7 @@ function emitPlayEnd(reason) {
   const dur = audio.duration || 0;
   const cur = audio.currentTime || 0;
   const pct = dur > 0 ? +(cur / dur).toFixed(3) : 0;
-  tel("play_end", {
-    n: currentSongNum,
-    elapsed_ms: Math.round(cur * 1000),
-    duration_ms: Math.round(dur * 1000),
-    pct,
-    reason,
-    real_tap: pct >= 0.4,
-  });
+  tel("play_end", { n: currentSongNum, elapsed_ms: Math.round(cur * 1000), duration_ms: Math.round(dur * 1000), pct, reason, real_tap: pct >= 0.4 });
   currentSongNum = null;
 }
 
@@ -464,121 +240,66 @@ function stop() {
   emitPlayEnd("stop");
   audio.pause();
   audio.currentTime = 0;
-  setPlaying(null);
+  currentTrack = null;
+  currentTile = null;
+  isPlaying = false;
+  hidePlayer();
 }
 
-function play(song, tile) {
-  if (currentTile === tile) { stop(); return; }
+function play(track, tile) {
+  // No toggle: re-tap on same tile during play is ignored (grid is locked anyway).
+  if (isPlaying) return;
   emitPlayEnd("replaced");
-  audio.src = encodeURI(BASE + song.file);
+  audio.src = encodeURI(track.audio);
+  isPlaying = true;  // optimistic — covers the load window between tap and audio.play resolving
+  document.body.classList.add("playing");
   audio.play().then(() => {
-    setPlaying(tile);
-    recordPlay(song.n);
-    currentSongNum = song.n;
-    tel("play_start", { n: song.n });
+    currentTile = tile;
+    currentTrack = track;
+    currentSongNum = track.n;
+    showPlayer(track);
+    recordPlay(track.n);
+    tel("play_start", { n: track.n });
   }).catch((err) => {
-    setPlaying(null);
-    tel("play_fail", { n: song.n, err: String(err && err.message || err).slice(0, 120) });
+    isPlaying = false;
+    document.body.classList.remove("playing");
+    hidePlayer();
+    tel("play_fail", { n: track.n, err: String(err && err.message || err).slice(0, 120) });
   });
 }
 
-audio.addEventListener("ended", () => { emitPlayEnd("ended"); setPlaying(null); });
+audio.addEventListener("ended", () => { emitPlayEnd("ended"); isPlaying = false; hidePlayer(); currentTrack = null; });
 audio.addEventListener("timeupdate", () => {
   const now = Date.now();
-  if (now - lastProgressLog < 2000) return;
-  if (currentSongNum == null) return;
+  if (now - lastProgressLog < 2000 || currentSongNum == null) return;
   lastProgressLog = now;
-  const dur = audio.duration || 0;
-  const cur = audio.currentTime || 0;
-  tel("play_progress", {
-    n: currentSongNum,
-    elapsed_ms: Math.round(cur * 1000),
-    duration_ms: Math.round(dur * 1000),
-    pct: dur > 0 ? +(cur / dur).toFixed(3) : 0,
-  });
+  const dur = audio.duration || 0, cur = audio.currentTime || 0;
+  tel("play_progress", { n: currentSongNum, elapsed_ms: Math.round(cur * 1000), duration_ms: Math.round(dur * 1000), pct: dur > 0 ? +(cur / dur).toFixed(3) : 0 });
 });
 
-const grid = document.getElementById("grid");
+// Player overlay has NO tap handler — tapping the song image does nothing.
+// The only way to stop a playing song is the red stop button in the bottombar.
 
-// Tap detection tuned for a 19-month-old + accidental brush rejection.
-// iOS reports radiusX/radiusY unreliably (often 0), so we don't rely on it.
-const MIN_TAP_MS = 65;            // ignore brushes shorter than this (pickup grazes)
-const MAX_TAP_MS = 1500;          // ignore long holds (palm resting)
-const MAX_TAP_DRIFT_PX = 50;      // ignore drags
+// --- Tile tap detection (toddler-tuned) ---
+const MIN_TAP_MS = 20;          // 2026-05-20: lowered from 65 — logs showed valid William taps at 30-60ms getting rejected
+const MAX_TAP_MS = 1500;
+const MAX_TAP_DRIFT_PX = 50;
+const PALM_RADIUS_PX = 60;      // touches above this radius are treated as palm and ignored
 
-const DEBUG_KEY = "liedjes_debug_on";
-let DEBUG = new URLSearchParams(location.search).has("debug")
-        || localStorage.getItem(DEBUG_KEY) === "1";
-
-function setDebug(on) {
-  DEBUG = on;
-  if (on) localStorage.setItem(DEBUG_KEY, "1");
-  else localStorage.removeItem(DEBUG_KEY);
-  const dbg = document.getElementById("debug");
-  const bar = document.getElementById("debugbar");
-  if (dbg) dbg.hidden = !on;
-  if (bar) bar.hidden = !on;
-}
-const LOG_KEY = "liedjes_debug_log";
-const MAX_PERSISTED_LOGS = 500;
-
-function persistLog(line) {
-  try {
-    const arr = JSON.parse(localStorage.getItem(LOG_KEY) || "[]");
-    arr.push(`${new Date().toISOString()} ${line}`);
-    if (arr.length > MAX_PERSISTED_LOGS) arr.splice(0, arr.length - MAX_PERSISTED_LOGS);
-    localStorage.setItem(LOG_KEY, JSON.stringify(arr));
-  } catch {}
-}
-
-const debugLog = (...args) => {
-  if (!DEBUG) return;
-  const line = args.join(" ");
-  persistLog(line);
-  const el = document.getElementById("debug");
-  if (!el) return;
-  el.textContent = (line + "\n" + el.textContent).split("\n").slice(0, 12).join("\n");
-};
-
-async function shareLogs() {
-  let arr = [];
-  try { arr = JSON.parse(localStorage.getItem(LOG_KEY) || "[]"); } catch {}
-  const ua = navigator.userAgent;
-  const screen = `${window.innerWidth}x${window.innerHeight} dpr=${window.devicePixelRatio}`;
-  const body = `# Liedjes debug log\n\nDevice: ${ua}\nScreen: ${screen}\nEntries: ${arr.length}\n\n` + arr.join("\n");
-  if (navigator.share) {
-    try { await navigator.share({ title: "Liedjes debug logs", text: body }); return; } catch {}
-  }
-  const subject = encodeURIComponent("Liedjes debug logs");
-  const mailBody = encodeURIComponent(body.slice(0, 6000));
-  location.href = `mailto:nicolas@mrtns.io?subject=${subject}&body=${mailBody}`;
-}
-
-function clearLogs() {
-  localStorage.removeItem(LOG_KEY);
-  const el = document.getElementById("debug");
-  if (el) el.textContent = "(cleared)";
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (DEBUG) {
-    document.getElementById("debug").hidden = false;
-    document.getElementById("debugbar").hidden = false;
-  }
-  document.getElementById("dbg-share")?.addEventListener("click", shareLogs);
-  document.getElementById("dbg-clear")?.addEventListener("click", clearLogs);
-  document.getElementById("dbgtoggle")?.addEventListener("click", () => setDebug(!DEBUG));
-});
-
-function attachTileHandlers(btn, song) {
-  const candidates = new Map(); // touchId -> {t0, x0, y0, r0, maxDrift, drifted}
+function attachTileHandlers(btn, track) {
+  const candidates = new Map();
 
   btn.addEventListener("touchstart", e => {
+    if (isPlaying) return;  // grid is locked while a song plays
     for (const t of e.changedTouches) {
       const r0 = Math.max(t.radiusX || 0, t.radiusY || 0);
+      if (r0 > PALM_RADIUS_PX) {
+        tel("palm_reject", { where: "tile", n: track.n, r: Math.round(r0), x: Math.round(t.clientX), y: Math.round(t.clientY) });
+        continue;
+      }
       candidates.set(t.identifier, { t0: Date.now(), x0: t.clientX, y0: t.clientY, r0, maxDrift: 0, drifted: false });
       btn.classList.add("pressing");
-      tel("touchstart", { n: song.n, x: Math.round(t.clientX), y: Math.round(t.clientY), r: Math.round(r0), touches: e.touches.length });
+      tel("touchstart", { n: track.n, x: Math.round(t.clientX), y: Math.round(t.clientY), r: Math.round(r0), touches: e.touches.length });
     }
   }, { passive: true });
 
@@ -588,10 +309,7 @@ function attachTileHandlers(btn, song) {
       if (!c) continue;
       const d = Math.hypot(t.clientX - c.x0, t.clientY - c.y0);
       if (d > c.maxDrift) c.maxDrift = d;
-      if (!c.drifted && d > MAX_TAP_DRIFT_PX) {
-        c.drifted = true;
-        debugLog(`#${song.n} drift cancel`);
-      }
+      if (!c.drifted && d > MAX_TAP_DRIFT_PX) c.drifted = true;
     }
   }, { passive: true });
 
@@ -613,22 +331,9 @@ function attachTileHandlers(btn, song) {
       else if (dur > MAX_TAP_MS)  decision = "too_long";
       else                        decision = "play";
 
-      debugLog(`#${song.n} dur=${dur}ms r=${r.toFixed(0)} onTile=${onTile} ${decision}`);
-      tel("touchend", {
-        n: song.n,
-        dur_ms: dur,
-        r_start: Math.round(c.r0),
-        r_end: Math.round(r),
-        drift_max: Math.round(c.maxDrift),
-        on_tile: onTile,
-        decision,
-      });
+      tel("touchend", { n: track.n, dur_ms: dur, r_start: Math.round(c.r0), r_end: Math.round(r), drift_max: Math.round(c.maxDrift), on_tile: onTile, decision });
 
-      if (decision === "play") {
-        e.preventDefault();
-        play(song, btn);
-        return;
-      }
+      if (decision === "play") { e.preventDefault(); play(track, btn); return; }
     }
   }, { passive: false });
 
@@ -636,49 +341,117 @@ function attachTileHandlers(btn, song) {
     for (const t of e.changedTouches) {
       const c = candidates.get(t.identifier);
       candidates.delete(t.identifier);
-      tel("touchcancel", { n: song.n, dur_ms: c ? Date.now() - c.t0 : null, drift_max: c ? Math.round(c.maxDrift) : null });
+      tel("touchcancel", { n: track.n, dur_ms: c ? Date.now() - c.t0 : null, drift_max: c ? Math.round(c.maxDrift) : null });
     }
     if (candidates.size === 0) btn.classList.remove("pressing");
   }, { passive: true });
 
-  // Desktop fallback (mouse clicks). On iOS Safari, click is suppressed when
-  // touchend already fired; e.detail === 0 also filters out programmatic clicks.
   btn.addEventListener("click", e => {
     if ("ontouchstart" in window) return;
     if (e.detail === 0) return;
-    tel("click", { n: song.n });
-    play(song, btn);
+    if (isPlaying) return;
+    tel("click", { n: track.n });
+    play(track, btn);
+  });
+}
+
+// --- Bottom-bar handlers (nav + stop) ---
+function attachBarButton(btn, opts) {
+  // opts: { kind: "nav" | "stop", href, label, lockable }
+  const candidates = new Map();
+  btn.addEventListener("touchstart", e => {
+    if (opts.lockable && isPlaying) return;  // nav locked during play
+    for (const t of e.changedTouches) {
+      const r0 = Math.max(t.radiusX || 0, t.radiusY || 0);
+      if (r0 > PALM_RADIUS_PX) {
+        tel("palm_reject", { where: opts.kind, label: opts.label, r: Math.round(r0) });
+        continue;
+      }
+      candidates.set(t.identifier, { t0: Date.now(), x0: t.clientX, y0: t.clientY, drifted: false, r0 });
+      btn.classList.add("pressing");
+      tel("bar_touchstart", { kind: opts.kind, label: opts.label, r: Math.round(r0) });
+    }
+  }, { passive: true });
+  btn.addEventListener("touchmove", e => {
+    for (const t of e.changedTouches) {
+      const c = candidates.get(t.identifier);
+      if (!c) continue;
+      const d = Math.hypot(t.clientX - c.x0, t.clientY - c.y0);
+      if (d > MAX_TAP_DRIFT_PX) c.drifted = true;
+    }
+  }, { passive: true });
+  btn.addEventListener("touchend", e => {
+    for (const t of e.changedTouches) {
+      const c = candidates.get(t.identifier);
+      candidates.delete(t.identifier);
+      if (candidates.size === 0) btn.classList.remove("pressing");
+      if (!c) continue;
+      const dur = Date.now() - c.t0;
+      const r = Math.max(t.radiusX || 0, t.radiusY || 0);
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const onBtn = el === btn || btn.contains(el);
+      let decision;
+      if (c.drifted)              decision = "drifted";
+      else if (!onBtn)            decision = "off_tile";
+      else if (dur < MIN_TAP_MS)  decision = "too_short";
+      else if (dur > MAX_TAP_MS)  decision = "too_long";
+      else                        decision = "fire";
+      tel("bar_touchend", { kind: opts.kind, label: opts.label, dur_ms: dur, r_start: Math.round(c.r0), r_end: Math.round(r), on_btn: onBtn, decision });
+      if (decision === "fire") {
+        e.preventDefault();
+        if (opts.kind === "stop") {
+          if (isPlaying) { stop(); }
+          else { window.location = PARENT_HREF; }
+        } else if (opts.kind === "nav" && opts.href) {
+          if (isPlaying) return;  // double-safety
+          window.location = opts.href;
+        }
+        return;
+      }
+    }
+  }, { passive: false });
+  btn.addEventListener("touchcancel", e => {
+    for (const t of e.changedTouches) {
+      candidates.delete(t.identifier);
+    }
+    if (candidates.size === 0) btn.classList.remove("pressing");
+  }, { passive: true });
+  btn.addEventListener("click", e => {
+    if ("ontouchstart" in window) return;
+    if (e.detail === 0) return;
+    if (opts.lockable && isPlaying) return;
+    tel("bar_click", { kind: opts.kind, label: opts.label });
+    if (opts.kind === "stop") {
+      if (isPlaying) { stop(); }
+      else { window.location = PARENT_HREF; }
+    } else if (opts.kind === "nav" && opts.href) {
+      window.location = opts.href;
+    }
   });
 }
 
 function build() {
-  songs.forEach((s) => {
+  TRACKS.forEach(track => {
     const btn = document.createElement("button");
     btn.className = "tile";
-    const key = String(s.n).padStart(2, "0");
-    const color = colorMap[key] || FALLBACK_COLOR;
-    btn.style.background = color;
-    btn.setAttribute("aria-label", `${s.n}. ${s.title}`);
-    const hasImg = colorMap[key] !== undefined;
-    btn.innerHTML = (hasImg
-      ? `<img src="icons/${key}.jpg" alt="">`
-      : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:clamp(48px,9vw,90px);font-weight:900;">${s.n}</div>`)
-      + `<div class="num">${s.n}</div>`;
-    attachTileHandlers(btn, s);
+    btn.setAttribute("aria-label", `${track.n}. ${track.title}`);
+    btn.innerHTML = `<img src="${encodeURI(track.icon)}" alt=""><div class="num">${track.n}</div>`;
+    attachTileHandlers(btn, track);
     grid.appendChild(btn);
   });
 }
 
-Promise.all([
-  fetch("icons/colors.json").then(r => r.ok ? r.json() : {}).catch(() => ({})),
-  fetch("popularity.json").then(r => r.ok ? r.json() : {}).catch(() => ({})),
-]).then(([colors, pop]) => {
-  colorMap = colors || {};
-  seedOrder = Array.isArray(pop?.seed) ? pop.seed : [];
-  build();
+// Wire bottom-bar buttons. Active highlight = active_taal (the parent taal this book belongs to).
+const ACTIVE_TAAL = document.body.dataset.activeTaal;
+["mama", "papa", "klas"].forEach(name => {
+  const btn = document.getElementById("nav-" + name);
+  if (!btn) return;
+  if (name === ACTIVE_TAAL) btn.classList.add("active");
+  attachBarButton(btn, { kind: "nav", href: btn.dataset.href, label: name, lockable: true });
 });
+attachBarButton(document.getElementById("stopbtn"), { kind: "stop", label: "stop", lockable: false });
 
-document.getElementById("stopbtn").addEventListener("click", stop);
+build();
 </script>
 </body>
 </html>

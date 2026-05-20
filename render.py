@@ -85,6 +85,7 @@ def render_grid(name, config):
         .replace("__HTML_LANG__",      spec["lang"])
         .replace("__PARENT_PHOTO__",   spec["parent_photo"])
         .replace("__PARENT_HREF__",    spec.get("parent_href", "/liedjes/"))
+        .replace("__ACTIVE_TAAL__",    spec.get("active_taal", ""))
         .replace("__APP_VERSION__",    spec["app_version"])
         .replace("__STORAGE_PREFIX__", spec["storage_prefix"])
         .replace("__TRACKS_JSON__",    json.dumps(spec["tracks"], ensure_ascii=False))

@@ -273,8 +273,8 @@ audio.addEventListener("timeupdate", () => {
 // Player overlay has NO tap handler — tapping the song image does nothing.
 // The only way to stop a playing song is the red stop button in the bottombar.
 
-// --- Tile tap detection (same thresholds as rhymes/) ---
-const MIN_TAP_MS = 65;
+// --- Tile tap detection (toddler-tuned) ---
+const MIN_TAP_MS = 20;          // 2026-05-20: lowered from 65 — logs showed valid William taps at 30-60ms getting rejected
 const MAX_TAP_MS = 1500;
 const MAX_TAP_DRIFT_PX = 50;
 const PALM_RADIUS_PX = 60;  // touches above this radius are treated as palm and ignored
