@@ -1,1 +1,7 @@
-{"tracks": []}
+{
+  "title": "Stories",
+  "lang": "en",
+  "tracks": [
+    {"n": 1, "title": "The Lion and the Mouse", "audio": "verhalen/audio/01.mp3", "icon": "verhalen/icons/01.jpg"}
+  ]
+}
