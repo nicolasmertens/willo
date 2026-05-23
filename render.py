@@ -6,11 +6,25 @@ Usage:
   python render.py rhymes klas    # render named grids/talen only
 """
 
+import hashlib
 import json
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent
+
+
+def content_hash(*parts) -> str:
+    h = hashlib.sha256()
+    for p in parts:
+        if isinstance(p, (dict, list)):
+            h.update(json.dumps(p, sort_keys=True, ensure_ascii=False).encode())
+        elif isinstance(p, str):
+            h.update(p.encode())
+        elif isinstance(p, bytes):
+            h.update(p)
+        h.update(b"\0")
+    return h.hexdigest()[:8]
 
 # Grid pages = standalone playback grids (rhymes, eendjes).
 GRIDS = {
@@ -33,10 +47,7 @@ TALEN = {
         "parent_photo": "/liedjes/home/mama.jpg",
         "parent_href": "/liedjes/",
         "title_fallback": "Mama",
-        "app_version": "mama-v1",
         "storage_prefix": "mama",
-        "cache_name": "mama-v1",
-        "mp3_cache_name": "mama-mp3-v1",
         "manifest_name": "Mama",
         "sections": ["boeken", "liedjes", "verhalen"],
     },
@@ -46,10 +57,7 @@ TALEN = {
         "parent_photo": "/liedjes/home/papa.jpg",
         "parent_href": "/liedjes/",
         "title_fallback": "Papa",
-        "app_version": "papa-v2",
         "storage_prefix": "papa",
-        "cache_name": "papa-v2",
-        "mp3_cache_name": "papa-mp3-v2",
         "manifest_name": "Papa",
         "sections": ["boeken", "liedjes", "verhalen"],
     },
@@ -59,10 +67,7 @@ TALEN = {
         "parent_photo": "/liedjes/home/klas.jpg",
         "parent_href": "/liedjes/",
         "title_fallback": "Klas",
-        "app_version": "klas-v1",
         "storage_prefix": "klas",
-        "cache_name": "klas-v3",
-        "mp3_cache_name": "klas-mp3-v3",
         "manifest_name": "Klas",
         "sections": ["boeken", "liedjes", "verhalen"],
     },
@@ -148,12 +153,21 @@ def render_taal(name, config):
     audio_keys = [f"{t['_section']}:{t['n']}" for t in all_tracks if t.get("audio")][:5]
 
     labels = SECTION_LABELS.get(config["lang"], SECTION_LABELS["nl"])
+
+    # Auto-derive cache versions from a content hash so any content/template
+    # change automatically invalidates PWA caches on next page load.
+    sw_template = (ROOT / "templates/service-worker.js").read_text()
+    ver = content_hash(all_tracks, template, sw_template, config["lang"], labels)
+    app_version = f"{name}-{ver}"
+    cache_name = f"{name}-{ver}"
+    mp3_cache_name = f"{name}-mp3-{ver}"
+
     html = (template
         .replace("__HTML_LANG__",       config["lang"])
         .replace("__PARENT_PHOTO__",    config["parent_photo"])
         .replace("__PARENT_HREF__",     config["parent_href"])
         .replace("__TITLE_FALLBACK__",  config["title_fallback"])
-        .replace("__APP_VERSION__",     config["app_version"])
+        .replace("__APP_VERSION__",     app_version)
         .replace("__STORAGE_PREFIX__",  config["storage_prefix"])
         .replace("__LABEL_BOEKEN__",    labels["boeken"])
         .replace("__LABEL_LIEDJES__",   labels["liedjes"])
@@ -164,10 +178,9 @@ def render_taal(name, config):
     (out_dir / "index.html").write_text(html, encoding="utf-8")
 
     # Service worker (reuse existing template)
-    sw_template = (ROOT / "templates/service-worker.js").read_text()
     sw = (sw_template
-        .replace("__CACHE_NAME__",     config["cache_name"])
-        .replace("__MP3_CACHE_NAME__", config["mp3_cache_name"])
+        .replace("__CACHE_NAME__",     cache_name)
+        .replace("__MP3_CACHE_NAME__", mp3_cache_name)
     )
     (out_dir / "service-worker.js").write_text(sw, encoding="utf-8")
 
