@@ -83,14 +83,35 @@
   </nav>
 
 <script>
-// --- Service worker ---
+// --- Service worker + auto-update on focus ---
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./service-worker.js")
-      .then(() => schedulePrefetch())
+      .then(reg => { schedulePrefetch(); checkForUpdates(reg); })
       .catch(() => {});
   });
 }
+
+async function checkForUpdates(reg) {
+  try {
+    if (reg && reg.update) { try { await reg.update(); } catch {} }
+    const resp = await fetch(location.pathname + "?_bust=" + Date.now(), { cache: "no-store" });
+    if (!resp.ok) return;
+    const html = await resp.text();
+    const m = html.match(/const APP_VERSION = "([^"]+)"/);
+    if (m && m[1] && m[1] !== APP_VERSION) {
+      location.reload();
+    }
+  } catch {}
+}
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    navigator.serviceWorker && navigator.serviceWorker.getRegistration().then(checkForUpdates).catch(() => {});
+  }
+});
+window.addEventListener("focus", () => {
+  navigator.serviceWorker && navigator.serviceWorker.getRegistration().then(checkForUpdates).catch(() => {});
+});
 
 // --- Toddler-proofing: kill all browser gestures ---
 document.addEventListener("gesturestart", e => e.preventDefault(), { passive: false });
