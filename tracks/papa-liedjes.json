@@ -1,1 +1,5 @@
-{"tracks": []}
+{
+  "tracks": [
+    {"n": 1, "title": "En de krokodil", "audio": "liedjes/audio/01.mp3", "icon": "liedjes/icons/01.jpg"}
+  ]
+}
