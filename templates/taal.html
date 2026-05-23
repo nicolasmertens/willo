@@ -105,38 +105,29 @@
   </nav>
 
 <script>
-// --- Service worker + auto-update on focus ---
+// --- Service worker + standard PWA update flow ---
+// Reload exactly once when a NEW worker takes control. No HTML polling,
+// no reload loops — uses the canonical controllerchange event.
 if ("serviceWorker" in navigator) {
+  let reloading = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (reloading) return;
+    reloading = true;
+    location.reload();
+  });
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./service-worker.js")
-      .then(reg => { schedulePrefetch(); checkForUpdates(reg); })
+      .then(reg => {
+        schedulePrefetch();
+        // Nudge the SW to check for an updated script when the user
+        // brings the app to the foreground.
+        const ping = () => { try { reg.update(); } catch {} };
+        document.addEventListener("visibilitychange", () => { if (!document.hidden) ping(); });
+        window.addEventListener("focus", ping);
+      })
       .catch(() => {});
   });
 }
-
-// Polls the live page on every focus/visibility-change and hard-reloads
-// if APP_VERSION drifted. Works around slow iOS PWA service-worker update
-// cycles so content changes appear within seconds of next focus.
-async function checkForUpdates(reg) {
-  try {
-    if (reg && reg.update) { try { await reg.update(); } catch {} }
-    const resp = await fetch(location.pathname + "?_bust=" + Date.now(), { cache: "no-store" });
-    if (!resp.ok) return;
-    const html = await resp.text();
-    const m = html.match(/const APP_VERSION = "([^"]+)"/);
-    if (m && m[1] && m[1] !== APP_VERSION) {
-      location.reload();
-    }
-  } catch {}
-}
-document.addEventListener("visibilitychange", () => {
-  if (!document.hidden) {
-    navigator.serviceWorker && navigator.serviceWorker.getRegistration().then(checkForUpdates).catch(() => {});
-  }
-});
-window.addEventListener("focus", () => {
-  navigator.serviceWorker && navigator.serviceWorker.getRegistration().then(checkForUpdates).catch(() => {});
-});
 
 // --- Toddler-proofing ---
 document.addEventListener("gesturestart", e => e.preventDefault(), { passive: false });
