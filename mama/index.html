@@ -140,11 +140,11 @@ document.addEventListener("touchmove", e => { if (e.touches.length > 1) e.preven
 document.addEventListener("contextmenu", e => e.preventDefault());
 document.addEventListener("dblclick", e => e.preventDefault());
 
-const ALL_TRACKS = [];
-const SEED_ORDER = [];
+const ALL_TRACKS = [{"n": 1, "title": "Les roues de l'autobus", "audio": "liedjes/audio/01.mp3", "icon": "liedjes/icons/01.jpg", "_section": "liedjes"}];
+const SEED_ORDER = ["liedjes:1"];
 const PARENT_HREF = "/liedjes/";
 const STORAGE_PREFIX = "mama";
-const APP_VERSION = "mama-c89e98a8";
+const APP_VERSION = "mama-7a120896";
 
 const audio = new Audio();
 audio.preload = "none";

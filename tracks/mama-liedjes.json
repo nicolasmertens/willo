@@ -1,1 +1,10 @@
-{"tracks": []}
+{
+  "tracks": [
+    {
+      "n": 1,
+      "title": "Les roues de l'autobus",
+      "audio": "liedjes/audio/01.mp3",
+      "icon": "liedjes/icons/01.jpg"
+    }
+  ]
+}
