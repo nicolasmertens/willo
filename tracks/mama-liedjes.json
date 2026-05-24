@@ -11,6 +11,12 @@
       "title": "L'araignée Gypsie",
       "audio": "liedjes/audio/02.mp3",
       "icon": "liedjes/icons/02.jpg"
+    },
+    {
+      "n": 3,
+      "title": "Il y avait de gros crocodiles",
+      "audio": "liedjes/audio/03.mp3",
+      "icon": "liedjes/icons/03.jpg"
     }
   ]
 }
