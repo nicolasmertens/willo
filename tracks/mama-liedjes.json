@@ -29,6 +29,12 @@
       "title": "Les 3 poules",
       "audio": "liedjes/audio/05.mp3",
       "icon": "liedjes/icons/05.jpg"
+    },
+    {
+      "n": 6,
+      "title": "Bateau sur l'eau",
+      "audio": "liedjes/audio/06.mp3",
+      "icon": "liedjes/icons/06.jpg"
     }
   ]
 }
