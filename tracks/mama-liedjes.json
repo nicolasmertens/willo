@@ -5,6 +5,12 @@
       "title": "Les roues de l'autobus",
       "audio": "liedjes/audio/01.mp3",
       "icon": "liedjes/icons/01.jpg"
+    },
+    {
+      "n": 2,
+      "title": "L'araignée Gypsie",
+      "audio": "liedjes/audio/02.mp3",
+      "icon": "liedjes/icons/02.jpg"
     }
   ]
 }
