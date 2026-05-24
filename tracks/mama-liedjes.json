@@ -17,6 +17,12 @@
       "title": "Il y avait de gros crocodiles",
       "audio": "liedjes/audio/03.mp3",
       "icon": "liedjes/icons/03.jpg"
+    },
+    {
+      "n": 4,
+      "title": "Une souris verte",
+      "audio": "liedjes/audio/04.mp3",
+      "icon": "liedjes/icons/04.jpg"
     }
   ]
 }
