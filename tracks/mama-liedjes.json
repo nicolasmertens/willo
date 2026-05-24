@@ -35,6 +35,12 @@
       "title": "Bateau sur l'eau",
       "audio": "liedjes/audio/06.mp3",
       "icon": "liedjes/icons/06.jpg"
+    },
+    {
+      "n": 7,
+      "title": "Au feu les pompiers",
+      "audio": "liedjes/audio/07.mp3",
+      "icon": "liedjes/icons/07.jpg"
     }
   ]
 }
