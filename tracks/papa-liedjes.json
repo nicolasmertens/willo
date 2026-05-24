@@ -1,5 +1,16 @@
 {
   "tracks": [
-    {"n": 1, "title": "En de krokodil", "audio": "liedjes/audio/01.mp3", "icon": "liedjes/icons/01.jpg"}
+    {
+      "n": 1,
+      "title": "En de krokodil",
+      "audio": "liedjes/audio/01.mp3",
+      "icon": "liedjes/icons/01.jpg"
+    },
+    {
+      "n": 2,
+      "title": "De wielen van de bus",
+      "audio": "liedjes/audio/02.mp3",
+      "icon": "liedjes/icons/02.jpg"
+    }
   ]
 }
