@@ -23,6 +23,12 @@
       "title": "Une souris verte",
       "audio": "liedjes/audio/04.mp3",
       "icon": "liedjes/icons/04.jpg"
+    },
+    {
+      "n": 5,
+      "title": "Les 3 poules",
+      "audio": "liedjes/audio/05.mp3",
+      "icon": "liedjes/icons/05.jpg"
     }
   ]
 }
