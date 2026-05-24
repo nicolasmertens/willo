@@ -1,6 +1,8 @@
 // liedjes-logger
 // Receives batched behaviour-log events from the Liedjes PWA and commits
-// them as a new JSONL file in nicolasmertens/liedjes under logs/<date>/.
+// them as a new JSONL file in nicolasmertens/liedjes under logs/<date>/
+// on the orphan `logs` branch (kept off main so telemetry commits don't
+// trigger GH Pages builds).
 //
 // Each batch produces its own file so concurrent writes never race.
 // GitHub PAT lives only in env.GH_TOKEN (Worker secret).
@@ -130,6 +132,7 @@ export default {
       body: JSON.stringify({
         message: `log: ${events.length} events (${body.session_id || "no-sid"})`,
         content: toBase64Utf8(content),
+        branch: "logs",
       }),
     });
 
