@@ -11,6 +11,12 @@
       "title": "De wielen van de bus",
       "audio": "liedjes/audio/02.mp3",
       "icon": "liedjes/icons/02.jpg"
+    },
+    {
+      "n": 3,
+      "title": "Hansje Pansje Kevertje",
+      "audio": "liedjes/audio/03.mp3",
+      "icon": "liedjes/icons/03.jpg"
     }
   ]
 }
