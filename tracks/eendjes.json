@@ -17,7 +17,7 @@
     {"n":  4, "title": "Op Een Grote Paddenstoel",  "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/07/04-Op-Een-Grote-Paddenstoel.mp3",  "icon": "icons/04.jpg"},
     {"n":  5, "title": "Dit Zijn Mijn Wangetjes",   "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/05-Dit-Zijn-Mijn-Wangetjes.mp3",   "icon": "icons/05.jpg"},
     {"n":  6, "title": "Onder Moeders Paraplu",     "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/06-Onder-Moeders-Paraplu.mp3",     "icon": "icons/06.jpg"},
-    {"n":  7, "title": "Eén, Twee, Drie",           "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/07-Eén-Twee-Drie.mp3",             "icon": "icons/07.jpg"},
+    {"n":  7, "title": "Eén, Twee, Drie",           "audio": "audio/07.mp3",             "icon": "icons/07.jpg"},
     {"n":  8, "title": "Slaap Kindje, Slaap",       "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/08-Slaap-KinDJe-Slaap.mp3",        "icon": "icons/08.jpg"},
     {"n":  9, "title": "Klein, Klein Kleutertje",   "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/09-Klein-Klein-Kleutertje.mp3",    "icon": "icons/09.jpg"},
     {"n": 10, "title": "Hoofd En Schouders",        "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/10-Hoofd-En-Schouders.mp3",         "icon": "icons/10.jpg"},
