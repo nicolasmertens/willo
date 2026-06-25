@@ -17,6 +17,12 @@
       "title": "Hansje Pansje Kevertje",
       "audio": "liedjes/audio/03.mp3",
       "icon": "liedjes/icons/03.jpg"
+    },
+    {
+      "n": 4,
+      "title": "Ze kunnen zeggen wat ze willen",
+      "audio": "liedjes/audio/04.mp3",
+      "icon": "liedjes/icons/04.jpg"
     }
   ]
 }
