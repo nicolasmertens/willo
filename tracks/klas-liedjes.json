@@ -63,6 +63,286 @@
       "title": "The Alphabet Song",
       "audio": "liedjes/audio/08.mp3",
       "icon": "liedjes/icons/08.jpg"
+    },
+    {
+      "n": 9,
+      "title": "Animal Sounds",
+      "audio": "liedjes/audio/09.mp3",
+      "icon": "liedjes/icons/09.jpg",
+      "frames": [
+        {
+          "t": 0.0,
+          "src": "liedjes/frames/09/0001.jpg"
+        },
+        {
+          "t": 8.0,
+          "src": "liedjes/frames/09/0002.jpg"
+        },
+        {
+          "t": 16.0,
+          "src": "liedjes/frames/09/0003.jpg"
+        },
+        {
+          "t": 24.0,
+          "src": "liedjes/frames/09/0004.jpg"
+        },
+        {
+          "t": 32.0,
+          "src": "liedjes/frames/09/0005.jpg"
+        },
+        {
+          "t": 40.0,
+          "src": "liedjes/frames/09/0006.jpg"
+        },
+        {
+          "t": 48.0,
+          "src": "liedjes/frames/09/0007.jpg"
+        },
+        {
+          "t": 56.0,
+          "src": "liedjes/frames/09/0008.jpg"
+        },
+        {
+          "t": 64.0,
+          "src": "liedjes/frames/09/0009.jpg"
+        },
+        {
+          "t": 72.0,
+          "src": "liedjes/frames/09/0010.jpg"
+        },
+        {
+          "t": 80.0,
+          "src": "liedjes/frames/09/0011.jpg"
+        },
+        {
+          "t": 88.0,
+          "src": "liedjes/frames/09/0012.jpg"
+        },
+        {
+          "t": 96.0,
+          "src": "liedjes/frames/09/0013.jpg"
+        },
+        {
+          "t": 104.0,
+          "src": "liedjes/frames/09/0014.jpg"
+        },
+        {
+          "t": 112.0,
+          "src": "liedjes/frames/09/0015.jpg"
+        },
+        {
+          "t": 120.0,
+          "src": "liedjes/frames/09/0016.jpg"
+        },
+        {
+          "t": 128.0,
+          "src": "liedjes/frames/09/0017.jpg"
+        },
+        {
+          "t": 136.0,
+          "src": "liedjes/frames/09/0018.jpg"
+        },
+        {
+          "t": 144.0,
+          "src": "liedjes/frames/09/0019.jpg"
+        },
+        {
+          "t": 152.0,
+          "src": "liedjes/frames/09/0020.jpg"
+        },
+        {
+          "t": 160.0,
+          "src": "liedjes/frames/09/0021.jpg"
+        },
+        {
+          "t": 168.0,
+          "src": "liedjes/frames/09/0022.jpg"
+        },
+        {
+          "t": 176.0,
+          "src": "liedjes/frames/09/0023.jpg"
+        },
+        {
+          "t": 184.0,
+          "src": "liedjes/frames/09/0024.jpg"
+        },
+        {
+          "t": 192.0,
+          "src": "liedjes/frames/09/0025.jpg"
+        },
+        {
+          "t": 200.0,
+          "src": "liedjes/frames/09/0026.jpg"
+        },
+        {
+          "t": 208.0,
+          "src": "liedjes/frames/09/0027.jpg"
+        },
+        {
+          "t": 216.0,
+          "src": "liedjes/frames/09/0028.jpg"
+        },
+        {
+          "t": 224.0,
+          "src": "liedjes/frames/09/0029.jpg"
+        },
+        {
+          "t": 232.0,
+          "src": "liedjes/frames/09/0030.jpg"
+        },
+        {
+          "t": 240.0,
+          "src": "liedjes/frames/09/0031.jpg"
+        },
+        {
+          "t": 248.0,
+          "src": "liedjes/frames/09/0032.jpg"
+        },
+        {
+          "t": 256.0,
+          "src": "liedjes/frames/09/0033.jpg"
+        },
+        {
+          "t": 264.0,
+          "src": "liedjes/frames/09/0034.jpg"
+        },
+        {
+          "t": 272.0,
+          "src": "liedjes/frames/09/0035.jpg"
+        },
+        {
+          "t": 280.0,
+          "src": "liedjes/frames/09/0036.jpg"
+        },
+        {
+          "t": 288.0,
+          "src": "liedjes/frames/09/0037.jpg"
+        },
+        {
+          "t": 296.0,
+          "src": "liedjes/frames/09/0038.jpg"
+        },
+        {
+          "t": 304.0,
+          "src": "liedjes/frames/09/0039.jpg"
+        },
+        {
+          "t": 312.0,
+          "src": "liedjes/frames/09/0040.jpg"
+        },
+        {
+          "t": 320.0,
+          "src": "liedjes/frames/09/0041.jpg"
+        },
+        {
+          "t": 328.0,
+          "src": "liedjes/frames/09/0042.jpg"
+        },
+        {
+          "t": 336.0,
+          "src": "liedjes/frames/09/0043.jpg"
+        },
+        {
+          "t": 344.0,
+          "src": "liedjes/frames/09/0044.jpg"
+        },
+        {
+          "t": 352.0,
+          "src": "liedjes/frames/09/0045.jpg"
+        },
+        {
+          "t": 360.0,
+          "src": "liedjes/frames/09/0046.jpg"
+        },
+        {
+          "t": 368.0,
+          "src": "liedjes/frames/09/0047.jpg"
+        },
+        {
+          "t": 376.0,
+          "src": "liedjes/frames/09/0048.jpg"
+        },
+        {
+          "t": 384.0,
+          "src": "liedjes/frames/09/0049.jpg"
+        },
+        {
+          "t": 392.0,
+          "src": "liedjes/frames/09/0050.jpg"
+        },
+        {
+          "t": 400.0,
+          "src": "liedjes/frames/09/0051.jpg"
+        },
+        {
+          "t": 408.0,
+          "src": "liedjes/frames/09/0052.jpg"
+        },
+        {
+          "t": 416.0,
+          "src": "liedjes/frames/09/0053.jpg"
+        },
+        {
+          "t": 424.0,
+          "src": "liedjes/frames/09/0054.jpg"
+        },
+        {
+          "t": 432.0,
+          "src": "liedjes/frames/09/0055.jpg"
+        },
+        {
+          "t": 440.0,
+          "src": "liedjes/frames/09/0056.jpg"
+        },
+        {
+          "t": 448.0,
+          "src": "liedjes/frames/09/0057.jpg"
+        },
+        {
+          "t": 456.0,
+          "src": "liedjes/frames/09/0058.jpg"
+        },
+        {
+          "t": 464.0,
+          "src": "liedjes/frames/09/0059.jpg"
+        },
+        {
+          "t": 472.0,
+          "src": "liedjes/frames/09/0060.jpg"
+        },
+        {
+          "t": 480.0,
+          "src": "liedjes/frames/09/0061.jpg"
+        },
+        {
+          "t": 488.0,
+          "src": "liedjes/frames/09/0062.jpg"
+        },
+        {
+          "t": 496.0,
+          "src": "liedjes/frames/09/0063.jpg"
+        },
+        {
+          "t": 504.0,
+          "src": "liedjes/frames/09/0064.jpg"
+        },
+        {
+          "t": 512.0,
+          "src": "liedjes/frames/09/0065.jpg"
+        },
+        {
+          "t": 520.0,
+          "src": "liedjes/frames/09/0066.jpg"
+        },
+        {
+          "t": 528.0,
+          "src": "liedjes/frames/09/0067.jpg"
+        },
+        {
+          "t": 536.0,
+          "src": "liedjes/frames/09/0068.jpg"
+        }
+      ]
     }
   ]
 }
