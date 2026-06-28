@@ -234,8 +234,32 @@ async function schedulePrefetch() {
 const player = document.getElementById("player");
 const playerImg = document.getElementById("player-img");
 
-function showPlayer(track) { playerImg.src = encodeURI(track.icon); player.classList.add("visible"); document.body.classList.add("playing"); document.querySelectorAll('section.taal-section').forEach(s => s.classList.add('dim')); }
-function hidePlayer() { player.classList.remove("visible"); document.body.classList.remove("playing"); document.querySelectorAll('section.taal-section').forEach(s => s.classList.remove('dim')); playerImg.src = ""; }
+// Timed slideshow: optional per-track `frames` [{t, src}] synced to audio time.
+// No frames => single still (track.icon), unchanged behaviour.
+let slideFrames = null;
+let slideIdx = -1;
+function setupSlideshow(track) {
+  slideFrames = (track.frames && track.frames.length) ? track.frames.slice().sort((a, b) => a.t - b.t) : null;
+  slideIdx = -1;
+  if (slideFrames) {
+    slideFrames.forEach(f => { const im = new Image(); im.src = encodeURI(f.src); }); // preload for instant swaps
+    applySlideFrame(0);
+  }
+}
+function applySlideFrame(time) {
+  if (!slideFrames) return;
+  let i = 0;
+  for (let j = 0; j < slideFrames.length; j++) { if (slideFrames[j].t <= time + 0.001) i = j; else break; }
+  if (i !== slideIdx) { slideIdx = i; playerImg.src = encodeURI(slideFrames[i].src); }
+}
+function clearSlideshow() { slideFrames = null; slideIdx = -1; }
+
+function showPlayer(track) {
+  if (track.frames && track.frames.length) { setupSlideshow(track); }
+  else { clearSlideshow(); playerImg.src = encodeURI(track.icon); }
+  player.classList.add("visible"); document.body.classList.add("playing"); document.querySelectorAll('section.taal-section').forEach(s => s.classList.add('dim'));
+}
+function hidePlayer() { clearSlideshow(); player.classList.remove("visible"); document.body.classList.remove("playing"); document.querySelectorAll('section.taal-section').forEach(s => s.classList.remove('dim')); playerImg.src = ""; }
 
 let isPlaying = false;
 let currentSongKey = null;
@@ -278,6 +302,7 @@ function play(track, tile) {
 
 audio.addEventListener("ended", () => { emitPlayEnd("ended"); isPlaying = false; hidePlayer(); currentTrack = null; });
 audio.addEventListener("timeupdate", () => {
+  if (slideFrames) applySlideFrame(audio.currentTime);
   const now = Date.now();
   if (now - lastProgressLog < 2000 || currentSongKey == null) return;
   lastProgressLog = now;
