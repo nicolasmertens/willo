@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Memory</title>
+<style>
+  :root{
+    --cream:#fff7e6;
+    --ink:#5a4632;
+    --back1:#ffb347;
+    --back2:#ff8c42;
+    --accentA:#7ec8e3;
+    --accentB:#a5d96b;
+    --accentC:#f78fb3;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:var(--cream);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-user-select:none;user-select:none;
+    touch-action:manipulation;
+    overflow-x:hidden;
+  }
+  #confetti{
+    position:fixed;inset:0;width:100%;height:100%;
+    pointer-events:none;z-index:50;
+  }
+  .screen{
+    position:fixed;inset:0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    overflow:hidden;
+  }
+  .screen.active{display:flex;}
+
+  /* Back button */
+  .backbtn{
+    position:fixed;top:14px;left:14px;z-index:40;
+    width:56px;height:56px;border:none;border-radius:50%;
+    background:#fff;color:var(--ink);
+    box-shadow:0 4px 12px rgba(90,70,50,.18);
+    font-size:28px;line-height:1;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .backbtn:active{transform:scale(.92);}
+
+  /* Start screen */
+  #start{justify-content:center;gap:6vh;padding:20px;}
+  #start h1{
+    font-size:clamp(48px,14vw,120px);
+    margin:0;
+    color:var(--back2);
+    text-shadow:0 4px 0 rgba(0,0,0,.06);
+    letter-spacing:2px;
+  }
+  .choices{
+    display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:stretch;
+    width:100%;max-width:760px;
+  }
+  .choice{
+    flex:1 1 180px;min-width:160px;
+    border:none;border-radius:28px;
+    padding:28px 18px;cursor:pointer;
+    color:#fff;
+    box-shadow:0 8px 0 rgba(0,0,0,.12);
+    display:flex;flex-direction:column;align-items:center;gap:10px;
+    transition:transform .08s ease;
+  }
+  .choice:active{transform:translateY(4px);box-shadow:0 4px 0 rgba(0,0,0,.12);}
+  .choice .num{font-size:clamp(44px,10vw,72px);font-weight:800;line-height:1;}
+  .choice .word{font-size:clamp(18px,4vw,26px);font-weight:700;opacity:.95;}
+  .choice .dots{font-size:clamp(20px,5vw,30px);letter-spacing:4px;}
+  .c4{background:var(--accentB);}
+  .c6{background:var(--accentA);}
+  .c8{background:var(--accentC);}
+
+  /* Game screen */
+  #game{padding:78px 12px 16px;justify-content:center;}
+  .board{
+    display:grid;
+    gap:clamp(8px,2vw,16px);
+    width:100%;
+    max-width:900px;
+    margin:auto;
+  }
+  .card{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    border-radius:20px;
+    cursor:pointer;
+    perspective:800px;
+    background:transparent;
+  }
+  .inner{
+    position:absolute;inset:0;
+    transform-style:preserve-3d;
+    transition:transform .45s cubic-bezier(.4,.0,.2,1);
+    border-radius:20px;
+  }
+  .card.up .inner,.card.matched .inner{transform:rotateY(180deg);}
+  .face{
+    position:absolute;inset:0;
+    border-radius:20px;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    overflow:hidden;
+    box-shadow:0 6px 14px rgba(90,70,50,.16);
+  }
+  .back{
+    background:linear-gradient(145deg,var(--back1),var(--back2));
+    display:flex;align-items:center;justify-content:center;
+    font-size:clamp(32px,10vw,64px);
+    color:rgba(255,255,255,.92);
+  }
+  .front{
+    transform:rotateY(180deg);
+    background:var(--cream);
+  }
+  .front img{
+    width:100%;height:100%;object-fit:cover;display:block;
+    pointer-events:none;
+  }
+  .card.matched{cursor:default;}
+  .card.matched .inner{transform:rotateY(180deg) scale(.94);}
+  .card.matched .front{box-shadow:0 0 0 4px var(--accentB),0 6px 14px rgba(90,70,50,.16);}
+
+  /* Win overlay */
+  #win{
+    position:fixed;inset:0;z-index:60;
+    display:none;flex-direction:column;
+    align-items:center;justify-content:center;gap:5vh;
+    background:rgba(255,247,230,.82);
+    backdrop-filter:blur(2px);
+  }
+  #win.active{display:flex;}
+  #win h2{
+    font-size:clamp(40px,12vw,90px);margin:0;color:var(--back2);
+    text-shadow:0 4px 0 rgba(0,0,0,.06);
+  }
+  .again{
+    border:none;border-radius:28px;
+    background:var(--accentB);color:#fff;
+    font-size:clamp(24px,6vw,38px);font-weight:800;
+    padding:22px 44px;cursor:pointer;
+    box-shadow:0 8px 0 rgba(0,0,0,.12);
+  }
+  .again:active{transform:translateY(4px);box-shadow:0 4px 0 rgba(0,0,0,.12);}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+
+<!-- START -->
+<section id="start" class="screen active">
+  <h1>Memory</h1>
+  <div class="choices">
+    <button class="choice c4" data-pairs="4">
+      <span class="num">4</span>
+      <span class="dots">★ ★</span>
+      <span class="word">Easy</span>
+    </button>
+    <button class="choice c6" data-pairs="6">
+      <span class="num">6</span>
+      <span class="dots">★ ★ ★</span>
+      <span class="word">Medium</span>
+    </button>
+    <button class="choice c8" data-pairs="8">
+      <span class="num">8</span>
+      <span class="dots">★ ★ ★ ★</span>
+      <span class="word">Hard</span>
+    </button>
+  </div>
+</section>
+
+<!-- GAME -->
+<section id="game" class="screen">
+  <button class="backbtn" id="backGame" aria-label="back">&#8592;</button>
+  <div class="board" id="board"></div>
+</section>
+
+<!-- WIN -->
+<div id="win">
+  <h2>Yay!</h2>
+  <button class="again" id="againBtn">Play again</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var ANIMALS = [];
+  var screens = {
+    start: document.getElementById('start'),
+    game:  document.getElementById('game')
+  };
+  var board = document.getElementById('board');
+  var winEl = document.getElementById('win');
+
+  /* ---------- helpers ---------- */
+  function show(name){
+    for(var k in screens){ screens[k].classList.remove('active'); }
+    if(screens[name]) screens[name].classList.add('active');
+  }
+  function shuffle(a){
+    for(var i=a.length-1;i>0;i--){
+      var j=Math.floor(Math.random()*(i+1));
+      var t=a[i];a[i]=a[j];a[j]=t;
+    }
+    return a;
+  }
+  function pickAnimals(n){
+    var pool = ANIMALS.slice();
+    shuffle(pool);
+    return pool.slice(0, Math.min(n, pool.length));
+  }
+
+  /* ---------- audio ---------- */
+  var current = null;
+  function playSound(a){
+    try{
+      if(current){ try{ current.pause(); }catch(e){} }
+      current = new Audio("../" + a.sound);
+      var p = current.play();
+      if(p && p.catch){ p.catch(function(){}); }
+    }catch(e){}
+  }
+  // tiny WebAudio chime for the win celebration
+  var actx = null;
+  function chime(){
+    try{
+      if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)();
+      var notes=[523.25,659.25,783.99,1046.5];
+      notes.forEach(function(f,i){
+        var o=actx.createOscillator(), g=actx.createGain();
+        o.type='sine'; o.frequency.value=f;
+        var t=actx.currentTime + i*0.12;
+        g.gain.setValueAtTime(0.0001,t);
+        g.gain.exponentialRampToValueAtTime(0.25,t+0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.4);
+        o.connect(g); g.connect(actx.destination);
+        o.start(t); o.stop(t+0.45);
+      });
+    }catch(e){}
+  }
+
+  /* ---------- confetti ---------- */
+  var cv = document.getElementById('confetti');
+  var ctx = cv.getContext('2d');
+  var parts = [];
+  var COLORS = ['#ffb347','#ff8c42','#7ec8e3','#a5d96b','#f78fb3','#ffe066','#c780e8'];
+  function resize(){
+    cv.width = window.innerWidth * (window.devicePixelRatio||1);
+    cv.height = window.innerHeight * (window.devicePixelRatio||1);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function burst(x, y, count, power){
+    var dpr = window.devicePixelRatio||1;
+    for(var i=0;i<count;i++){
+      var ang = Math.random()*Math.PI*2;
+      var spd = (Math.random()*power + power*0.3);
+      parts.push({
+        x:x*dpr, y:y*dpr,
+        vx:Math.cos(ang)*spd,
+        vy:Math.sin(ang)*spd - power*0.5,
+        g:0.35*dpr,
+        size:(Math.random()*6+5)*dpr,
+        color:COLORS[(Math.random()*COLORS.length)|0],
+        life:1,
+        rot:Math.random()*Math.PI,
+        vr:(Math.random()-0.5)*0.3
+      });
+    }
+    if(!raf) loop();
+  }
+  var raf = null;
+  function loop(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    for(var i=parts.length-1;i>=0;i--){
+      var p=parts[i];
+      p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      p.life-=0.012;
+      if(p.life<=0 || p.y>cv.height+50){ parts.splice(i,1); continue; }
+      ctx.save();
+      ctx.globalAlpha=Math.max(0,p.life);
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle=p.color;
+      ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+      ctx.restore();
+    }
+    if(parts.length>0){ raf=requestAnimationFrame(loop); }
+    else { ctx.clearRect(0,0,cv.width,cv.height); raf=null; }
+  }
+  function burstFullScreen(){
+    var w=window.innerWidth, h=window.innerHeight;
+    burst(w*0.5, h*0.45, 160, 22);
+    setTimeout(function(){ burst(w*0.25,h*0.4,90,18); },180);
+    setTimeout(function(){ burst(w*0.75,h*0.4,90,18); },340);
+  }
+
+  /* ---------- game state ---------- */
+  var firstCard=null, lock=false, matchedCount=0, totalPairs=0;
+
+  function buildBoard(pairs){
+    totalPairs = pairs;
+    matchedCount = 0;
+    firstCard = null;
+    lock = false;
+    board.innerHTML = '';
+
+    var chosen = pickAnimals(pairs);
+    var deck = [];
+    chosen.forEach(function(a){ deck.push(a); deck.push(a); });
+    shuffle(deck);
+
+    // columns: keep cards big, square-ish
+    var cols = pairs<=4 ? 4 : (pairs<=6 ? 4 : 4);
+    if(window.innerWidth > 700){ cols = pairs<=4?4:(pairs<=6?4:4); }
+    // 8 pairs = 16 cards -> 4x4; 6 pairs =12 ->4x3; 4 pairs=8 ->4x2
+    board.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)';
+
+    deck.forEach(function(a){
+      var card=document.createElement('div');
+      card.className='card';
+      card.dataset.n=a.n;
+      card._animal=a;
+      card.innerHTML =
+        '<div class="inner">'+
+          '<div class="face back">?</div>'+
+          '<div class="face front"><img alt="" src="../'+a.img+'"></div>'+
+        '</div>';
+      card.addEventListener('click', function(){ onCard(card); });
+      board.appendChild(card);
+    });
+  }
+
+  function onCard(card){
+    if(lock) return;
+    if(card.classList.contains('matched')) return;
+    if(card.classList.contains('up')) return;
+
+    card.classList.add('up');
+    playSound(card._animal);
+
+    if(!firstCard){
+      firstCard = card;
+      return;
+    }
+
+    // second card
+    if(firstCard.dataset.n === card.dataset.n){
+      // match
+      var a=firstCard, b=card;
+      a.classList.add('matched'); b.classList.add('matched');
+      matchedCount++;
+      firstCard=null;
+      celebrateMatch(b);
+      if(matchedCount===totalPairs){
+        setTimeout(win, 650);
+      }
+    } else {
+      lock=true;
+      var a2=firstCard, b2=card;
+      firstCard=null;
+      setTimeout(function(){
+        a2.classList.remove('up');
+        b2.classList.remove('up');
+        lock=false;
+      }, 900);
+    }
+  }
+
+  function celebrateMatch(card){
+    var r=card.getBoundingClientRect();
+    burst(r.left+r.width/2, r.top+r.height/2, 40, 14);
+  }
+
+  function win(){
+    winEl.classList.add('active');
+    chime();
+    burstFullScreen();
+  }
+
+  /* ---------- wiring ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.choice'), function(btn){
+    btn.addEventListener('click', function(){
+      var n = parseInt(btn.dataset.pairs,10);
+      buildBoard(n);
+      show('game');
+    });
+  });
+
+  document.getElementById('backGame').addEventListener('click', function(){
+    history.back();
+  });
+
+  document.getElementById('againBtn').addEventListener('click', function(){
+    winEl.classList.remove('active');
+    parts.length=0;
+    show('start');
+  });
+
+  /* ---------- load data ---------- */
+  fetch('../animals.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){ ANIMALS = data || []; })
+    .catch(function(){ ANIMALS = []; });
+
+})();
+</script>
+</body>
+</html>

@@ -34,9 +34,9 @@ GRIDS = {
 
 # Section header labels per language.
 SECTION_LABELS = {
-    "nl": {"boeken": "Boeken", "liedjes": "Liedjes", "verhalen": "Verhalen"},
-    "fr": {"boeken": "Livres", "liedjes": "Chansons", "verhalen": "Histoires"},
-    "en": {"boeken": "Books",  "liedjes": "Songs",    "verhalen": "Stories"},
+    "nl": {"boeken": "Boeken", "games": "Spelen", "liedjes": "Liedjes", "verhalen": "Verhalen"},
+    "fr": {"boeken": "Livres", "games": "Jeux",   "liedjes": "Chansons", "verhalen": "Histoires"},
+    "en": {"boeken": "Books",  "games": "Games",  "liedjes": "Songs",    "verhalen": "Stories"},
 }
 
 # Taal pages = single multi-section pages (boeken / liedjes / verhalen stacked).
@@ -69,7 +69,7 @@ TALEN = {
         "title_fallback": "Klas",
         "storage_prefix": "klas",
         "manifest_name": "Klas",
-        "sections": ["boeken", "liedjes", "verhalen"],
+        "sections": ["boeken", "games", "liedjes", "verhalen"],
     },
 }
 
@@ -170,6 +170,7 @@ def render_taal(name, config):
         .replace("__APP_VERSION__",     app_version)
         .replace("__STORAGE_PREFIX__",  config["storage_prefix"])
         .replace("__LABEL_BOEKEN__",    labels["boeken"])
+        .replace("__LABEL_GAMES__",     labels["games"])
         .replace("__LABEL_LIEDJES__",   labels["liedjes"])
         .replace("__LABEL_VERHALEN__",  labels["verhalen"])
         .replace("__ALL_TRACKS_JSON__", json.dumps(all_tracks, ensure_ascii=False))

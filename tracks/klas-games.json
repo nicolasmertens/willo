@@ -1,0 +1,8 @@
+{
+  "title": "Games",
+  "lang": "en",
+  "tracks": [
+    {"n": 1, "title": "Memory", "icon": "games/hero-memory.jpg", "href": "/liedjes/klas/games/memory/"},
+    {"n": 2, "title": "Sounds", "icon": "games/hero-sounds.jpg", "href": "/liedjes/klas/games/soundboard/"}
+  ]
+}

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Sound Board</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0; height: 100%; width: 100%;
+    overflow: hidden;
+    background: #fff7e6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;
+    touch-action: manipulation;
+    color: #4a3f2a;
+  }
+  #app {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    width: 100%;
+  }
+
+  /* LEFT: grid pane (~70%) */
+  #gridPane {
+    flex: 0 0 70%;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px;
+    padding-top: 84px; /* room for back button */
+  }
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+  }
+  .tile {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #ffe9bf;
+    box-shadow: 0 4px 12px rgba(120, 90, 30, 0.18);
+    cursor: pointer;
+    border: 4px solid transparent;
+    transition: transform 0.08s ease, border-color 0.12s ease;
+  }
+  .tile:active { transform: scale(0.95); }
+  .tile.selected { border-color: #ff9f43; }
+  .tile img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+
+  /* RIGHT: stage pane (~30%) */
+  #stagePane {
+    flex: 0 0 30%;
+    height: 100%;
+    padding: 16px;
+    padding-top: 84px;
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+  }
+  #stage {
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    box-shadow: 0 6px 20px rgba(120, 90, 30, 0.18);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* IDLE panel */
+  #idle {
+    width: 100%; height: 100%;
+    background: #d9d9d9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+  }
+  #idle svg { width: 46%; max-width: 160px; height: auto; }
+  #idle .hint {
+    color: #7a7a7a;
+    font-size: 1.1rem;
+    font-weight: 600;
+    opacity: 0.8;
+  }
+
+  /* ACTIVE panel */
+  #active {
+    width: 100%; height: 100%;
+    background: #fffdf8;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 18px;
+  }
+  #active.show { display: flex; }
+  #active img {
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    object-fit: contain;
+    border-radius: 16px;
+  }
+  #active .name {
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    font-weight: 800;
+    color: #ff7f11;
+    text-align: center;
+    flex: 0 0 auto;
+  }
+
+  /* Back button */
+  #back {
+    position: fixed;
+    top: 18px; left: 18px;
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: #ff9f43;
+    border: none;
+    box-shadow: 0 4px 12px rgba(120, 90, 30, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 50;
+    padding: 0;
+  }
+  #back:active { transform: scale(0.92); }
+  #back svg { width: 26px; height: 26px; }
+
+  #loading {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; color: #b09a6a; font-weight: 600;
+  }
+
+  /* PORTRAIT PHONE: stack, sticky stage on top */
+  @media (max-width: 700px) {
+    #app { flex-direction: column; }
+    #stagePane {
+      flex: 0 0 30vh;
+      order: -1;
+      position: sticky;
+      top: 0;
+      padding: 10px;
+      padding-left: 84px; /* clear back button */
+    }
+    #gridPane {
+      flex: 1 1 auto;
+      padding: 12px;
+      padding-top: 12px;
+    }
+    #grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
+    #active { flex-direction: row; padding: 12px; gap: 14px; }
+    #active img { height: 100%; width: auto; flex: 0 1 auto; max-width: 45%; }
+    #idle svg { max-width: 90px; }
+    #idle .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+<button id="back" aria-label="Back">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="15 18 9 12 15 6"></polyline>
+  </svg>
+</button>
+
+<div id="app">
+  <div id="gridPane">
+    <div id="grid"></div>
+  </div>
+  <div id="stagePane">
+    <div id="stage">
+      <div id="idle">
+        <svg viewBox="0 0 100 100" fill="none" stroke="#8a8a8a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="58 22 30 50 58 78"></polyline>
+          <line x1="30" y1="50" x2="78" y2="50"></line>
+        </svg>
+        <div class="hint">Tap an animal</div>
+      </div>
+      <div id="active">
+        <img id="activeImg" alt="">
+        <div class="name" id="activeName"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="loading">Loading…</div>
+
+<script>
+(function () {
+  "use strict";
+  var grid = document.getElementById('grid');
+  var idle = document.getElementById('idle');
+  var active = document.getElementById('active');
+  var activeImg = document.getElementById('activeImg');
+  var activeName = document.getElementById('activeName');
+  var loading = document.getElementById('loading');
+
+  document.getElementById('back').addEventListener('click', function () {
+    history.back();
+  });
+
+  var audio = new Audio();
+  audio.preload = 'none';
+  var currentTile = null;
+  var playToken = 0;
+
+  function showIdle() {
+    active.classList.remove('show');
+    idle.style.display = 'flex';
+    if (currentTile) { currentTile.classList.remove('selected'); currentTile = null; }
+  }
+
+  function showActive(a) {
+    idle.style.display = 'none';
+    activeImg.src = '../' + a.img;
+    activeName.textContent = a.name;
+    active.classList.add('show');
+  }
+
+  audio.addEventListener('ended', function () { showIdle(); });
+  audio.addEventListener('error', function () { showIdle(); });
+
+  function pick(a, tile) {
+    var token = ++playToken;
+    // interrupt any current playback
+    try { audio.pause(); } catch (e) {}
+
+    if (currentTile && currentTile !== tile) currentTile.classList.remove('selected');
+    currentTile = tile;
+    tile.classList.add('selected');
+
+    showActive(a);
+
+    audio.src = '../' + a.sound;
+    audio.currentTime = 0;
+    var p = audio.play();
+    if (p && typeof p.then === 'function') {
+      p.catch(function () {
+        if (token === playToken) showIdle();
+      });
+    }
+  }
+
+  function build(animals) {
+    var frag = document.createDocumentFragment();
+    animals.forEach(function (a) {
+      var tile = document.createElement('div');
+      tile.className = 'tile';
+      var img = document.createElement('img');
+      img.loading = 'lazy';
+      img.src = '../' + a.img;
+      img.alt = a.name;
+      tile.appendChild(img);
+      tile.addEventListener('click', function () { pick(a, tile); });
+      frag.appendChild(tile);
+    });
+    grid.appendChild(frag);
+  }
+
+  fetch('../animals.json')
+    .then(function (r) { return r.json(); })
+    .then(function (animals) {
+      build(animals);
+      loading.style.display = 'none';
+    })
+    .catch(function () {
+      loading.textContent = 'Could not load animals.';
+    });
+})();
+</script>
+</body>
+</html>
