@@ -112,6 +112,27 @@ def extract_frames(video: Path, frames_dir: Path, threshold: float):
     return jpgs[:n], times
 
 
+def sample_frames(video: Path, frames_dir: Path, every: float):
+    """Even time sampling: one frame every `every` seconds, scaled to 640w.
+
+    Robust for continuous animation where scene-detection clusters on transitions
+    and leaves long dead zones. Returns (jpgs, timestamps).
+    """
+    frames_dir.mkdir(parents=True, exist_ok=True)
+    info(f"ffmpeg even-sample (every {every}s) → {frames_dir.name}/")
+    run([
+        "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
+        "-i", str(video),
+        "-vf", f"fps=1/{every},scale=640:-2", "-q:v", "3",
+        str(frames_dir / "%04d.jpg"),
+    ])
+    jpgs = sorted(frames_dir.glob("*.jpg"))
+    if not jpgs:
+        fail("no frames extracted")
+    times = [round(i * every, 2) for i in range(len(jpgs))]
+    return jpgs, times
+
+
 def make_icon(frame: Path, icon_dst: Path):
     icon_dst.parent.mkdir(parents=True, exist_ok=True)
     info(f"ffmpeg square icon → {icon_dst.name}")
@@ -130,6 +151,7 @@ def main():
     p.add_argument("url", help="YouTube URL")
     p.add_argument("title", help="Track title shown in the app")
     p.add_argument("--threshold", type=float, default=0.3, help="scene-detection sensitivity (default 0.3)")
+    p.add_argument("--every", type=float, default=0.0, help="even-sample one frame every N seconds (recommended for continuous animation). 0 = use scene detection")
     p.add_argument("--no-push", action="store_true")
     p.add_argument("--no-commit", action="store_true")
     args = p.parse_args()
@@ -151,7 +173,10 @@ def main():
         video = Path(td) / "video.mp4"
         download_video(args.url, video)
         extract_audio(video, audio_dst)
-        jpgs, times = extract_frames(video, frames_dir, args.threshold)
+        if args.every > 0:
+            jpgs, times = sample_frames(video, frames_dir, args.every)
+        else:
+            jpgs, times = extract_frames(video, frames_dir, args.threshold)
 
     # Rename frames to clean 1-based sequence and build the frames array.
     frames = []
@@ -194,7 +219,7 @@ def main():
          f"{args.taal}/{args.sectie}/frames/{n:02d}/",
          str(manifest_path.relative_to(ROOT)),
          f"{args.taal}/"], cwd=ROOT)
-    msg = f"feat({args.taal}/{args.sectie}): add slideshow '{args.title}' ({len(frames)} scenes)"
+    msg = f"feat({args.taal}/{args.sectie}): add slideshow '{args.title}' ({len(frames)} frames)"
     try:
         run(["git", "commit", "-m", msg], cwd=ROOT, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError:
