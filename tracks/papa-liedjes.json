@@ -23,6 +23,12 @@
       "title": "Ze kunnen zeggen wat ze willen",
       "audio": "liedjes/audio/04.mp3",
       "icon": "liedjes/icons/04.jpg"
+    },
+    {
+      "n": 5,
+      "title": "Het ABC",
+      "audio": "liedjes/audio/05.mp3",
+      "icon": "liedjes/icons/05.jpg"
     }
   ]
 }
