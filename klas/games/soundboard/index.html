@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Sound Board</title>
 <style>
+  :root { --bar-h: 92px; --bar-pad: 10px; --bar-gap: 8px; }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
     margin: 0; padding: 0; height: 100%; width: 100%;
@@ -29,7 +30,8 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 16px;
-    padding-top: 84px; /* room for back button */
+    padding-top: 84px; /* room for toggles */
+    padding-bottom: calc(var(--bar-h) + 28px); /* clear bottom bar */
   }
   #grid {
     display: grid;
@@ -64,6 +66,7 @@
     height: 100%;
     padding: 16px;
     padding-top: 84px;
+    padding-bottom: calc(var(--bar-h) + 16px); /* clear bottom bar */
     display: flex;
     align-items: stretch;
     justify-content: center;
@@ -173,24 +176,14 @@
   .toggle.on .sw::after { transform: translateX(22px); }
   .toggle:active { transform: scale(0.96); }
 
-  /* Back button */
-  #back {
-    position: fixed;
-    top: 18px; left: 18px;
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    background: #ff9f43;
-    border: none;
-    box-shadow: 0 4px 12px rgba(120, 90, 30, 0.3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 50;
-    padding: 0;
-  }
-  #back:active { transform: scale(0.92); }
-  #back svg { width: 26px; height: 26px; }
+  /* Bottom navigation bar */
+  .bottombar { position: fixed; left:0; right:0; bottom:0; z-index:200; padding: var(--bar-pad) var(--bar-pad) max(var(--bar-pad), env(safe-area-inset-bottom)) var(--bar-pad); background: rgba(255,247,230,0.96); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 -2px 12px rgba(0,0,0,0.10); display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap: var(--bar-gap); }
+  .bottombar > button { height: var(--bar-h); border-radius:18px; border:4px solid transparent; background:#fff; padding:0; overflow:hidden; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,0.12),0 8px 18px rgba(0,0,0,0.08); }
+  .bottombar .navtile img { width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
+  .bottombar .navtile.active { border-color:#ff7043; box-shadow:0 0 0 3px rgba(255,112,67,0.25); }
+  .bottombar .stopbtn { background:#e53935; border-color:#fff; display:flex; align-items:center; justify-content:center; }
+  .bottombar .stopbtn svg { width:56%; height:56%; fill:#fff; pointer-events:none; }
+  .bottombar > button:active { transform: scale(0.94); filter: brightness(1.12); }
 
   #loading {
     position: fixed; inset: 0;
@@ -207,12 +200,13 @@
       position: sticky;
       top: 0;
       padding: 10px;
-      padding-left: 84px; /* clear back button */
+      padding-bottom: 10px;
     }
     #gridPane {
       flex: 1 1 auto;
       padding: 12px;
       padding-top: 12px;
+      padding-bottom: calc(var(--bar-h) + 28px); /* clear bottom bar */
     }
     #grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
     #active { flex-direction: row; padding: 12px; gap: 14px; }
@@ -225,12 +219,6 @@
 <script src="../tel.js"></script>
 </head>
 <body>
-<button id="back" aria-label="Back">
-  <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="15 18 9 12 15 6"></polyline>
-  </svg>
-</button>
-
 <div id="toggles">
   <div class="toggle" id="tNames" role="switch" aria-label="Names">
     <span class="lbl">Names</span><span class="sw"></span>
@@ -263,6 +251,13 @@
 
 <div id="loading">Loading…</div>
 
+<nav class="bottombar" aria-label="nav">
+  <button class="navtile" data-href="/liedjes/mama/" aria-label="mama"><img src="/liedjes/home/mama.jpg" alt=""></button>
+  <button class="navtile" data-href="/liedjes/papa/" aria-label="papa"><img src="/liedjes/home/papa.jpg" alt=""></button>
+  <button class="navtile active" data-href="/liedjes/klas/" aria-label="klas"><img src="/liedjes/home/klas.jpg" alt=""></button>
+  <button class="stopbtn" id="exitbtn" aria-label="exit"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
+</nav>
+
 <script>
 (function () {
   "use strict";
@@ -273,10 +268,22 @@
   var activeName = document.getElementById('activeName');
   var loading = document.getElementById('loading');
 
-  document.getElementById('back').addEventListener('click', function () {
-    if (window.tel) window.tel("back", {});
-    history.back();
-  });
+  /* ---- Bottom navigation bar (parent-operated) ---- */
+  var navtiles = document.querySelectorAll('.bottombar .navtile');
+  for (var i = 0; i < navtiles.length; i++) {
+    (function (btn) {
+      btn.addEventListener('click', function () {
+        window.location = btn.getAttribute('data-href');
+      });
+    })(navtiles[i]);
+  }
+  var exitbtn = document.getElementById('exitbtn');
+  if (exitbtn) {
+    exitbtn.addEventListener('click', function () {
+      if (window.tel) window.tel("back", {});
+      window.location = "/liedjes/klas/";
+    });
+  }
 
   /* ---- Toggles (persisted in localStorage, default both ON) ---- */
   function loadToggle(key) {

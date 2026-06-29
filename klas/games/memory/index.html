@@ -13,6 +13,7 @@
     --accentA:#7ec8e3;
     --accentB:#a5d96b;
     --accentC:#f78fb3;
+    --bar-h: 92px; --bar-pad: 10px; --bar-gap: 8px;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{
@@ -26,7 +27,7 @@
   }
   #confetti{
     position:fixed;inset:0;width:100%;height:100%;
-    pointer-events:none;z-index:50;
+    pointer-events:none;z-index:300;
   }
   .screen{
     position:fixed;inset:0;
@@ -36,17 +37,6 @@
     overflow:hidden;
   }
   .screen.active{display:flex;}
-
-  /* Back button */
-  .backbtn{
-    position:fixed;top:14px;left:14px;z-index:40;
-    width:56px;height:56px;border:none;border-radius:50%;
-    background:#fff;color:var(--ink);
-    box-shadow:0 4px 12px rgba(90,70,50,.18);
-    font-size:28px;line-height:1;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
-  }
-  .backbtn:active{transform:scale(.92);}
 
   /* Start screen */
   #start{justify-content:center;gap:6vh;padding:20px;}
@@ -79,12 +69,10 @@
   .c8{background:var(--accentC);}
 
   /* Game screen */
-  #game{padding:78px 12px 16px;justify-content:center;}
+  #game{padding:12px 12px calc(var(--bar-h) + 28px) 12px;justify-content:center;}
   .board{
     display:grid;
-    gap:clamp(8px,2vw,16px);
-    width:100%;
-    max-width:900px;
+    gap:12px;
     margin:auto;
   }
   .card{
@@ -140,7 +128,7 @@
 
   /* Win overlay */
   #win{
-    position:fixed;inset:0;z-index:60;
+    position:fixed;inset:0;z-index:250;
     display:none;flex-direction:column;
     align-items:center;justify-content:center;gap:5vh;
     background:rgba(255,247,230,.82);
@@ -159,6 +147,15 @@
     box-shadow:0 8px 0 rgba(0,0,0,.12);
   }
   .again:active{transform:translateY(4px);box-shadow:0 4px 0 rgba(0,0,0,.12);}
+
+  /* Bottom nav bar */
+  .bottombar { position: fixed; left:0; right:0; bottom:0; z-index:200; padding: var(--bar-pad) var(--bar-pad) max(var(--bar-pad), env(safe-area-inset-bottom)) var(--bar-pad); background: rgba(255,247,230,0.96); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow:0 -2px 12px rgba(0,0,0,0.10); display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap: var(--bar-gap); }
+  .bottombar > button { height: var(--bar-h); border-radius:18px; border:4px solid transparent; background:#fff; padding:0; overflow:hidden; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,0.12),0 8px 18px rgba(0,0,0,0.08); }
+  .bottombar .navtile img { width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
+  .bottombar .navtile.active { border-color:#ff7043; box-shadow:0 0 0 3px rgba(255,112,67,0.25); }
+  .bottombar .stopbtn { background:#e53935; border-color:#fff; display:flex; align-items:center; justify-content:center; }
+  .bottombar .stopbtn svg { width:56%; height:56%; fill:#fff; pointer-events:none; }
+  .bottombar > button:active { transform: scale(0.94); filter: brightness(1.12); }
 </style>
 <script>window.TEL_APP="klas-memory-v1";</script>
 <script src="../tel.js"></script>
@@ -168,7 +165,6 @@
 
 <!-- START -->
 <section id="start" class="screen active">
-  <button class="backbtn" id="backStart" aria-label="back">&#8592;</button>
   <h1>Memory</h1>
   <div class="choices">
     <button class="choice c4" data-pairs="4">
@@ -191,7 +187,6 @@
 
 <!-- GAME -->
 <section id="game" class="screen">
-  <button class="backbtn" id="backGame" aria-label="back">&#8592;</button>
   <div class="board" id="board"></div>
 </section>
 
@@ -200,6 +195,13 @@
   <h2>Yay!</h2>
   <button class="again" id="againBtn">Play again</button>
 </div>
+
+<nav class="bottombar" id="bottombar" aria-label="nav">
+  <button class="navtile" data-href="/liedjes/mama/" aria-label="mama"><img src="/liedjes/home/mama.jpg" alt=""></button>
+  <button class="navtile" data-href="/liedjes/papa/" aria-label="papa"><img src="/liedjes/home/papa.jpg" alt=""></button>
+  <button class="navtile active" data-href="/liedjes/klas/" aria-label="klas"><img src="/liedjes/home/klas.jpg" alt=""></button>
+  <button class="stopbtn" id="exitbtn" aria-label="exit"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
+</nav>
 
 <script>
 (function(){
@@ -382,6 +384,34 @@
   /* ---------- game state ---------- */
   var firstCard=null, lock=false, matchedCount=0, totalPairs=0;
   var totalFlips=0, mismatchCount=0, gameStart=0;
+  var currentCards=0;
+
+  /* ---------- responsive board layout ---------- */
+  var GAP = 12;
+  function layoutBoard(){
+    var n = currentCards;
+    if(!n) return;
+    var barEl = document.getElementById('bottombar');
+    var barH = barEl ? barEl.offsetHeight : 112;
+    var pad = 12;
+    var availW = window.innerWidth - pad*2;
+    var availH = window.innerHeight - barH - pad - 16;
+    if(availW < 40) availW = 40;
+    if(availH < 40) availH = 40;
+    var best = 0, bestCols = 1;
+    for(var cols=1; cols<=n; cols++){
+      var rows = Math.ceil(n/cols);
+      var cw = (availW - (cols-1)*GAP)/cols;
+      var ch = (availH - (rows-1)*GAP)/rows;
+      var size = Math.min(cw, ch);
+      if(size > best){ best = size; bestCols = cols; }
+    }
+    best = Math.floor(best);
+    board.style.gridTemplateColumns = 'repeat(' + bestCols + ',' + best + 'px)';
+    board.style.gridAutoRows = best + 'px';
+  }
+  window.addEventListener('resize', layoutBoard);
+  window.addEventListener('orientationchange', function(){ setTimeout(layoutBoard, 60); });
 
   function buildBoard(pairs){
     totalPairs = pairs;
@@ -398,11 +428,7 @@
     chosen.forEach(function(a){ deck.push(a); deck.push(a); });
     shuffle(deck);
 
-    // columns: keep cards big, square-ish
-    var cols = pairs<=4 ? 4 : (pairs<=6 ? 4 : 4);
-    if(window.innerWidth > 700){ cols = pairs<=4?4:(pairs<=6?4:4); }
-    // 8 pairs = 16 cards -> 4x4; 6 pairs =12 ->4x3; 4 pairs=8 ->4x2
-    board.style.gridTemplateColumns = 'repeat(' + cols + ',1fr)';
+    currentCards = deck.length;
 
     deck.forEach(function(a){
       var card=document.createElement('div');
@@ -417,6 +443,8 @@
       attachTap(card);
       board.appendChild(card);
     });
+
+    layoutBoard();
   }
 
   /* ---------- reliable pointer taps ---------- */
@@ -522,15 +550,16 @@
     });
   });
 
-  document.getElementById('backStart').addEventListener('click', function(){
-    if(window.tel) window.tel("back",{where:"start"});
-    history.back();
+  Array.prototype.forEach.call(document.querySelectorAll('.bottombar .navtile'), function(btn){
+    btn.addEventListener('click', function(){
+      stopSound();
+      window.location = btn.dataset.href;
+    });
   });
 
-  document.getElementById('backGame').addEventListener('click', function(){
-    if(window.tel) window.tel("back",{where:"game"});
+  document.getElementById('exitbtn').addEventListener('click', function(){
     stopSound();
-    history.back();
+    window.location = "/liedjes/klas/";
   });
 
   document.getElementById('againBtn').addEventListener('click', function(){
