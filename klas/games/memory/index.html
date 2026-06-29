@@ -435,10 +435,10 @@
       var moved = Math.sqrt(dx*dx + dy*dy);
       var dt = Date.now() - st.t;
       st = null;
-      if(moved < 14 && dt < 800){
+      if(moved < 30 && dt < 800){
         onCard(card);
       } else {
-        var reason = moved >= 14 ? "drift" : "too_long";
+        var reason = moved >= 30 ? "drift" : "too_long";
         if(window.tel) window.tel("tap_reject",{reason:reason, dx:dx, dy:dy, ms:dt});
       }
     });

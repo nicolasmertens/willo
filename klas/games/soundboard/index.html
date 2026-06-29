@@ -394,7 +394,7 @@
   }
 
   /* ---- Pointer-based reliable taps (toddler-proof, scroll-safe) ---- */
-  var MOVE_TOL = 14;
+  var MOVE_TOL = 30;   // toddler taps wobble 15-35px; real scrolls are 60px+
   var TIME_TOL = 800;
 
   function attachTile(tile, a) {
@@ -405,22 +405,18 @@
       tile.classList.add('pressed');
     });
 
-    function clearPress() {
-      tile.classList.remove('pressed');
-      down = null;
-    }
-
+    // Drop only the pressed visual on big movement; KEEP `down` so pointerup
+    // can measure real drift (touch has implicit capture, so pointerup still
+    // fires on this tile even if the finger slid off it).
     tile.addEventListener('pointermove', function (e) {
       if (!down || e.pointerId !== down.id) return;
-      var dx = e.clientX - down.x;
-      var dy = e.clientY - down.y;
-      if (Math.abs(dx) > MOVE_TOL || Math.abs(dy) > MOVE_TOL) clearPress();
+      var dx = e.clientX - down.x, dy = e.clientY - down.y;
+      if (Math.abs(dx) > MOVE_TOL || Math.abs(dy) > MOVE_TOL) tile.classList.remove('pressed');
     });
 
     tile.addEventListener('pointerup', function (e) {
       if (!down || e.pointerId !== down.id) {
         if (window.tel) window.tel("tap_reject", { reason: "off_tile", dx: 0, dy: 0, ms: 0 });
-        clearPress();
         return;
       }
       var dx = e.clientX - down.x;
@@ -428,23 +424,15 @@
       var dt = Date.now() - down.t;
       var moved = Math.abs(dx) > MOVE_TOL || Math.abs(dy) > MOVE_TOL;
       tile.classList.remove('pressed');
+      down = null;
       if (!moved && dt < TIME_TOL) {
         pick(a, tile);
       } else if (window.tel) {
-        window.tel("tap_reject", {
-          reason: moved ? "drift" : "too_long",
-          dx: Math.round(dx),
-          dy: Math.round(dy),
-          ms: dt
-        });
+        window.tel("tap_reject", { reason: moved ? "drift" : "too_long", dx: Math.round(dx), dy: Math.round(dy), ms: dt });
       }
-      down = null;
     });
 
-    tile.addEventListener('pointercancel', clearPress);
-    tile.addEventListener('pointerleave', function (e) {
-      if (down && e.pointerId === down.id) clearPress();
-    });
+    tile.addEventListener('pointercancel', function () { tile.classList.remove('pressed'); down = null; });
   }
 
   function build(animals) {
