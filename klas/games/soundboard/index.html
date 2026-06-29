@@ -46,9 +46,10 @@
     box-shadow: 0 4px 12px rgba(120, 90, 30, 0.18);
     cursor: pointer;
     border: 4px solid transparent;
-    transition: transform 0.08s ease, border-color 0.12s ease;
+    transition: transform 0.08s ease, border-color 0.12s ease, filter 0.08s ease;
+    touch-action: manipulation;
   }
-  .tile:active { transform: scale(0.95); }
+  .tile.pressed { transform: scale(0.93); filter: brightness(1.12); }
   .tile.selected { border-color: #ff9f43; }
   .tile img {
     width: 100%; height: 100%;
@@ -124,6 +125,54 @@
     flex: 0 0 auto;
   }
 
+  /* Toggle header bar (top-right over the grid) */
+  #toggles {
+    position: fixed;
+    top: 14px; right: 16px;
+    display: flex;
+    gap: 12px;
+    z-index: 50;
+  }
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #ffe9bf;
+    border-radius: 999px;
+    padding: 7px 12px 7px 14px;
+    box-shadow: 0 3px 10px rgba(120, 90, 30, 0.22);
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  .toggle .lbl {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #7a6233;
+    letter-spacing: 0.2px;
+  }
+  .toggle .sw {
+    position: relative;
+    width: 52px; height: 30px;
+    border-radius: 999px;
+    background: #cbb489;
+    transition: background 0.15s ease;
+    flex: 0 0 auto;
+  }
+  .toggle .sw::after {
+    content: "";
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+    transition: transform 0.15s ease;
+  }
+  .toggle.on .sw { background: #ff9f43; }
+  .toggle.on .sw::after { transform: translateX(22px); }
+  .toggle:active { transform: scale(0.96); }
+
   /* Back button */
   #back {
     position: fixed;
@@ -180,6 +229,15 @@
   </svg>
 </button>
 
+<div id="toggles">
+  <div class="toggle" id="tNames" role="switch" aria-label="Names">
+    <span class="lbl">Names</span><span class="sw"></span>
+  </div>
+  <div class="toggle" id="tSounds" role="switch" aria-label="Sounds">
+    <span class="lbl">Sounds</span><span class="sw"></span>
+  </div>
+</div>
+
 <div id="app">
   <div id="gridPane">
     <div id="grid"></div>
@@ -217,12 +275,49 @@
     history.back();
   });
 
+  /* ---- Toggles (persisted in localStorage, default both ON) ---- */
+  function loadToggle(key) {
+    try {
+      var v = localStorage.getItem(key);
+      return v === null ? true : v === '1';
+    } catch (e) { return true; }
+  }
+  function saveToggle(key, val) {
+    try { localStorage.setItem(key, val ? '1' : '0'); } catch (e) {}
+  }
+  var namesOn = loadToggle('sb_names');
+  var soundsOn = loadToggle('sb_sounds');
+
+  var tNames = document.getElementById('tNames');
+  var tSounds = document.getElementById('tSounds');
+
+  function renderToggle(el, on) {
+    el.classList.toggle('on', on);
+    el.setAttribute('aria-checked', on ? 'true' : 'false');
+  }
+  renderToggle(tNames, namesOn);
+  renderToggle(tSounds, soundsOn);
+
+  tNames.addEventListener('click', function () {
+    namesOn = !namesOn; saveToggle('sb_names', namesOn); renderToggle(tNames, namesOn);
+  });
+  tSounds.addEventListener('click', function () {
+    soundsOn = !soundsOn; saveToggle('sb_sounds', soundsOn); renderToggle(tSounds, soundsOn);
+  });
+
+  /* ---- Stage + playback ---- */
   var audio = new Audio();
   audio.preload = 'none';
   var currentTile = null;
   var playToken = 0;
+  var silentTimer = null;
+
+  function clearSilentTimer() {
+    if (silentTimer) { clearTimeout(silentTimer); silentTimer = null; }
+  }
 
   function showIdle() {
+    clearSilentTimer();
     active.classList.remove('show');
     idle.style.display = 'flex';
     if (currentTile) { currentTile.classList.remove('selected'); currentTile = null; }
@@ -235,13 +330,25 @@
     active.classList.add('show');
   }
 
-  audio.addEventListener('ended', function () { showIdle(); });
-  audio.addEventListener('error', function () { showIdle(); });
+  // play a single clip; resolves the chain via callback when it ends/errors/fails
+  function playClip(src, token, onDone) {
+    try { audio.pause(); } catch (e) {}
+    audio.onended = function () { if (token === playToken) onDone(); };
+    audio.onerror = function () { if (token === playToken) onDone(); };
+    audio.src = '../' + src;
+    try { audio.currentTime = 0; } catch (e) {}
+    var p = audio.play();
+    if (p && typeof p.then === 'function') {
+      p.catch(function () { if (token === playToken) onDone(); });
+    }
+  }
 
   function pick(a, tile) {
     var token = ++playToken;
-    // interrupt any current playback
+    clearSilentTimer();
     try { audio.pause(); } catch (e) {}
+    audio.onended = null;
+    audio.onerror = null;
 
     if (currentTile && currentTile !== tile) currentTile.classList.remove('selected');
     currentTile = tile;
@@ -249,14 +356,77 @@
 
     showActive(a);
 
-    audio.src = '../' + a.sound;
-    audio.currentTime = 0;
-    var p = audio.play();
-    if (p && typeof p.then === 'function') {
-      p.catch(function () {
+    var playName = namesOn && a.nameClip;
+    var playSound = soundsOn && a.sound;
+
+    if (playName && playSound) {
+      // name clip -> short gap -> sound clip
+      playClip(a.nameClip, token, function () {
+        if (token !== playToken) return;
+        setTimeout(function () {
+          if (token !== playToken) return;
+          playClip(a.sound, token, function () {
+            if (token === playToken) showIdle();
+          });
+        }, 120);
+      });
+    } else if (playName) {
+      playClip(a.nameClip, token, function () {
         if (token === playToken) showIdle();
       });
+    } else if (playSound) {
+      playClip(a.sound, token, function () {
+        if (token === playToken) showIdle();
+      });
+    } else {
+      // both off: show silently, then revert
+      silentTimer = setTimeout(function () {
+        if (token === playToken) showIdle();
+      }, 1500);
     }
+  }
+
+  /* ---- Pointer-based reliable taps (toddler-proof, scroll-safe) ---- */
+  var MOVE_TOL = 14;
+  var TIME_TOL = 800;
+
+  function attachTile(tile, a) {
+    var down = null;
+
+    tile.addEventListener('pointerdown', function (e) {
+      down = { x: e.clientX, y: e.clientY, t: Date.now(), id: e.pointerId };
+      tile.classList.add('pressed');
+    });
+
+    function clearPress() {
+      tile.classList.remove('pressed');
+      down = null;
+    }
+
+    tile.addEventListener('pointermove', function (e) {
+      if (!down || e.pointerId !== down.id) return;
+      var dx = e.clientX - down.x;
+      var dy = e.clientY - down.y;
+      if (Math.abs(dx) > MOVE_TOL || Math.abs(dy) > MOVE_TOL) clearPress();
+    });
+
+    tile.addEventListener('pointerup', function (e) {
+      if (!down || e.pointerId !== down.id) { clearPress(); return; }
+      var dx = e.clientX - down.x;
+      var dy = e.clientY - down.y;
+      var dt = Date.now() - down.t;
+      var moved = Math.abs(dx) > MOVE_TOL || Math.abs(dy) > MOVE_TOL;
+      tile.classList.remove('pressed');
+      if (!moved && dt < TIME_TOL) {
+        pick(a, tile);
+      }
+      down = null;
+    });
+
+    tile.addEventListener('pointercancel', clearPress);
+    tile.addEventListener('pointerleave', function (e) {
+      if (down && e.pointerId === down.id) clearPress();
+    });
   }
 
   function build(animals) {
@@ -269,7 +439,7 @@
       img.src = '../' + a.img;
       img.alt = a.name;
       tile.appendChild(img);
-      tile.addEventListener('click', function () { pick(a, tile); });
+      attachTile(tile, a);
       frag.appendChild(tile);
     });
     grid.appendChild(frag);

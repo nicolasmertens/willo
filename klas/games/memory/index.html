@@ -124,6 +124,16 @@
     width:100%;height:100%;object-fit:cover;display:block;
     pointer-events:none;
   }
+  .card{touch-action:manipulation;}
+  @keyframes wiggle{
+    0%,100%{transform:translateX(0);}
+    15%{transform:translateX(-8px) rotate(-3deg);}
+    30%{transform:translateX(8px) rotate(3deg);}
+    45%{transform:translateX(-6px) rotate(-2deg);}
+    60%{transform:translateX(6px) rotate(2deg);}
+    75%{transform:translateX(-3px);}
+  }
+  .card.wiggle{animation:wiggle .5s ease;}
   .card.matched{cursor:default;}
   .card.matched .inner{transform:rotateY(180deg) scale(.94);}
   .card.matched .front{box-shadow:0 0 0 4px var(--accentB),0 6px 14px rgba(90,70,50,.16);}
@@ -156,6 +166,7 @@
 
 <!-- START -->
 <section id="start" class="screen active">
+  <button class="backbtn" id="backStart" aria-label="back">&#8592;</button>
   <h1>Memory</h1>
   <div class="choices">
     <button class="choice c4" data-pairs="4">
@@ -219,20 +230,82 @@
   }
 
   /* ---------- audio ---------- */
+  var actx = null;
+  function ensureAudio(){
+    try{
+      if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)();
+      if(actx.state === 'suspended'){ actx.resume(); }
+    }catch(e){}
+    return actx;
+  }
+
   var current = null;
+  function stopSound(){
+    if(current){
+      try{ current.pause(); current.currentTime = 0; }catch(e){}
+      current = null;
+    }
+  }
   function playSound(a){
     try{
-      if(current){ try{ current.pause(); }catch(e){} }
+      stopSound();
       current = new Audio("../" + a.sound);
       var p = current.play();
       if(p && p.catch){ p.catch(function(){}); }
     }catch(e){}
   }
+
+  // gentle "uh-oh": two short descending notes
+  function uhOh(){
+    try{
+      var ac = ensureAudio(); if(!ac) return;
+      var seq=[{f:330,t:0},{f:247,t:0.22}];
+      seq.forEach(function(s){
+        var o=ac.createOscillator(), g=ac.createGain();
+        o.type='triangle'; o.frequency.value=s.f;
+        var t=ac.currentTime + s.t;
+        g.gain.setValueAtTime(0.0001,t);
+        g.gain.exponentialRampToValueAtTime(0.12,t+0.03);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.2);
+        o.connect(g); g.connect(ac.destination);
+        o.start(t); o.stop(t+0.24);
+      });
+    }catch(e){}
+  }
+
+  // synthesized applause: bursts of bandpass-filtered white noise
+  function clap(dense){
+    try{
+      var ac = ensureAudio(); if(!ac) return;
+      var bursts = dense ? 28 : 12;
+      var span = dense ? 0.9 : 0.65;
+      // reusable noise buffer
+      var len = Math.floor(ac.sampleRate * 0.18);
+      var buf = ac.createBuffer(1, len, ac.sampleRate);
+      var d = buf.getChannelData(0);
+      for(var i=0;i<len;i++){ d[i] = (Math.random()*2-1) * (1 - i/len); }
+      for(var b=0;b<bursts;b++){
+        var src = ac.createBufferSource(); src.buffer = buf;
+        var bp = ac.createBiquadFilter();
+        bp.type='bandpass';
+        bp.frequency.value = 900 + Math.random()*1600;
+        bp.Q.value = 0.7 + Math.random();
+        var g = ac.createGain();
+        var t = ac.currentTime + Math.random()*span;
+        var lvl = 0.12 + Math.random()*0.16;
+        g.gain.setValueAtTime(0.0001,t);
+        g.gain.exponentialRampToValueAtTime(lvl,t+0.005);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.06+Math.random()*0.05);
+        src.connect(bp); bp.connect(g); g.connect(ac.destination);
+        src.start(t); src.stop(t+0.2);
+      }
+    }catch(e){}
+  }
+
   // tiny WebAudio chime for the win celebration
-  var actx = null;
   function chime(){
     try{
-      if(!actx) actx = new (window.AudioContext||window.webkitAudioContext)();
+      var actx = ensureAudio(); if(!actx) return;
       var notes=[523.25,659.25,783.99,1046.5];
       notes.forEach(function(f,i){
         var o=actx.createOscillator(), g=actx.createGain();
@@ -335,9 +408,28 @@
           '<div class="face back">?</div>'+
           '<div class="face front"><img alt="" src="../'+a.img+'"></div>'+
         '</div>';
-      card.addEventListener('click', function(){ onCard(card); });
+      attachTap(card);
       board.appendChild(card);
     });
+  }
+
+  /* ---------- reliable pointer taps ---------- */
+  function attachTap(card){
+    var st = null;
+    card.addEventListener('pointerdown', function(e){
+      ensureAudio();
+      st = { x:e.clientX, y:e.clientY, t:Date.now() };
+    });
+    card.addEventListener('pointerup', function(e){
+      if(!st) return;
+      var dx = e.clientX - st.x, dy = e.clientY - st.y;
+      var moved = Math.sqrt(dx*dx + dy*dy);
+      var dt = Date.now() - st.t;
+      st = null;
+      if(moved < 14 && dt < 800){ onCard(card); }
+    });
+    card.addEventListener('pointercancel', function(){ st = null; });
+    card.addEventListener('pointerleave', function(){ /* keep st for slight slips */ });
   }
 
   function onCard(card){
@@ -360,19 +452,29 @@
       a.classList.add('matched'); b.classList.add('matched');
       matchedCount++;
       firstCard=null;
+      stopSound();
+      clap(false);
       celebrateMatch(b);
       if(matchedCount===totalPairs){
         setTimeout(win, 650);
       }
     } else {
+      // mismatch: gentle uh-oh + wiggle, then flip back
       lock=true;
       var a2=firstCard, b2=card;
       firstCard=null;
+      stopSound();
+      uhOh();
+      a2.classList.add('wiggle');
+      b2.classList.add('wiggle');
       setTimeout(function(){
+        a2.classList.remove('wiggle');
+        b2.classList.remove('wiggle');
         a2.classList.remove('up');
         b2.classList.remove('up');
+        stopSound();
         lock=false;
-      }, 900);
+      }, 850);
     }
   }
 
@@ -383,24 +485,33 @@
 
   function win(){
     winEl.classList.add('active');
+    stopSound();
     chime();
+    clap(true);
     burstFullScreen();
   }
 
   /* ---------- wiring ---------- */
   Array.prototype.forEach.call(document.querySelectorAll('.choice'), function(btn){
     btn.addEventListener('click', function(){
+      ensureAudio();
       var n = parseInt(btn.dataset.pairs,10);
       buildBoard(n);
       show('game');
     });
   });
 
+  document.getElementById('backStart').addEventListener('click', function(){
+    history.back();
+  });
+
   document.getElementById('backGame').addEventListener('click', function(){
+    stopSound();
     history.back();
   });
 
   document.getElementById('againBtn').addEventListener('click', function(){
+    stopSound();
     winEl.classList.remove('active');
     parts.length=0;
     show('start');

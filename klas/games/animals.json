@@ -3,300 +3,350 @@
     "n": 1,
     "name": "Dog",
     "img": "img/01.jpg",
-    "sound": "audio/01.mp3"
+    "nameClip": "name/01.mp3",
+    "sound": "sound/01.mp3"
   },
   {
     "n": 2,
     "name": "Cat",
     "img": "img/02.jpg",
-    "sound": "audio/02.mp3"
+    "nameClip": "name/02.mp3",
+    "sound": "sound/02.mp3"
   },
   {
     "n": 3,
     "name": "Cow",
     "img": "img/03.jpg",
-    "sound": "audio/03.mp3"
+    "nameClip": "name/03.mp3",
+    "sound": "sound/03.mp3"
   },
   {
     "n": 4,
     "name": "Lion",
     "img": "img/04.jpg",
-    "sound": "audio/04.mp3"
+    "nameClip": "name/04.mp3",
+    "sound": "sound/04.mp3"
   },
   {
     "n": 5,
     "name": "Leopard",
     "img": "img/05.jpg",
-    "sound": "audio/05.mp3"
+    "nameClip": "name/05.mp3",
+    "sound": "sound/05.mp3"
   },
   {
     "n": 6,
     "name": "Elephant",
     "img": "img/06.jpg",
-    "sound": "audio/06.mp3"
+    "nameClip": "name/06.mp3",
+    "sound": "sound/06.mp3"
   },
   {
     "n": 7,
     "name": "Horse",
     "img": "img/07.jpg",
-    "sound": "audio/07.mp3"
+    "nameClip": "name/07.mp3",
+    "sound": "sound/07.mp3"
   },
   {
     "n": 8,
     "name": "Tiger",
     "img": "img/08.jpg",
-    "sound": "audio/08.mp3"
+    "nameClip": "name/08.mp3",
+    "sound": "sound/08.mp3"
   },
   {
     "n": 9,
     "name": "Sheep",
     "img": "img/09.jpg",
-    "sound": "audio/09.mp3"
+    "nameClip": "name/09.mp3",
+    "sound": "sound/09.mp3"
   },
   {
     "n": 10,
     "name": "Pig",
     "img": "img/10.jpg",
-    "sound": "audio/10.mp3"
+    "nameClip": "name/10.mp3",
+    "sound": "sound/10.mp3"
   },
   {
     "n": 11,
     "name": "Goat",
     "img": "img/11.jpg",
-    "sound": "audio/11.mp3"
+    "nameClip": "name/11.mp3",
+    "sound": "sound/11.mp3"
   },
   {
     "n": 12,
     "name": "Rooster",
     "img": "img/12.jpg",
-    "sound": "audio/12.mp3"
+    "nameClip": "name/12.mp3",
+    "sound": "sound/12.mp3"
   },
   {
     "n": 13,
     "name": "Duck",
     "img": "img/13.jpg",
-    "sound": "audio/13.mp3"
+    "nameClip": "name/13.mp3",
+    "sound": "sound/13.mp3"
   },
   {
     "n": 14,
     "name": "Crow",
     "img": "img/14.jpg",
-    "sound": "audio/14.mp3"
+    "nameClip": "name/14.mp3",
+    "sound": "sound/14.mp3"
   },
   {
     "n": 15,
     "name": "Chicken",
     "img": "img/15.jpg",
-    "sound": "audio/15.mp3"
+    "nameClip": "name/15.mp3",
+    "sound": "sound/15.mp3"
   },
   {
     "n": 16,
     "name": "Owl",
     "img": "img/16.jpg",
-    "sound": "audio/16.mp3"
+    "nameClip": "name/16.mp3",
+    "sound": "sound/16.mp3"
   },
   {
     "n": 17,
     "name": "Deer",
     "img": "img/17.jpg",
-    "sound": "audio/17.mp3"
+    "nameClip": "name/17.mp3",
+    "sound": "sound/17.mp3"
   },
   {
     "n": 18,
     "name": "Parrot",
     "img": "img/18.jpg",
-    "sound": "audio/18.mp3"
+    "nameClip": "name/18.mp3",
+    "sound": "sound/18.mp3"
   },
   {
     "n": 19,
     "name": "Peacock",
     "img": "img/19.jpg",
-    "sound": "audio/19.mp3"
+    "nameClip": "name/19.mp3",
+    "sound": "sound/19.mp3"
   },
   {
     "n": 20,
     "name": "Frog",
     "img": "img/20.jpg",
-    "sound": "audio/20.mp3"
+    "nameClip": "name/20.mp3",
+    "sound": "sound/20.mp3"
   },
   {
     "n": 21,
     "name": "Giraffe",
     "img": "img/21.jpg",
-    "sound": "audio/21.mp3"
+    "nameClip": "name/21.mp3",
+    "sound": "sound/21.mp3"
   },
   {
     "n": 22,
     "name": "Snake",
     "img": "img/22.jpg",
-    "sound": "audio/22.mp3"
+    "nameClip": "name/22.mp3",
+    "sound": "sound/22.mp3"
   },
   {
     "n": 23,
     "name": "Bee",
     "img": "img/23.jpg",
-    "sound": "audio/23.mp3"
+    "nameClip": "name/23.mp3",
+    "sound": "sound/23.mp3"
   },
   {
     "n": 24,
     "name": "Cricket",
     "img": "img/24.jpg",
-    "sound": "audio/24.mp3"
+    "nameClip": "name/24.mp3",
+    "sound": "sound/24.mp3"
   },
   {
     "n": 25,
     "name": "Wolf",
     "img": "img/25.jpg",
-    "sound": "audio/25.mp3"
+    "nameClip": "name/25.mp3",
+    "sound": "sound/25.mp3"
   },
   {
     "n": 26,
     "name": "Fox",
     "img": "img/26.jpg",
-    "sound": "audio/26.mp3"
+    "nameClip": "name/26.mp3",
+    "sound": "sound/26.mp3"
   },
   {
     "n": 27,
     "name": "Hyena",
     "img": "img/27.jpg",
-    "sound": "audio/27.mp3"
+    "nameClip": "name/27.mp3",
+    "sound": "sound/27.mp3"
   },
   {
     "n": 28,
     "name": "Donkey",
     "img": "img/28.jpg",
-    "sound": "audio/28.mp3"
+    "nameClip": "name/28.mp3",
+    "sound": "sound/28.mp3"
   },
   {
     "n": 29,
     "name": "Camel",
     "img": "img/29.jpg",
-    "sound": "audio/29.mp3"
+    "nameClip": "name/29.mp3",
+    "sound": "sound/29.mp3"
   },
   {
     "n": 30,
     "name": "Monkey",
     "img": "img/30.jpg",
-    "sound": "audio/30.mp3"
+    "nameClip": "name/30.mp3",
+    "sound": "sound/30.mp3"
   },
   {
     "n": 31,
     "name": "Dolphin",
     "img": "img/31.jpg",
-    "sound": "audio/31.mp3"
+    "nameClip": "name/31.mp3",
+    "sound": "sound/31.mp3"
   },
   {
     "n": 32,
     "name": "Gorilla",
     "img": "img/32.jpg",
-    "sound": "audio/32.mp3"
+    "nameClip": "name/32.mp3",
+    "sound": "sound/32.mp3"
   },
   {
     "n": 33,
     "name": "Whale",
     "img": "img/33.jpg",
-    "sound": "audio/33.mp3"
+    "nameClip": "name/33.mp3",
+    "sound": "sound/33.mp3"
   },
   {
     "n": 34,
     "name": "Turkey",
     "img": "img/34.jpg",
-    "sound": "audio/34.mp3"
+    "nameClip": "name/34.mp3",
+    "sound": "sound/34.mp3"
   },
   {
     "n": 35,
     "name": "Penguin",
     "img": "img/35.jpg",
-    "sound": "audio/35.mp3"
+    "nameClip": "name/35.mp3",
+    "sound": "sound/35.mp3"
   },
   {
     "n": 36,
     "name": "Goose",
     "img": "img/36.jpg",
-    "sound": "audio/36.mp3"
+    "nameClip": "name/36.mp3",
+    "sound": "sound/36.mp3"
   },
   {
     "n": 37,
     "name": "Seal",
     "img": "img/37.jpg",
-    "sound": "audio/37.mp3"
+    "nameClip": "name/37.mp3",
+    "sound": "sound/37.mp3"
   },
   {
     "n": 38,
     "name": "Bat",
     "img": "img/38.jpg",
-    "sound": "audio/38.mp3"
+    "nameClip": "name/38.mp3",
+    "sound": "sound/38.mp3"
   },
   {
     "n": 39,
     "name": "Hawk",
     "img": "img/39.jpg",
-    "sound": "audio/39.mp3"
+    "nameClip": "name/39.mp3",
+    "sound": "sound/39.mp3"
   },
   {
     "n": 40,
     "name": "Eagle",
     "img": "img/40.jpg",
-    "sound": "audio/40.mp3"
+    "nameClip": "name/40.mp3",
+    "sound": "sound/40.mp3"
   },
   {
     "n": 41,
     "name": "Mouse",
     "img": "img/41.jpg",
-    "sound": "audio/41.mp3"
+    "nameClip": "name/41.mp3",
+    "sound": "sound/41.mp3"
   },
   {
     "n": 42,
     "name": "Rabbit",
     "img": "img/42.jpg",
-    "sound": "audio/42.mp3"
+    "nameClip": "name/42.mp3",
+    "sound": "sound/42.mp3"
   },
   {
     "n": 43,
     "name": "Zebra",
     "img": "img/43.jpg",
-    "sound": "audio/43.mp3"
+    "nameClip": "name/43.mp3",
+    "sound": "sound/43.mp3"
   },
   {
     "n": 44,
     "name": "Cheetah",
     "img": "img/44.jpg",
-    "sound": "audio/44.mp3"
+    "nameClip": "name/44.mp3",
+    "sound": "sound/44.mp3"
   },
   {
     "n": 45,
     "name": "Bear",
     "img": "img/45.jpg",
-    "sound": "audio/45.mp3"
+    "nameClip": "name/45.mp3",
+    "sound": "sound/45.mp3"
   },
   {
     "n": 46,
     "name": "Crocodile",
     "img": "img/46.jpg",
-    "sound": "audio/46.mp3"
+    "nameClip": "name/46.mp3",
+    "sound": "sound/46.mp3"
   },
   {
     "n": 47,
     "name": "Alligator",
     "img": "img/47.jpg",
-    "sound": "audio/47.mp3"
+    "nameClip": "name/47.mp3",
+    "sound": "sound/47.mp3"
   },
   {
     "n": 48,
     "name": "Chimpanzee",
     "img": "img/48.jpg",
-    "sound": "audio/48.mp3"
+    "nameClip": "name/48.mp3",
+    "sound": "sound/48.mp3"
   },
   {
     "n": 49,
     "name": "Kangaroo",
     "img": "img/49.jpg",
-    "sound": "audio/49.mp3"
+    "nameClip": "name/49.mp3",
+    "sound": "sound/49.mp3"
   },
   {
     "n": 50,
     "name": "Hippopotamus",
     "img": "img/50.jpg",
-    "sound": "audio/50.mp3"
+    "nameClip": "name/50.mp3",
+    "sound": "sound/50.mp3"
   }
 ]
