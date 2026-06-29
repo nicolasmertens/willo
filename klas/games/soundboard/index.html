@@ -221,6 +221,8 @@
     #idle .hint { display: none; }
   }
 </style>
+<script>window.TEL_APP="klas-soundboard-v1";</script>
+<script src="../tel.js"></script>
 </head>
 <body>
 <button id="back" aria-label="Back">
@@ -272,6 +274,7 @@
   var loading = document.getElementById('loading');
 
   document.getElementById('back').addEventListener('click', function () {
+    if (window.tel) window.tel("back", {});
     history.back();
   });
 
@@ -300,9 +303,11 @@
 
   tNames.addEventListener('click', function () {
     namesOn = !namesOn; saveToggle('sb_names', namesOn); renderToggle(tNames, namesOn);
+    if (window.tel) window.tel("toggle", { which: "names", on: namesOn ? 1 : 0 });
   });
   tSounds.addEventListener('click', function () {
     soundsOn = !soundsOn; saveToggle('sb_sounds', soundsOn); renderToggle(tSounds, soundsOn);
+    if (window.tel) window.tel("toggle", { which: "sounds", on: soundsOn ? 1 : 0 });
   });
 
   /* ---- Stage + playback ---- */
@@ -353,6 +358,8 @@
     if (currentTile && currentTile !== tile) currentTile.classList.remove('selected');
     currentTile = tile;
     tile.classList.add('selected');
+
+    if (window.tel) window.tel("tap", { n: a.n, name: a.name, names: namesOn ? 1 : 0, sounds: soundsOn ? 1 : 0 });
 
     showActive(a);
 
@@ -411,7 +418,11 @@
     });
 
     tile.addEventListener('pointerup', function (e) {
-      if (!down || e.pointerId !== down.id) { clearPress(); return; }
+      if (!down || e.pointerId !== down.id) {
+        if (window.tel) window.tel("tap_reject", { reason: "off_tile", dx: 0, dy: 0, ms: 0 });
+        clearPress();
+        return;
+      }
       var dx = e.clientX - down.x;
       var dy = e.clientY - down.y;
       var dt = Date.now() - down.t;
@@ -419,6 +430,13 @@
       tile.classList.remove('pressed');
       if (!moved && dt < TIME_TOL) {
         pick(a, tile);
+      } else if (window.tel) {
+        window.tel("tap_reject", {
+          reason: moved ? "drift" : "too_long",
+          dx: Math.round(dx),
+          dy: Math.round(dy),
+          ms: dt
+        });
       }
       down = null;
     });

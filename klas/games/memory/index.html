@@ -160,6 +160,8 @@
   }
   .again:active{transform:translateY(4px);box-shadow:0 4px 0 rgba(0,0,0,.12);}
 </style>
+<script>window.TEL_APP="klas-memory-v1";</script>
+<script src="../tel.js"></script>
 </head>
 <body>
 <canvas id="confetti"></canvas>
@@ -379,12 +381,16 @@
 
   /* ---------- game state ---------- */
   var firstCard=null, lock=false, matchedCount=0, totalPairs=0;
+  var totalFlips=0, mismatchCount=0, gameStart=0;
 
   function buildBoard(pairs){
     totalPairs = pairs;
     matchedCount = 0;
     firstCard = null;
     lock = false;
+    totalFlips = 0;
+    mismatchCount = 0;
+    gameStart = Date.now();
     board.innerHTML = '';
 
     var chosen = pickAnimals(pairs);
@@ -421,12 +427,20 @@
       st = { x:e.clientX, y:e.clientY, t:Date.now() };
     });
     card.addEventListener('pointerup', function(e){
-      if(!st) return;
+      if(!st){
+        if(window.tel) window.tel("tap_reject",{reason:"off_card", dx:0, dy:0, ms:0});
+        return;
+      }
       var dx = e.clientX - st.x, dy = e.clientY - st.y;
       var moved = Math.sqrt(dx*dx + dy*dy);
       var dt = Date.now() - st.t;
       st = null;
-      if(moved < 14 && dt < 800){ onCard(card); }
+      if(moved < 14 && dt < 800){
+        onCard(card);
+      } else {
+        var reason = moved >= 14 ? "drift" : "too_long";
+        if(window.tel) window.tel("tap_reject",{reason:reason, dx:dx, dy:dy, ms:dt});
+      }
     });
     card.addEventListener('pointercancel', function(){ st = null; });
     card.addEventListener('pointerleave', function(){ /* keep st for slight slips */ });
@@ -439,6 +453,8 @@
 
     card.classList.add('up');
     playSound(card._animal);
+    totalFlips++;
+    if(window.tel) window.tel("flip",{n:card._animal.n});
 
     if(!firstCard){
       firstCard = card;
@@ -452,6 +468,7 @@
       a.classList.add('matched'); b.classList.add('matched');
       matchedCount++;
       firstCard=null;
+      if(window.tel) window.tel("match",{n:b._animal.n});
       stopSound();
       clap(false);
       celebrateMatch(b);
@@ -463,6 +480,8 @@
       lock=true;
       var a2=firstCard, b2=card;
       firstCard=null;
+      mismatchCount++;
+      if(window.tel) window.tel("mismatch",{a:parseInt(a2.dataset.n,10), b:parseInt(b2.dataset.n,10)});
       stopSound();
       uhOh();
       a2.classList.add('wiggle');
@@ -484,6 +503,7 @@
   }
 
   function win(){
+    if(window.tel) window.tel("win",{pairs:totalPairs, flips:totalFlips, mismatches:mismatchCount, ms:Date.now()-gameStart});
     winEl.classList.add('active');
     stopSound();
     chime();
@@ -496,21 +516,25 @@
     btn.addEventListener('click', function(){
       ensureAudio();
       var n = parseInt(btn.dataset.pairs,10);
+      if(window.tel) window.tel("level",{pairs:n});
       buildBoard(n);
       show('game');
     });
   });
 
   document.getElementById('backStart').addEventListener('click', function(){
+    if(window.tel) window.tel("back",{where:"start"});
     history.back();
   });
 
   document.getElementById('backGame').addEventListener('click', function(){
+    if(window.tel) window.tel("back",{where:"game"});
     stopSound();
     history.back();
   });
 
   document.getElementById('againBtn').addEventListener('click', function(){
+    if(window.tel) window.tel("play_again",{});
     stopSound();
     winEl.classList.remove('active');
     parts.length=0;
