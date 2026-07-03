@@ -474,6 +474,22 @@
     card.addEventListener('pointerleave', function(){ /* keep st for slight slips */ });
   }
 
+  // Same reliable-tap tolerance as attachTap(), for chrome buttons (play again,
+  // level choice, exit, nav) that were still on fragile 'click' handlers.
+  function attachButtonTap(el, handler){
+    var st = null;
+    el.addEventListener('pointerdown', function(e){ st = { x:e.clientX, y:e.clientY, t:Date.now() }; });
+    el.addEventListener('pointerup', function(e){
+      if(!st) return;
+      var dx = e.clientX - st.x, dy = e.clientY - st.y;
+      var moved = Math.sqrt(dx*dx + dy*dy);
+      var dt = Date.now() - st.t;
+      st = null;
+      if(moved < 30 && dt < 800) handler(e);
+    });
+    el.addEventListener('pointercancel', function(){ st = null; });
+  }
+
   function onCard(card){
     if(lock) return;
     if(card.classList.contains('matched')) return;
@@ -541,7 +557,7 @@
 
   /* ---------- wiring ---------- */
   Array.prototype.forEach.call(document.querySelectorAll('.choice'), function(btn){
-    btn.addEventListener('click', function(){
+    attachButtonTap(btn, function(){
       ensureAudio();
       var n = parseInt(btn.dataset.pairs,10);
       if(window.tel) window.tel("level",{pairs:n});
@@ -551,18 +567,18 @@
   });
 
   Array.prototype.forEach.call(document.querySelectorAll('.bottombar .navtile'), function(btn){
-    btn.addEventListener('click', function(){
+    attachButtonTap(btn, function(){
       stopSound();
       window.location = btn.dataset.href;
     });
   });
 
-  document.getElementById('exitbtn').addEventListener('click', function(){
+  attachButtonTap(document.getElementById('exitbtn'), function(){
     stopSound();
     window.location = "/liedjes/klas/";
   });
 
-  document.getElementById('againBtn').addEventListener('click', function(){
+  attachButtonTap(document.getElementById('againBtn'), function(){
     if(window.tel) window.tel("play_again",{});
     stopSound();
     winEl.classList.remove('active');

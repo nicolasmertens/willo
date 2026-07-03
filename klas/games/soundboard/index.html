@@ -268,18 +268,35 @@
   var activeName = document.getElementById('activeName');
   var loading = document.getElementById('loading');
 
+  // Same reliable-tap tolerance as attachTile(), for chrome buttons (nav,
+  // exit, toggles) that were still on fragile 'click' handlers.
+  var BTN_MOVE_TOL = 30, BTN_TIME_TOL = 800;
+  function attachButtonTap(el, handler) {
+    var st = null;
+    el.addEventListener('pointerdown', function (e) { st = { x: e.clientX, y: e.clientY, t: Date.now() }; });
+    el.addEventListener('pointerup', function (e) {
+      if (!st) return;
+      var dx = e.clientX - st.x, dy = e.clientY - st.y;
+      var moved = Math.sqrt(dx * dx + dy * dy);
+      var dt = Date.now() - st.t;
+      st = null;
+      if (moved < BTN_MOVE_TOL && dt < BTN_TIME_TOL) handler(e);
+    });
+    el.addEventListener('pointercancel', function () { st = null; });
+  }
+
   /* ---- Bottom navigation bar (parent-operated) ---- */
   var navtiles = document.querySelectorAll('.bottombar .navtile');
   for (var i = 0; i < navtiles.length; i++) {
     (function (btn) {
-      btn.addEventListener('click', function () {
+      attachButtonTap(btn, function () {
         window.location = btn.getAttribute('data-href');
       });
     })(navtiles[i]);
   }
   var exitbtn = document.getElementById('exitbtn');
   if (exitbtn) {
-    exitbtn.addEventListener('click', function () {
+    attachButtonTap(exitbtn, function () {
       if (window.tel) window.tel("back", {});
       window.location = "/liedjes/klas/";
     });
@@ -308,11 +325,11 @@
   renderToggle(tNames, namesOn);
   renderToggle(tSounds, soundsOn);
 
-  tNames.addEventListener('click', function () {
+  attachButtonTap(tNames, function () {
     namesOn = !namesOn; saveToggle('sb_names', namesOn); renderToggle(tNames, namesOn);
     if (window.tel) window.tel("toggle", { which: "names", on: namesOn ? 1 : 0 });
   });
-  tSounds.addEventListener('click', function () {
+  attachButtonTap(tSounds, function () {
     soundsOn = !soundsOn; saveToggle('sb_sounds', soundsOn); renderToggle(tSounds, soundsOn);
     if (window.tel) window.tel("toggle", { which: "sounds", on: soundsOn ? 1 : 0 });
   });
