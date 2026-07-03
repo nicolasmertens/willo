@@ -1,0 +1,352 @@
+[
+  {
+    "n": 1,
+    "name": "Hond",
+    "img": "../../klas/games/img/01.jpg",
+    "nameClip": "name/01.mp3",
+    "sound": "../../klas/games/sound/01.mp3"
+  },
+  {
+    "n": 2,
+    "name": "Kat",
+    "img": "../../klas/games/img/02.jpg",
+    "nameClip": "name/02.mp3",
+    "sound": "../../klas/games/sound/02.mp3"
+  },
+  {
+    "n": 3,
+    "name": "Koe",
+    "img": "../../klas/games/img/03.jpg",
+    "nameClip": "name/03.mp3",
+    "sound": "../../klas/games/sound/03.mp3"
+  },
+  {
+    "n": 4,
+    "name": "Leeuw",
+    "img": "../../klas/games/img/04.jpg",
+    "nameClip": "name/04.mp3",
+    "sound": "../../klas/games/sound/04.mp3"
+  },
+  {
+    "n": 5,
+    "name": "Luipaard",
+    "img": "../../klas/games/img/05.jpg",
+    "nameClip": "name/05.mp3",
+    "sound": "../../klas/games/sound/05.mp3"
+  },
+  {
+    "n": 6,
+    "name": "Olifant",
+    "img": "../../klas/games/img/06.jpg",
+    "nameClip": "name/06.mp3",
+    "sound": "../../klas/games/sound/06.mp3"
+  },
+  {
+    "n": 7,
+    "name": "Paard",
+    "img": "../../klas/games/img/07.jpg",
+    "nameClip": "name/07.mp3",
+    "sound": "../../klas/games/sound/07.mp3"
+  },
+  {
+    "n": 8,
+    "name": "Tijger",
+    "img": "../../klas/games/img/08.jpg",
+    "nameClip": "name/08.mp3",
+    "sound": "../../klas/games/sound/08.mp3"
+  },
+  {
+    "n": 9,
+    "name": "Schaap",
+    "img": "../../klas/games/img/09.jpg",
+    "nameClip": "name/09.mp3",
+    "sound": "../../klas/games/sound/09.mp3"
+  },
+  {
+    "n": 10,
+    "name": "Varken",
+    "img": "../../klas/games/img/10.jpg",
+    "nameClip": "name/10.mp3",
+    "sound": "../../klas/games/sound/10.mp3"
+  },
+  {
+    "n": 11,
+    "name": "Geit",
+    "img": "../../klas/games/img/11.jpg",
+    "nameClip": "name/11.mp3",
+    "sound": "../../klas/games/sound/11.mp3"
+  },
+  {
+    "n": 12,
+    "name": "Haan",
+    "img": "../../klas/games/img/12.jpg",
+    "nameClip": "name/12.mp3",
+    "sound": "../../klas/games/sound/12.mp3"
+  },
+  {
+    "n": 13,
+    "name": "Eend",
+    "img": "../../klas/games/img/13.jpg",
+    "nameClip": "name/13.mp3",
+    "sound": "../../klas/games/sound/13.mp3"
+  },
+  {
+    "n": 14,
+    "name": "Kraai",
+    "img": "../../klas/games/img/14.jpg",
+    "nameClip": "name/14.mp3",
+    "sound": "../../klas/games/sound/14.mp3"
+  },
+  {
+    "n": 15,
+    "name": "Kip",
+    "img": "../../klas/games/img/15.jpg",
+    "nameClip": "name/15.mp3",
+    "sound": "../../klas/games/sound/15.mp3"
+  },
+  {
+    "n": 16,
+    "name": "Uil",
+    "img": "../../klas/games/img/16.jpg",
+    "nameClip": "name/16.mp3",
+    "sound": "../../klas/games/sound/16.mp3"
+  },
+  {
+    "n": 17,
+    "name": "Hert",
+    "img": "../../klas/games/img/17.jpg",
+    "nameClip": "name/17.mp3",
+    "sound": "../../klas/games/sound/17.mp3"
+  },
+  {
+    "n": 18,
+    "name": "Papegaai",
+    "img": "../../klas/games/img/18.jpg",
+    "nameClip": "name/18.mp3",
+    "sound": "../../klas/games/sound/18.mp3"
+  },
+  {
+    "n": 19,
+    "name": "Pauw",
+    "img": "../../klas/games/img/19.jpg",
+    "nameClip": "name/19.mp3",
+    "sound": "../../klas/games/sound/19.mp3"
+  },
+  {
+    "n": 20,
+    "name": "Kikker",
+    "img": "../../klas/games/img/20.jpg",
+    "nameClip": "name/20.mp3",
+    "sound": "../../klas/games/sound/20.mp3"
+  },
+  {
+    "n": 21,
+    "name": "Giraf",
+    "img": "../../klas/games/img/21.jpg",
+    "nameClip": "name/21.mp3",
+    "sound": "../../klas/games/sound/21.mp3"
+  },
+  {
+    "n": 22,
+    "name": "Slang",
+    "img": "../../klas/games/img/22.jpg",
+    "nameClip": "name/22.mp3",
+    "sound": "../../klas/games/sound/22.mp3"
+  },
+  {
+    "n": 23,
+    "name": "Bij",
+    "img": "../../klas/games/img/23.jpg",
+    "nameClip": "name/23.mp3",
+    "sound": "../../klas/games/sound/23.mp3"
+  },
+  {
+    "n": 24,
+    "name": "Krekel",
+    "img": "../../klas/games/img/24.jpg",
+    "nameClip": "name/24.mp3",
+    "sound": "../../klas/games/sound/24.mp3"
+  },
+  {
+    "n": 25,
+    "name": "Wolf",
+    "img": "../../klas/games/img/25.jpg",
+    "nameClip": "name/25.mp3",
+    "sound": "../../klas/games/sound/25.mp3"
+  },
+  {
+    "n": 26,
+    "name": "Vos",
+    "img": "../../klas/games/img/26.jpg",
+    "nameClip": "name/26.mp3",
+    "sound": "../../klas/games/sound/26.mp3"
+  },
+  {
+    "n": 27,
+    "name": "Hyena",
+    "img": "../../klas/games/img/27.jpg",
+    "nameClip": "name/27.mp3",
+    "sound": "../../klas/games/sound/27.mp3"
+  },
+  {
+    "n": 28,
+    "name": "Ezel",
+    "img": "../../klas/games/img/28.jpg",
+    "nameClip": "name/28.mp3",
+    "sound": "../../klas/games/sound/28.mp3"
+  },
+  {
+    "n": 29,
+    "name": "Kameel",
+    "img": "../../klas/games/img/29.jpg",
+    "nameClip": "name/29.mp3",
+    "sound": "../../klas/games/sound/29.mp3"
+  },
+  {
+    "n": 30,
+    "name": "Aap",
+    "img": "../../klas/games/img/30.jpg",
+    "nameClip": "name/30.mp3",
+    "sound": "../../klas/games/sound/30.mp3"
+  },
+  {
+    "n": 31,
+    "name": "Dolfijn",
+    "img": "../../klas/games/img/31.jpg",
+    "nameClip": "name/31.mp3",
+    "sound": "../../klas/games/sound/31.mp3"
+  },
+  {
+    "n": 32,
+    "name": "Gorilla",
+    "img": "../../klas/games/img/32.jpg",
+    "nameClip": "name/32.mp3",
+    "sound": "../../klas/games/sound/32.mp3"
+  },
+  {
+    "n": 33,
+    "name": "Walvis",
+    "img": "../../klas/games/img/33.jpg",
+    "nameClip": "name/33.mp3",
+    "sound": "../../klas/games/sound/33.mp3"
+  },
+  {
+    "n": 34,
+    "name": "Kalkoen",
+    "img": "../../klas/games/img/34.jpg",
+    "nameClip": "name/34.mp3",
+    "sound": "../../klas/games/sound/34.mp3"
+  },
+  {
+    "n": 35,
+    "name": "Pinguïn",
+    "img": "../../klas/games/img/35.jpg",
+    "nameClip": "name/35.mp3",
+    "sound": "../../klas/games/sound/35.mp3"
+  },
+  {
+    "n": 36,
+    "name": "Gans",
+    "img": "../../klas/games/img/36.jpg",
+    "nameClip": "name/36.mp3",
+    "sound": "../../klas/games/sound/36.mp3"
+  },
+  {
+    "n": 37,
+    "name": "Zeehond",
+    "img": "../../klas/games/img/37.jpg",
+    "nameClip": "name/37.mp3",
+    "sound": "../../klas/games/sound/37.mp3"
+  },
+  {
+    "n": 38,
+    "name": "Vleermuis",
+    "img": "../../klas/games/img/38.jpg",
+    "nameClip": "name/38.mp3",
+    "sound": "../../klas/games/sound/38.mp3"
+  },
+  {
+    "n": 39,
+    "name": "Havik",
+    "img": "../../klas/games/img/39.jpg",
+    "nameClip": "name/39.mp3",
+    "sound": "../../klas/games/sound/39.mp3"
+  },
+  {
+    "n": 40,
+    "name": "Arend",
+    "img": "../../klas/games/img/40.jpg",
+    "nameClip": "name/40.mp3",
+    "sound": "../../klas/games/sound/40.mp3"
+  },
+  {
+    "n": 41,
+    "name": "Muis",
+    "img": "../../klas/games/img/41.jpg",
+    "nameClip": "name/41.mp3",
+    "sound": "../../klas/games/sound/41.mp3"
+  },
+  {
+    "n": 42,
+    "name": "Konijn",
+    "img": "../../klas/games/img/42.jpg",
+    "nameClip": "name/42.mp3",
+    "sound": "../../klas/games/sound/42.mp3"
+  },
+  {
+    "n": 43,
+    "name": "Zebra",
+    "img": "../../klas/games/img/43.jpg",
+    "nameClip": "name/43.mp3",
+    "sound": "../../klas/games/sound/43.mp3"
+  },
+  {
+    "n": 44,
+    "name": "Jachtluipaard",
+    "img": "../../klas/games/img/44.jpg",
+    "nameClip": "name/44.mp3",
+    "sound": "../../klas/games/sound/44.mp3"
+  },
+  {
+    "n": 45,
+    "name": "Beer",
+    "img": "../../klas/games/img/45.jpg",
+    "nameClip": "name/45.mp3",
+    "sound": "../../klas/games/sound/45.mp3"
+  },
+  {
+    "n": 46,
+    "name": "Krokodil",
+    "img": "../../klas/games/img/46.jpg",
+    "nameClip": "name/46.mp3",
+    "sound": "../../klas/games/sound/46.mp3"
+  },
+  {
+    "n": 47,
+    "name": "Alligator",
+    "img": "../../klas/games/img/47.jpg",
+    "nameClip": "name/47.mp3",
+    "sound": "../../klas/games/sound/47.mp3"
+  },
+  {
+    "n": 48,
+    "name": "Chimpansee",
+    "img": "../../klas/games/img/48.jpg",
+    "nameClip": "name/48.mp3",
+    "sound": "../../klas/games/sound/48.mp3"
+  },
+  {
+    "n": 49,
+    "name": "Kangoeroe",
+    "img": "../../klas/games/img/49.jpg",
+    "nameClip": "name/49.mp3",
+    "sound": "../../klas/games/sound/49.mp3"
+  },
+  {
+    "n": 50,
+    "name": "Nijlpaard",
+    "img": "../../klas/games/img/50.jpg",
+    "nameClip": "name/50.mp3",
+    "sound": "../../klas/games/sound/50.mp3"
+  }
+]

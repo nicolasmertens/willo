@@ -1,0 +1,7 @@
+{
+  "title": "Jeux",
+  "lang": "fr",
+  "tracks": [
+    {"n": 1, "title": "Sons", "icon": "/liedjes/klas/games/hero-sounds.jpg", "href": "/liedjes/mama/games/soundboard/"}
+  ]
+}

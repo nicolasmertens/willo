@@ -49,7 +49,7 @@ TALEN = {
         "title_fallback": "Mama",
         "storage_prefix": "mama",
         "manifest_name": "Mama",
-        "sections": ["boeken", "liedjes", "verhalen"],
+        "sections": ["boeken", "games", "liedjes", "verhalen"],
     },
     "papa": {
         "out_dir": "papa",
@@ -59,7 +59,7 @@ TALEN = {
         "title_fallback": "Papa",
         "storage_prefix": "papa",
         "manifest_name": "Papa",
-        "sections": ["boeken", "liedjes", "verhalen"],
+        "sections": ["boeken", "games", "liedjes", "verhalen"],
     },
     "klas": {
         "out_dir": "klas",
