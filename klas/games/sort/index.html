@@ -14,6 +14,12 @@
     --accentB:#a5d96b;
     --accentC:#f78fb3;
     --bar-h: 92px; --bar-pad: 10px; --bar-gap: 8px;
+    /* Photocard side length (it's a 1:1 square). Zone heights below are
+       derived FROM this so the neutral middle strip always exactly fits
+       the card, at any viewport size, with a guaranteed clearance margin
+       (no hand-tuned percentages that can drift out of sync). */
+    --card-size: min(50vw,50vh,320px);
+    --card-margin: 14px; /* clearance on each side of the card inside the strip */
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{
@@ -74,11 +80,17 @@
   #game{padding:0;}
   .sortstage{position:fixed;inset:0;}
   .zone{
-    position:absolute;left:0;right:0;height:50%;
+    /* Height is derived from the card size + margin, NOT a fixed 50%, so a
+       genuinely neutral strip (no zone underneath) always exists in the
+       vertical middle for the photocard to live in — see --card-size /
+       --card-margin above and .photocard below. */
+    position:absolute;left:0;right:0;
+    height:calc((100vh - var(--card-size))/2 - var(--card-margin));
     display:flex;flex-direction:column;align-items:center;
     touch-action:manipulation;
     transition:filter .2s ease;
     z-index:1;
+    overflow:hidden;
   }
   #zoneTop{
     top:0;
@@ -92,7 +104,35 @@
     justify-content:flex-end;
     padding-bottom:calc(var(--bar-h) + 34px);
   }
+  /* Ambient decoration: faded/desaturated silhouettes of other animals from
+     the same size category, so each zone visually reads as "where big
+     things live" / "where small things live", not just a color + word a
+     21-month-old can't read yet. Pure decoration: pointer-events:none,
+     low opacity, grayscale, sits behind the title text (z-index 0 vs the
+     ztitle's implicit stacking) and never looks like a tap target. */
+  .zone::before{
+    content:"";
+    position:absolute;inset:0;
+    pointer-events:none;
+    z-index:0;
+    background-repeat:no-repeat,no-repeat,no-repeat;
+    filter:grayscale(1) contrast(.85);
+    opacity:.16;
+  }
+  #zoneTop::before{
+    /* elephant, giraffe, lion */
+    background-image:url(../img/06.jpg),url(../img/21.jpg),url(../img/04.jpg);
+    background-size:26vmin,22vmin,24vmin;
+    background-position:3% 12%, 94% 8%, 50% 68%;
+  }
+  #zoneBottom::before{
+    /* mouse, frog, bee */
+    background-image:url(../img/41.jpg),url(../img/20.jpg),url(../img/23.jpg);
+    background-size:15vmin,17vmin,12vmin;
+    background-position:5% 88%, 93% 90%, 50% 22%;
+  }
   .zone .ztitle{
+    position:relative;z-index:1;
     font-weight:800;color:#fff;
     text-shadow:0 3px 0 rgba(0,0,0,.14);
     letter-spacing:1px;
@@ -108,7 +148,7 @@
 
   .photocard{
     position:fixed;top:50%;left:50%;
-    width:min(50vw,50vh,320px);
+    width:var(--card-size);
     aspect-ratio:1/1;
     transform:translate(-50%,-50%);
     border-radius:28px;

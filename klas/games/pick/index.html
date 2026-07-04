@@ -65,6 +65,7 @@
   .choice .num{font-size:clamp(44px,10vw,72px);font-weight:800;line-height:1;}
   .choice .word{font-size:clamp(18px,4vw,26px);font-weight:700;opacity:.95;}
   .choice .dots{font-size:clamp(20px,5vw,30px);letter-spacing:4px;}
+  .choice .rounds{font-size:clamp(13px,3vw,17px);font-weight:600;opacity:.85;}
   .cEasy{background:var(--accentB);}
   .cMed{background:var(--accentA);}
   .cHard{background:var(--accentC);}
@@ -172,16 +173,19 @@
       <span class="num">2</span>
       <span class="dots">★ ★</span>
       <span class="word">Easy</span>
+      <span class="rounds">6 rounds</span>
     </button>
     <button class="choice cMed" data-choices="3" data-rounds="6">
       <span class="num">3</span>
       <span class="dots">★ ★ ★</span>
       <span class="word">Medium</span>
+      <span class="rounds">6 rounds</span>
     </button>
     <button class="choice cHard" data-choices="4" data-rounds="6">
       <span class="num">4</span>
       <span class="dots">★ ★ ★ ★</span>
       <span class="word">Hard</span>
+      <span class="rounds">6 rounds</span>
     </button>
   </div>
 </section>
@@ -474,6 +478,14 @@
   var tier = 2, roundsTotal = 6, roundIndex = 0, correctCount = 0;
   var sessionStart = 0;
   var target = null, roundChoices = [], locked = false, latencyStart = 0;
+  // Toddlers commonly triple-tap in a burst rather than one clean tap.
+  // NEXT_ROUND_DELAY gives the whole burst time to finish before the next
+  // round's tiles even build. SETTLE_MS is a belt-and-suspenders grace
+  // period *after* the new round's tiles/audio appear, keeping input
+  // blocked a little longer so any still-straggling tap from the previous
+  // round's flurry lands on nothing rather than answering an unseen round.
+  var NEXT_ROUND_DELAY = 2000;
+  var SETTLE_MS = 400;
 
   function startTier(choicesCount, roundsCount){
     tier = choicesCount;
@@ -489,7 +501,9 @@
   function nextRound(){
     if(roundIndex >= roundsTotal){ finishSession(); return; }
     roundIndex++;
-    locked = false;
+    // Stay locked through the build; playTarget() is the one that
+    // schedules the unlock, after its own SETTLE_MS grace period.
+    locked = true;
     buildRound();
   }
 
@@ -502,7 +516,9 @@
     currentTileCount = chosen.length;
     chosen.forEach(function(a){
       var tile = document.createElement('div');
-      tile.className = 'tile';
+      // Rendered fully normal (just cursor:default via .locked) during the
+      // settle window -- no loading/disabled look, just not tappable yet.
+      tile.className = 'tile locked';
       tile.dataset.n = a.n;
       var img = document.createElement('img');
       img.src = '../' + a.img;
@@ -520,13 +536,21 @@
     playTarget();
   }
 
+  function unlockAfterSettle(){
+    setTimeout(function(){
+      locked = false;
+      Array.prototype.forEach.call(board.querySelectorAll('.tile'), function(t){ t.classList.remove('locked'); });
+    }, SETTLE_MS);
+  }
+
   function playTarget(){
     var p = playClip(target.nameClip);
     if(p && p.then){
-      p.then(function(){ latencyStart = Date.now(); })
-       .catch(function(){ latencyStart = Date.now(); });
+      p.then(function(){ latencyStart = Date.now(); unlockAfterSettle(); })
+       .catch(function(){ latencyStart = Date.now(); unlockAfterSettle(); });
     } else {
       latencyStart = Date.now();
+      unlockAfterSettle();
     }
   }
 
@@ -571,7 +595,7 @@
       }, 550);
     }
 
-    setTimeout(nextRound, 1200);
+    setTimeout(nextRound, NEXT_ROUND_DELAY);
   }
 
   function finishSession(){
