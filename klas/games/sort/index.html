@@ -147,7 +147,14 @@
   }
 
   .photocard{
-    position:fixed;top:50%;left:50%;
+    /* Horizontal anchor is left-of-center on purpose (parent asked for the
+       card to sit toward the LEFT side of the screen, not centered).
+       Anchor = half the card's own width + a constant 24px clearance, so
+       the left edge always sits exactly 24px from the viewport edge at
+       any --card-size (no clipping), while the card's center stays well
+       left of the 50% mark at every tested width. Vertical stays
+       top:50% / translateY(-50%), unchanged from the neutral-gap fix. */
+    position:fixed;top:50%;left:calc(var(--card-size)/2 + 24px);
     width:var(--card-size);
     aspect-ratio:1/1;
     transform:translate(-50%,-50%);
