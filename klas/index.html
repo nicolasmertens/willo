@@ -37,25 +37,20 @@
   body.has-games .top-row > section.games  { flex: 1 1 200px; }
   @media (max-width: 900px) { body.has-games .top-row { flex-direction: column; align-items: stretch; } }
 
-  /* --- Top-row grids: normal WRAPPING grid, fixed ~154px tiles (30% smaller
-     than the old 220px horizontal-scroll-strip tiles that were removed here).
-     auto-fill with a fixed track length computes however many columns fit
-     the section's available width and wraps the rest onto new rows, so
-     adding a 5th/6th game later needs no column-count edit — that's exactly
-     the kind of hardcoded-count bug the scroll strip was patched around
-     earlier. Boeken shares the same fixed tile size for visual consistency;
-     with its usual 1 tile it just renders a single column, no dead strip
-     next to it. Songs/Verhalen below keep the plain .grid (repeat(5,1fr))
-     untouched. */
-  body.has-games .top-row .grid {
-    grid-template-columns: repeat(auto-fill, 154px);
-  }
   section.taal-section.empty { display: none; }
   section.taal-section.dim { opacity: 0; pointer-events: none; }
 
-  /* --- Grid (matches rhymes/index.html breakpoints) --- */
-  .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
-  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
+  /* --- Grid: normal WRAPPING grid, fixed ~154px tiles (30% smaller than the
+     old 220px horizontal-scroll-strip tiles that were removed from the
+     top-row). auto-fill with a fixed track length computes however many
+     columns fit the container's available width and wraps the rest onto new
+     rows, so adding more items later needs no column-count edit and no
+     manual breakpoint — that's exactly the kind of hardcoded-count bug the
+     scroll strip was patched around earlier. Applies uniformly to all four
+     sections (Boeken/Games in .top-row, Liedjes/Verhalen below) for visual
+     consistency: same tile size everywhere, just more rows where there are
+     more items (e.g. Liedjes). */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, 154px); gap: 14px; }
 
   /* --- Tile (same as grid.html) --- */
   .tile { aspect-ratio: 1 / 1; border: 4px solid transparent; border-radius: 22px; padding: 0; background: #fff; cursor: pointer; overflow: hidden; position: relative; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); transition: transform .08s ease, box-shadow .08s ease; font-family: inherit; }
@@ -176,7 +171,7 @@ const ALL_TRACKS = [{"n": 1, "title": "Nursery Rhymes", "href": "/liedjes/rhymes
 const SEED_ORDER = ["liedjes:1", "liedjes:2", "liedjes:3", "liedjes:4", "liedjes:5"];
 const PARENT_HREF = "/liedjes/";
 const STORAGE_PREFIX = "klas";
-const APP_VERSION = "klas-efb6ea63";
+const APP_VERSION = "klas-ac505e8b";
 
 const audio = new Audio();
 audio.preload = "none";
