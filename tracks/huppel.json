@@ -1,0 +1,93 @@
+{
+  "title": "Kleine Huppel",
+  "lang": "nl",
+  "parent_photo": "/liedjes/home/papa.jpg",
+  "parent_href": "/liedjes/papa/",
+  "active_taal": "papa",
+  "app_version": "huppel-v1",
+  "storage_prefix": "huppel",
+  "cache_name": "huppel-v1",
+  "mp3_cache_name": "huppel-mp3-v1",
+  "manifest_name": "Huppel",
+  "seed_order": [
+    1,
+    10,
+    6,
+    4,
+    2
+  ],
+  "tracks": [
+    {
+      "n": 1,
+      "title": "We maken een kringetje",
+      "audio": "audio/01.mp3",
+      "icon": "icons/01.jpg"
+    },
+    {
+      "n": 2,
+      "title": "Klein, klein kleutertje",
+      "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/09-Klein-Klein-Kleutertje.mp3",
+      "icon": "icons/02.jpg"
+    },
+    {
+      "n": 3,
+      "title": "Zakdoek leggen",
+      "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/24-Zakdoek-Leggen.mp3",
+      "icon": "icons/03.jpg"
+    },
+    {
+      "n": 4,
+      "title": "Heb je wel gehoord van de zevensprong?",
+      "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/19-De-Zevensprong.mp3",
+      "icon": "icons/04.jpg"
+    },
+    {
+      "n": 5,
+      "title": "Witte zwanen, zwarte zwanen",
+      "audio": "audio/05.mp3",
+      "icon": "icons/05.jpg"
+    },
+    {
+      "n": 6,
+      "title": "'k Zag twee beren",
+      "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/17-k-Zag-Twee-Beren.mp3",
+      "icon": "icons/06.jpg"
+    },
+    {
+      "n": 7,
+      "title": "In het bos staat een huisje",
+      "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/14-In-Het-Bos.mp3",
+      "icon": "icons/07.jpg"
+    },
+    {
+      "n": 8,
+      "title": "Toen onze Mop een Mopje was",
+      "audio": "audio/08.mp3",
+      "icon": "icons/08.jpg"
+    },
+    {
+      "n": 9,
+      "title": "Twee handjes op de tafel",
+      "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/07/03-Twee-HanDJes.mp3",
+      "icon": "icons/09.jpg"
+    },
+    {
+      "n": 10,
+      "title": "Alle eendjes zwemmen in het water",
+      "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/01-Alle-EenDJes.mp3",
+      "icon": "icons/10.jpg"
+    },
+    {
+      "n": 11,
+      "title": "Parapluutje",
+      "audio": "https://www.standaarduitgeverij.be/wp-content/uploads/2019/04/02-Parapluutje.mp3",
+      "icon": "icons/11.jpg"
+    },
+    {
+      "n": 12,
+      "title": "Twee emmertjes water halen",
+      "audio": "audio/12.mp3",
+      "icon": "icons/12.jpg"
+    }
+  ]
+}

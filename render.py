@@ -30,6 +30,7 @@ def content_hash(*parts) -> str:
 GRIDS = {
     "rhymes":  {"tracks": "tracks/rhymes.json",  "out_dir": "rhymes"},
     "eendjes": {"tracks": "tracks/eendjes.json",  "out_dir": "eendjes"},
+    "huppel":  {"tracks": "tracks/huppel.json",  "out_dir": "huppel"},
 }
 
 # Section header labels per language.
