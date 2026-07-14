@@ -2,16 +2,26 @@
 
 Book: *Kleine Huppel: vrolijk liedjes- en versjesboek* (Clara Suetens, Deltas).
 
-## Audio (MVP)
+## Policy (v2)
 
-| Track | Source |
-|---|---|
-| Overlap with Alle eendjes | Standaard Uitgeverij promo MP3s (same URLs as `tracks/eendjes.json`) |
-| 01 We maken een kringetje | YouTube Minidisco `uYvj7QtLiYI` |
-| 05 Witte zwanen | YouTube Minidisco `5wncB6FvDnI` |
-| 08 Toen onze Mop | YouTube Minidisco `l1HlEh_w3p8` |
-| 12 Twee emmertjes | YouTube Minidisco `oRHdt28fig0` |
+**Zero overlap with Alle eendjes.** Huppel grid = songs that are *not* already
+in `tracks/eendjes.json`. Icons from phone photos of this book.
 
-Icons: phone photos of the book (`~/Downloads/Kleine Huppel`), rotated + square-cropped.
+## MVP tracks (12) — all local audio
 
-MVP = 12 songs with distinctive visuals. Full register (~70) later.
+| n | Title | YouTube id |
+|---|---|---|
+| 01 | We maken een kringetje | uYvj7QtLiYI |
+| 02 | Hansje sokken | uqjFR9EAPpc |
+| 03 | 'k Heb een stuiver in mijn hand | Q41UlzyIfpA |
+| 04 | Witte zwanen, zwarte zwanen | 5wncB6FvDnI |
+| 05 | Minneke poes | fK4kV3ZMdd0 |
+| 06 | Grauwtje de ezel | gMFJHZkIn70 |
+| 07 | Toen onze Mop een Mopje was | l1HlEh_w3p8 |
+| 08 | Poesje mauw | muyYAKAf_3k |
+| 09 | Grote klokken zeggen | AlPxqHqKI4k |
+| 10 | Bim bam beieren | TStXDG5DIVg |
+| 11 | In Holland staat een huis | OMUw8Nt_GHg |
+| 12 | Twee emmertjes water halen | oRHdt28fig0 |
+
+Full register (~70) later; dual-page songs share a page photo as icon for now.
