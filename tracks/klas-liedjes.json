@@ -63,6 +63,12 @@
       "title": "The Alphabet Song",
       "audio": "liedjes/audio/08.mp3",
       "icon": "liedjes/icons/08.jpg"
+    },
+    {
+      "n": 9,
+      "title": "Old MacDonald Had a Farm",
+      "audio": "liedjes/audio/09.mp3",
+      "icon": "liedjes/icons/09.jpg"
     }
   ]
 }
