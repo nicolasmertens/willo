@@ -4,12 +4,12 @@
   "parent_photo": "/liedjes/home/klas.jpg",
   "parent_href": "/liedjes/klas/",
   "active_taal": "klas",
-  "app_version": "rhymes-v3",
+  "app_version": "rhymes-v4",
   "storage_prefix": "rhymes",
-  "cache_name": "rhymes-v14",
-  "mp3_cache_name": "rhymes-mp3-v14",
+  "cache_name": "rhymes-v15",
+  "mp3_cache_name": "rhymes-mp3-v15",
   "manifest_name": "Rhymes",
-  "seed_order": [1, 6, 2, 7, 4],
+  "seed_order": [1, 6, 2, 7, 11],
   "tracks": [
     {"n":  1, "title": "Twinkle, Twinkle, Little Star",              "audio": "audio/01.mp3", "icon": "icons/01.jpg"},
     {"n":  2, "title": "Hey Diddle Diddle",                          "audio": "audio/02.mp3", "icon": "icons/02.jpg"},
@@ -20,6 +20,7 @@
     {"n":  7, "title": "Jack and Jill",                              "audio": "audio/07.mp3", "icon": "icons/07.jpg"},
     {"n":  8, "title": "Little Bo-Peep",                             "audio": "audio/08.mp3", "icon": "icons/08.jpg"},
     {"n":  9, "title": "There Was an Old Woman Who Lived in a Shoe", "audio": "audio/09.mp3", "icon": "icons/09.jpg"},
-    {"n": 10, "title": "This Little Piggy",                          "audio": "audio/10.mp3", "icon": "icons/10.jpg"}
+    {"n": 10, "title": "This Little Piggy",                          "audio": "audio/10.mp3", "icon": "icons/10.jpg"},
+    {"n": 11, "title": "Old MacDonald Had a Farm",                   "audio": "audio/11.mp3", "icon": "icons/11.jpg"}
   ]
 }

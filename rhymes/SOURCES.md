@@ -19,13 +19,11 @@ fade). Verse end is the first inter-segment gap ≥ 1.3 s after at least
 | 08 | Little Bo-Peep                 | Dave and Ava         | w0eJJUv9BEQ    | 55.00 | 29.00 |
 | 09 | There Was an Old Woman         | Sunbeam Publishers   | taHSyGBOPlo    | 14.00 | 26.29 |
 | 10 | This Little Piggy              | Bounce Patrol        | 5bdTKxLAoos    | 28.00 | 26.16 |
-| 11 | Vroom Vroom                    | Super Simple Songs   | B1u-ylQR6Fo    |  0.10 | 25.50 |
-| 12 | I Love My Garbage Truck        | Super Simple Songs   | YEmFhRK-dTg    | 14.40 | 31.40 |
-| 13 | Driving In My Car              | Super Simple Songs   | YEmFhRK-dTg    | 173.30 | 50.10 |
-| 14 | Here Comes The Firetruck       | Super Simple Songs   | YEmFhRK-dTg    | 1472.70 | 60.30 |
-| 15 | Baby Shark                     | Super Simple Songs   | GR2o6k8aPlI    |  0.00 | 45.00 |
-| 16 | One Little Finger              | Super Simple Songs   | eBVqcTEC3zQ    |  1.60 | 35.00 |
-| 17 | The Wheels On The Bus          | Super Simple Songs   | yWirdnSDsV4    | 26.58 | 28.10 |
+| 11 | Old MacDonald Had a Farm       | Super Simple Songs   | _6HzoUcx3eo    |  7.00 | 48.00 |
+
+Icon for #11: still from the video at t≈16s (farmer + barn; no tractor in this SSS cut).
+
+Vehicle / modern SSS songs (Vroom Vroom, Baby Shark, …) live under `klas/liedjes/`, not here.
 
 ## Re-render pipeline
 
@@ -39,7 +37,7 @@ fade). Verse end is the first inter-segment gap ≥ 1.3 s after at least
 
 ## Notes
 
-- All 10 are commercial recordings used here on a single child's home
+- All 11 are commercial recordings used here on a single child's home
   tablet. Repo is public for telemetry tooling convenience — if
   redistribution becomes a concern, either flip the repo to private (GH
   Pages still works on private repos with Pro) or replace with
