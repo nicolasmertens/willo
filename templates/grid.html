@@ -208,13 +208,22 @@ document.addEventListener("visibilitychange", () => { if (document.visibilitySta
 window.addEventListener("pagehide", () => flushTel(true));
 tel("session_start", { ua: navigator.userAgent, vw: window.innerWidth, vh: window.innerHeight, dpr: window.devicePixelRatio || 1, standalone: !!(navigator.standalone || window.matchMedia("(display-mode: standalone)").matches) });
 
+// Audio URL with optional ?v=rev so re-encoded tracks bust SW/browser cache
+// (same path alone is cache-first and keeps the old short mp3 forever).
+function audioUrl(track) {
+  if (!track || !track.audio) return "";
+  let u = track.audio;
+  if (track.rev != null) u += (u.includes("?") ? "&" : "?") + "v=" + track.rev;
+  return encodeURI(u);
+}
+
 // --- Prefetch ---
 async function schedulePrefetch() {
   let worker = navigator.serviceWorker.controller;
   if (!worker) { try { const reg = await navigator.serviceWorker.ready; worker = navigator.serviceWorker.controller || reg.active; } catch {} }
   if (!worker) return;
   const order = downloadOrder();
-  const urls = order.map(n => { const s = trackByNum(n); return s ? encodeURI(s.audio) : null; }).filter(Boolean);
+  const urls = order.map(n => { const s = trackByNum(n); return s ? audioUrl(s) : null; }).filter(Boolean);
   worker.postMessage({ type: "prefetch-mp3s", urls });
 }
 
@@ -285,7 +294,7 @@ function play(track, tile) {
   // No toggle: re-tap on same tile during play is ignored (grid is locked anyway).
   if (isPlaying) return;
   emitPlayEnd("replaced");
-  audio.src = encodeURI(track.audio);
+  audio.src = audioUrl(track);
   isPlaying = true;  // optimistic — covers the load window between tap and audio.play resolving
   document.body.classList.add("playing");
   audio.play().then(() => {
