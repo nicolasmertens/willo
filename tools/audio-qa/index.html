@@ -14,8 +14,9 @@
     --card: #fffdf8;
     --accent: #ff8c42;
     --ok: #2e7d32;
+    --ok-bg: #e8f5e9;
     --bad: #c62828;
-    --flag: #fff3e0;
+    --open-bg: #fff8e7;
   }
   * { box-sizing: border-box; }
   html, body {
@@ -69,7 +70,8 @@
     font-size: .9rem;
     color: var(--muted);
   }
-  .stats strong { color: var(--bad); }
+  .stats strong.ok { color: var(--ok); }
+  .stats strong.open { color: var(--bad); }
   main { padding: 10px 10px 40px; max-width: 1100px; margin: 0 auto; }
   .loading, .error {
     padding: 24px; text-align: center; color: var(--muted);
@@ -100,7 +102,8 @@
     top: 0;
   }
   /* header is sticky too; thead sticky under it is hard on iOS — skip double sticky */
-  tr.flagged { background: var(--flag); }
+  tr.is-ok { background: var(--ok-bg); }
+  tr.is-open { background: var(--open-bg); }
   tr.playing { outline: 2px solid var(--accent); outline-offset: -2px; }
   .n { font-variant-numeric: tabular-nums; color: var(--muted); width: 2.5rem; }
   .kind {
@@ -141,11 +144,11 @@
   }
   .play:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.12); }
   .play.playing { background: linear-gradient(145deg, #66bb6a, #2e7d32); }
-  .flagbox {
+  .okbox {
     width: 28px; height: 28px;
-    accent-color: var(--bad);
+    accent-color: var(--ok);
   }
-  .flagcell { text-align: center; width: 4rem; }
+  .okcell { text-align: center; width: 4.5rem; }
   .playcell { width: 3.5rem; text-align: center; }
   footer {
     margin: 16px 4px 0;
@@ -162,7 +165,7 @@
 <body>
 <header>
   <h1>Audio QA — dieren &amp; FX</h1>
-  <p class="sub">Speel af · vink aan wat vervangen moet worden. Vinkjes blijven bewaard op dit device.</p>
+  <p class="sub">Speel af · vink aan als hij <strong>goed</strong> is. Open laten = nog niet ok / vervangen. Vinkjes blijven bewaard op dit device.</p>
   <div class="toolbar">
     <select id="filterKind" aria-label="Soort">
       <option value="all">Alle soorten</option>
@@ -178,11 +181,11 @@
       <option value="shared">Gedeeld</option>
     </select>
     <label style="display:flex;align-items:center;gap:6px;font-size:.9rem;">
-      <input type="checkbox" id="onlyFlagged"> Alleen gemarkeerd
+      <input type="checkbox" id="onlyOpen"> Alleen open (niet goed)
     </label>
     <input type="search" id="search" placeholder="Zoek naam / pad…" enterkeyhint="search">
     <button type="button" id="stopBtn" class="secondary">Stop</button>
-    <button type="button" id="exportBtn" class="secondary">Kopieer gemarkeerd</button>
+    <button type="button" id="exportBtn" class="secondary">Kopieer open</button>
     <button type="button" id="clearBtn" class="secondary">Wis vinkjes</button>
   </div>
   <div class="stats" id="stats">Laden…</div>
@@ -199,7 +202,7 @@
           <th>Label</th>
           <th>Pad</th>
           <th>Play</th>
-          <th>Vervangen?</th>
+          <th>Goed ✓</th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -207,14 +210,15 @@
   </div>
   <footer>
     Namen: 50× EN + 50× FR + 50× NL. Dierengeluiden: 50× (één set voor alle talen).
-    FX: Jaaaa / Neee. Markeer alleen wat écht vervangen moet.
+    FX: Jaaaa / Neee. <strong>Aanvinken = goed</strong>. Open laten = nog werk.
   </footer>
 </main>
 <script>
 (function () {
   "use strict";
 
-  var STORAGE_KEY = "liedjes-audio-qa-v1";
+  // v2: checked = good (ok). Unchecked/open = not good yet.
+  var STORAGE_KEY = "liedjes-audio-qa-v2-ok";
   // GH Pages: /liedjes/tools/audio-qa/ · local server from repo root: /tools/audio-qa/
   var BASE = (function () {
     var m = location.pathname.match(/^(.*)\/tools\/audio-qa\/?/);
@@ -223,7 +227,7 @@
   })();
 
   var rows = []; // {id, kind, lang, n, label, url, path}
-  var flags = loadFlags();
+  var okMap = loadOk();
   var audio = null;
   var playingId = null;
 
@@ -234,20 +238,21 @@
     stats: document.getElementById("stats"),
     filterKind: document.getElementById("filterKind"),
     filterLang: document.getElementById("filterLang"),
-    onlyFlagged: document.getElementById("onlyFlagged"),
+    onlyOpen: document.getElementById("onlyOpen"),
     search: document.getElementById("search"),
     stopBtn: document.getElementById("stopBtn"),
     exportBtn: document.getElementById("exportBtn"),
     clearBtn: document.getElementById("clearBtn"),
   };
 
-  function loadFlags() {
+  function loadOk() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {}; }
     catch (e) { return {}; }
   }
-  function saveFlags() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(flags)); } catch (e) {}
+  function saveOk() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(okMap)); } catch (e) {}
   }
+  function isOk(id) { return !!okMap[id]; }
 
   function pad2(n) { return (n < 10 ? "0" : "") + n; }
 
@@ -381,12 +386,12 @@
   function filtered() {
     var kind = el.filterKind.value;
     var lang = el.filterLang.value;
-    var only = el.onlyFlagged.checked;
+    var onlyOpen = el.onlyOpen.checked;
     var q = (el.search.value || "").trim().toLowerCase();
     return rows.filter(function (r) {
       if (kind !== "all" && r.kind !== kind) return false;
       if (lang !== "all" && r.lang !== lang) return false;
-      if (only && !flags[r.id]) return false;
+      if (onlyOpen && isOk(r.id)) return false; // hide approved
       if (q) {
         var hay = (r.label + " " + r.path + " " + r.id + " " + r.n).toLowerCase();
         if (hay.indexOf(q) === -1) return false;
@@ -396,11 +401,15 @@
   }
 
   function updateStats(visible) {
-    var flaggedTotal = Object.keys(flags).filter(function (k) { return flags[k]; }).length;
-    var flaggedVisible = visible.filter(function (r) { return flags[r.id]; }).length;
+    var okTotal = rows.filter(function (r) { return isOk(r.id); }).length;
+    var openTotal = rows.length - okTotal;
+    var okVis = visible.filter(function (r) { return isOk(r.id); }).length;
+    var openVis = visible.length - okVis;
     el.stats.innerHTML =
-      visible.length + " zichtbaar · <strong>" + flaggedTotal + " gemarkeerd</strong>" +
-      (flaggedVisible !== flaggedTotal ? " (" + flaggedVisible + " in filter)" : "") +
+      visible.length + " zichtbaar" +
+      " · <strong class=\"ok\">" + okTotal + " goed</strong>" +
+      " · <strong class=\"open\">" + openTotal + " open</strong>" +
+      " (" + openVis + " open in filter)" +
       " · " + rows.length + " totaal";
   }
 
@@ -409,7 +418,8 @@
     el.tbody.innerHTML = "";
     list.forEach(function (r) {
       var tr = document.createElement("tr");
-      if (flags[r.id]) tr.classList.add("flagged");
+      var ok = isOk(r.id);
+      tr.classList.add(ok ? "is-ok" : "is-open");
       tr.dataset.id = r.id;
 
       var tdN = document.createElement("td");
@@ -454,32 +464,35 @@
       tdPlay.appendChild(btn);
       tr.appendChild(tdPlay);
 
-      var tdFlag = document.createElement("td");
-      tdFlag.className = "flagcell";
+      var tdOk = document.createElement("td");
+      tdOk.className = "okcell";
       var cb = document.createElement("input");
       cb.type = "checkbox";
-      cb.className = "flagbox";
-      cb.title = "Markeer voor vervanging";
-      cb.checked = !!flags[r.id];
+      cb.className = "okbox";
+      cb.title = "Aan = goed · uit = open (nog niet ok)";
+      cb.checked = ok;
       cb.addEventListener("change", function () {
-        if (cb.checked) flags[r.id] = true;
-        else delete flags[r.id];
-        saveFlags();
-        tr.classList.toggle("flagged", !!flags[r.id]);
+        if (cb.checked) okMap[r.id] = true;
+        else delete okMap[r.id];
+        saveOk();
+        tr.classList.toggle("is-ok", cb.checked);
+        tr.classList.toggle("is-open", !cb.checked);
         updateStats(filtered());
+        // If filtering "only open", approved rows disappear on next render
+        if (el.onlyOpen.checked && cb.checked) render();
       });
-      tdFlag.appendChild(cb);
-      tr.appendChild(tdFlag);
+      tdOk.appendChild(cb);
+      tr.appendChild(tdOk);
 
       el.tbody.appendChild(tr);
     });
     updateStats(list);
   }
 
-  function exportFlagged() {
-    var list = rows.filter(function (r) { return flags[r.id]; });
+  function exportOpen() {
+    var list = rows.filter(function (r) { return !isOk(r.id); });
     if (!list.length) {
-      alert("Nog niets gemarkeerd.");
+      alert("Alles is goed gemarkeerd — geen open items.");
       return;
     }
     var lines = list.map(function (r) {
@@ -496,7 +509,7 @@
     var text = "id\tkind\tlang\tn\tlabel\tpath\turl\n" + lines.join("\n");
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(function () {
-        alert(list.length + " gemarkeerde items gekopieerd (TSV).");
+        alert(list.length + " open (niet-goed) items gekopieerd (TSV).");
       }).catch(function () {
         prompt("Kopieer:", text);
       });
@@ -507,14 +520,14 @@
 
   el.filterKind.addEventListener("change", render);
   el.filterLang.addEventListener("change", render);
-  el.onlyFlagged.addEventListener("change", render);
+  el.onlyOpen.addEventListener("change", render);
   el.search.addEventListener("input", render);
   el.stopBtn.addEventListener("click", stop);
-  el.exportBtn.addEventListener("click", exportFlagged);
+  el.exportBtn.addEventListener("click", exportOpen);
   el.clearBtn.addEventListener("click", function () {
-    if (!confirm("Alle vinkjes wissen op dit device?")) return;
-    flags = {};
-    saveFlags();
+    if (!confirm("Alle ‘goed’-vinkjes wissen op dit device? Alles wordt weer open.")) return;
+    okMap = {};
+    saveOk();
     render();
   });
 
