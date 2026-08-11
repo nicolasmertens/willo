@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Liedjes — audio QA</title>
+<style>
+  :root {
+    --bg: #fff7e6;
+    --ink: #3d2f1f;
+    --muted: #7a6a55;
+    --line: rgba(90,70,40,.14);
+    --card: #fffdf8;
+    --accent: #ff8c42;
+    --ok: #2e7d32;
+    --bad: #c62828;
+    --flag: #fff3e0;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(255,247,230,.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 14px max(12px, env(safe-area-inset-top));
+  }
+  h1 {
+    margin: 0 0 4px;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+  .sub { color: var(--muted); font-size: .9rem; margin: 0 0 10px; }
+  .toolbar {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  }
+  .toolbar select, .toolbar button, .toolbar input[type="search"] {
+    font: inherit;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #fff;
+    padding: 8px 10px;
+    color: var(--ink);
+  }
+  .toolbar input[type="search"] { min-width: 140px; flex: 1 1 140px; }
+  .toolbar button {
+    cursor: pointer;
+    background: var(--accent);
+    color: #fff;
+    border-color: transparent;
+    font-weight: 700;
+  }
+  .toolbar button.secondary {
+    background: #fff;
+    color: var(--ink);
+    border-color: var(--line);
+    font-weight: 600;
+  }
+  .stats {
+    margin-top: 8px;
+    font-size: .9rem;
+    color: var(--muted);
+  }
+  .stats strong { color: var(--bad); }
+  main { padding: 10px 10px 40px; max-width: 1100px; margin: 0 auto; }
+  .loading, .error {
+    padding: 24px; text-align: center; color: var(--muted);
+  }
+  .error { color: var(--bad); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(90,70,40,.08);
+  }
+  th, td {
+    padding: 10px 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    vertical-align: middle;
+    font-size: .92rem;
+  }
+  th {
+    background: rgba(255,140,66,.12);
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--muted);
+    position: sticky;
+    top: 0;
+  }
+  /* header is sticky too; thead sticky under it is hard on iOS — skip double sticky */
+  tr.flagged { background: var(--flag); }
+  tr.playing { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .n { font-variant-numeric: tabular-nums; color: var(--muted); width: 2.5rem; }
+  .kind {
+    display: inline-block;
+    font-size: .72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: rgba(90,70,40,.08);
+  }
+  .kind.name { background: #e3f2fd; color: #1565c0; }
+  .kind.cry { background: #e8f5e9; color: #2e7d32; }
+  .kind.fx { background: #fce4ec; color: #ad1457; }
+  .lang {
+    font-weight: 700;
+    font-size: .8rem;
+    color: var(--muted);
+  }
+  .label { font-weight: 700; }
+  .path {
+    display: block;
+    font-size: .72rem;
+    color: var(--muted);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    word-break: break-all;
+    margin-top: 2px;
+  }
+  .play {
+    width: 44px; height: 44px;
+    border: none; border-radius: 50%;
+    background: linear-gradient(145deg, #ffb347, #ff8c42);
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,.12);
+  }
+  .play:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.12); }
+  .play.playing { background: linear-gradient(145deg, #66bb6a, #2e7d32); }
+  .flagbox {
+    width: 28px; height: 28px;
+    accent-color: var(--bad);
+  }
+  .flagcell { text-align: center; width: 4rem; }
+  .playcell { width: 3.5rem; text-align: center; }
+  footer {
+    margin: 16px 4px 0;
+    color: var(--muted);
+    font-size: .82rem;
+    line-height: 1.4;
+  }
+  @media (max-width: 640px) {
+    th:nth-child(5), td:nth-child(5) { display: none; } /* hide path col on phone */
+    .label { font-size: .95rem; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Audio QA — dieren &amp; FX</h1>
+  <p class="sub">Speel af · vink aan wat vervangen moet worden. Vinkjes blijven bewaard op dit device.</p>
+  <div class="toolbar">
+    <select id="filterKind" aria-label="Soort">
+      <option value="all">Alle soorten</option>
+      <option value="name">Namen (talen)</option>
+      <option value="cry">Dierengeluiden (gedeeld)</option>
+      <option value="fx">Overige FX (Jaaaa / Neee)</option>
+    </select>
+    <select id="filterLang" aria-label="Taal">
+      <option value="all">Alle talen</option>
+      <option value="en">EN (klas)</option>
+      <option value="fr">FR (mama)</option>
+      <option value="nl">NL (papa)</option>
+      <option value="shared">Gedeeld</option>
+    </select>
+    <label style="display:flex;align-items:center;gap:6px;font-size:.9rem;">
+      <input type="checkbox" id="onlyFlagged"> Alleen gemarkeerd
+    </label>
+    <input type="search" id="search" placeholder="Zoek naam / pad…" enterkeyhint="search">
+    <button type="button" id="stopBtn" class="secondary">Stop</button>
+    <button type="button" id="exportBtn" class="secondary">Kopieer gemarkeerd</button>
+    <button type="button" id="clearBtn" class="secondary">Wis vinkjes</button>
+  </div>
+  <div class="stats" id="stats">Laden…</div>
+</header>
+<main>
+  <div id="status" class="loading">Audio-lijst laden…</div>
+  <div id="tableWrap" hidden>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Soort</th>
+          <th>Taal</th>
+          <th>Label</th>
+          <th>Pad</th>
+          <th>Play</th>
+          <th>Vervangen?</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <footer>
+    Namen: 50× EN + 50× FR + 50× NL. Dierengeluiden: 50× (één set voor alle talen).
+    FX: Jaaaa / Neee. Markeer alleen wat écht vervangen moet.
+  </footer>
+</main>
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "liedjes-audio-qa-v1";
+  // GH Pages: /liedjes/tools/audio-qa/ · local server from repo root: /tools/audio-qa/
+  var BASE = (function () {
+    var m = location.pathname.match(/^(.*)\/tools\/audio-qa\/?/);
+    if (m) return m[1] || "";
+    return "/liedjes";
+  })();
+
+  var rows = []; // {id, kind, lang, n, label, url, path}
+  var flags = loadFlags();
+  var audio = null;
+  var playingId = null;
+
+  var el = {
+    status: document.getElementById("status"),
+    wrap: document.getElementById("tableWrap"),
+    tbody: document.getElementById("tbody"),
+    stats: document.getElementById("stats"),
+    filterKind: document.getElementById("filterKind"),
+    filterLang: document.getElementById("filterLang"),
+    onlyFlagged: document.getElementById("onlyFlagged"),
+    search: document.getElementById("search"),
+    stopBtn: document.getElementById("stopBtn"),
+    exportBtn: document.getElementById("exportBtn"),
+    clearBtn: document.getElementById("clearBtn"),
+  };
+
+  function loadFlags() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") || {}; }
+    catch (e) { return {}; }
+  }
+  function saveFlags() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(flags)); } catch (e) {}
+  }
+
+  function pad2(n) { return (n < 10 ? "0" : "") + n; }
+
+  function absUrl(relFromGames, taal) {
+    // relFromGames e.g. "name/01.mp3" under mama/games, or klas paths
+    if (relFromGames.indexOf("../../klas/games/") === 0) {
+      return BASE + "/klas/games/" + relFromGames.slice("../../klas/games/".length);
+    }
+    if (relFromGames.indexOf("img/") === 0 || relFromGames.indexOf("name/") === 0 ||
+        relFromGames.indexOf("sound/") === 0 || relFromGames.indexOf("fx/") === 0) {
+      return BASE + "/" + taal + "/games/" + relFromGames;
+    }
+    return BASE + "/" + relFromGames.replace(/^\//, "");
+  }
+
+  function addRow(r) {
+    rows.push(r);
+  }
+
+  function buildFromAnimals(taal, langCode, animals) {
+    animals.forEach(function (a) {
+      var n = a.n;
+      // name clip (per language)
+      addRow({
+        id: "name-" + langCode + "-" + pad2(n),
+        kind: "name",
+        lang: langCode,
+        n: n,
+        label: a.name + " (naam)",
+        path: taal + "/games/" + (a.nameClip || ("name/" + pad2(n) + ".mp3")),
+        url: absUrl(a.nameClip || ("name/" + pad2(n) + ".mp3"), taal),
+      });
+    });
+  }
+
+  function buildSharedCries(animals) {
+    // only once from klas list
+    animals.forEach(function (a) {
+      var n = a.n;
+      var soundRel = a.sound || ("sound/" + pad2(n) + ".mp3");
+      // normalize to klas sound path
+      var url = absUrl(soundRel, "klas");
+      if (soundRel.indexOf("../../klas/games/") === 0) {
+        url = BASE + "/klas/games/" + soundRel.slice("../../klas/games/".length);
+      } else if (soundRel.indexOf("sound/") === 0) {
+        url = BASE + "/klas/games/" + soundRel;
+      }
+      addRow({
+        id: "cry-" + pad2(n),
+        kind: "cry",
+        lang: "shared",
+        n: n,
+        label: a.name + " (geluid / cri)",
+        path: "klas/games/sound/" + pad2(n) + ".mp3",
+        url: url,
+      });
+    });
+  }
+
+  function buildFx() {
+    addRow({
+      id: "fx-jaaa",
+      kind: "fx",
+      lang: "shared",
+      n: 0,
+      label: "Jaaaa (clap / confetti)",
+      path: "klas/games/fx/jaaa.mp3",
+      url: BASE + "/klas/games/fx/jaaa.mp3",
+    });
+    addRow({
+      id: "fx-neee",
+      kind: "fx",
+      lang: "shared",
+      n: 0,
+      label: "Neee (uh-oh)",
+      path: "klas/games/fx/neee.mp3",
+      url: BASE + "/klas/games/fx/neee.mp3",
+    });
+  }
+
+  function kindLabel(k) {
+    if (k === "name") return "Naam";
+    if (k === "cry") return "Cri";
+    if (k === "fx") return "FX";
+    return k;
+  }
+  function langLabel(l) {
+    if (l === "en") return "EN";
+    if (l === "fr") return "FR";
+    if (l === "nl") return "NL";
+    if (l === "shared") return "alle";
+    return l;
+  }
+
+  function stop() {
+    if (audio) {
+      try { audio.pause(); audio.currentTime = 0; } catch (e) {}
+      audio = null;
+    }
+    playingId = null;
+    Array.prototype.forEach.call(document.querySelectorAll("tr.playing"), function (tr) {
+      tr.classList.remove("playing");
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".play.playing"), function (b) {
+      b.classList.remove("playing");
+      b.textContent = "▶";
+    });
+  }
+
+  function play(row, btn, tr) {
+    if (playingId === row.id) { stop(); return; }
+    stop();
+    try {
+      audio = new Audio(row.url);
+      playingId = row.id;
+      btn.classList.add("playing");
+      btn.textContent = "■";
+      tr.classList.add("playing");
+      audio.onended = function () { stop(); };
+      audio.onerror = function () {
+        btn.textContent = "!";
+        setTimeout(stop, 600);
+      };
+      var p = audio.play();
+      if (p && p.catch) p.catch(function () { stop(); });
+    } catch (e) {
+      stop();
+    }
+  }
+
+  function filtered() {
+    var kind = el.filterKind.value;
+    var lang = el.filterLang.value;
+    var only = el.onlyFlagged.checked;
+    var q = (el.search.value || "").trim().toLowerCase();
+    return rows.filter(function (r) {
+      if (kind !== "all" && r.kind !== kind) return false;
+      if (lang !== "all" && r.lang !== lang) return false;
+      if (only && !flags[r.id]) return false;
+      if (q) {
+        var hay = (r.label + " " + r.path + " " + r.id + " " + r.n).toLowerCase();
+        if (hay.indexOf(q) === -1) return false;
+      }
+      return true;
+    });
+  }
+
+  function updateStats(visible) {
+    var flaggedTotal = Object.keys(flags).filter(function (k) { return flags[k]; }).length;
+    var flaggedVisible = visible.filter(function (r) { return flags[r.id]; }).length;
+    el.stats.innerHTML =
+      visible.length + " zichtbaar · <strong>" + flaggedTotal + " gemarkeerd</strong>" +
+      (flaggedVisible !== flaggedTotal ? " (" + flaggedVisible + " in filter)" : "") +
+      " · " + rows.length + " totaal";
+  }
+
+  function render() {
+    var list = filtered();
+    el.tbody.innerHTML = "";
+    list.forEach(function (r) {
+      var tr = document.createElement("tr");
+      if (flags[r.id]) tr.classList.add("flagged");
+      tr.dataset.id = r.id;
+
+      var tdN = document.createElement("td");
+      tdN.className = "n";
+      tdN.textContent = r.n ? r.n : "—";
+      tr.appendChild(tdN);
+
+      var tdKind = document.createElement("td");
+      var sp = document.createElement("span");
+      sp.className = "kind " + r.kind;
+      sp.textContent = kindLabel(r.kind);
+      tdKind.appendChild(sp);
+      tr.appendChild(tdKind);
+
+      var tdLang = document.createElement("td");
+      tdLang.className = "lang";
+      tdLang.textContent = langLabel(r.lang);
+      tr.appendChild(tdLang);
+
+      var tdLabel = document.createElement("td");
+      var lab = document.createElement("div");
+      lab.className = "label";
+      lab.textContent = r.label;
+      tdLabel.appendChild(lab);
+      tr.appendChild(tdLabel);
+
+      var tdPath = document.createElement("td");
+      var path = document.createElement("span");
+      path.className = "path";
+      path.textContent = r.path;
+      tdPath.appendChild(path);
+      tr.appendChild(tdPath);
+
+      var tdPlay = document.createElement("td");
+      tdPlay.className = "playcell";
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "play";
+      btn.setAttribute("aria-label", "Speel " + r.label);
+      btn.textContent = "▶";
+      btn.addEventListener("click", function () { play(r, btn, tr); });
+      tdPlay.appendChild(btn);
+      tr.appendChild(tdPlay);
+
+      var tdFlag = document.createElement("td");
+      tdFlag.className = "flagcell";
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.className = "flagbox";
+      cb.title = "Markeer voor vervanging";
+      cb.checked = !!flags[r.id];
+      cb.addEventListener("change", function () {
+        if (cb.checked) flags[r.id] = true;
+        else delete flags[r.id];
+        saveFlags();
+        tr.classList.toggle("flagged", !!flags[r.id]);
+        updateStats(filtered());
+      });
+      tdFlag.appendChild(cb);
+      tr.appendChild(tdFlag);
+
+      el.tbody.appendChild(tr);
+    });
+    updateStats(list);
+  }
+
+  function exportFlagged() {
+    var list = rows.filter(function (r) { return flags[r.id]; });
+    if (!list.length) {
+      alert("Nog niets gemarkeerd.");
+      return;
+    }
+    var lines = list.map(function (r) {
+      return [
+        r.id,
+        kindLabel(r.kind),
+        langLabel(r.lang),
+        r.n || "",
+        r.label,
+        r.path,
+        r.url,
+      ].join("\t");
+    });
+    var text = "id\tkind\tlang\tn\tlabel\tpath\turl\n" + lines.join("\n");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        alert(list.length + " gemarkeerde items gekopieerd (TSV).");
+      }).catch(function () {
+        prompt("Kopieer:", text);
+      });
+    } else {
+      prompt("Kopieer:", text);
+    }
+  }
+
+  el.filterKind.addEventListener("change", render);
+  el.filterLang.addEventListener("change", render);
+  el.onlyFlagged.addEventListener("change", render);
+  el.search.addEventListener("input", render);
+  el.stopBtn.addEventListener("click", stop);
+  el.exportBtn.addEventListener("click", exportFlagged);
+  el.clearBtn.addEventListener("click", function () {
+    if (!confirm("Alle vinkjes wissen op dit device?")) return;
+    flags = {};
+    saveFlags();
+    render();
+  });
+
+  // Load animals from three talen
+  Promise.all([
+    fetch(BASE + "/klas/games/animals.json").then(function (r) { return r.json(); }),
+    fetch(BASE + "/mama/games/animals.json").then(function (r) { return r.json(); }),
+    fetch(BASE + "/papa/games/animals.json").then(function (r) { return r.json(); }),
+  ]).then(function (arr) {
+    var klas = arr[0], mama = arr[1], papa = arr[2];
+    buildFromAnimals("klas", "en", klas);
+    buildFromAnimals("mama", "fr", mama);
+    buildFromAnimals("papa", "nl", papa);
+    buildSharedCries(klas);
+    buildFx();
+    // stable order: cries by n, names by n per lang, fx last already
+    rows.sort(function (a, b) {
+      var ko = { cry: 0, name: 1, fx: 2 };
+      if (ko[a.kind] !== ko[b.kind]) return ko[a.kind] - ko[b.kind];
+      if ((a.n || 0) !== (b.n || 0)) return (a.n || 0) - (b.n || 0);
+      var lo = { en: 0, fr: 1, nl: 2, shared: 3 };
+      return (lo[a.lang] || 0) - (lo[b.lang] || 0);
+    });
+    el.status.hidden = true;
+    el.wrap.hidden = false;
+    render();
+  }).catch(function (err) {
+    el.status.className = "error";
+    el.status.textContent = "Kon animals.json niet laden. Open via GitHub Pages (/liedjes/tools/audio-qa/). " + err;
+  });
+})();
+</script>
+</body>
+</html>
