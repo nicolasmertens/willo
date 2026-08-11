@@ -4,10 +4,10 @@
   "parent_photo": "/liedjes/home/papa.jpg",
   "parent_href": "/liedjes/papa/",
   "active_taal": "papa",
-  "app_version": "eendjes-v2",
+  "app_version": "eendjes-v3",
   "storage_prefix": "eendjes",
-  "cache_name": "eendjes-v2",
-  "mp3_cache_name": "eendjes-mp3-v2",
+  "cache_name": "eendjes-v3",
+  "mp3_cache_name": "eendjes-mp3-v3",
   "manifest_name": "Eendjes",
   "seed_order": [1, 4, 12, 13, 17],
   "tracks": [

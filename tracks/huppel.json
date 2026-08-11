@@ -4,10 +4,10 @@
   "parent_photo": "/liedjes/home/papa.jpg",
   "parent_href": "/liedjes/papa/",
   "active_taal": "papa",
-  "app_version": "huppel-v2",
+  "app_version": "huppel-v3",
   "storage_prefix": "huppel",
-  "cache_name": "huppel-v2",
-  "mp3_cache_name": "huppel-mp3-v2",
+  "cache_name": "huppel-v3",
+  "mp3_cache_name": "huppel-mp3-v3",
   "manifest_name": "Huppel",
   "seed_order": [
     1,

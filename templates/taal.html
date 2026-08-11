@@ -59,16 +59,16 @@
   .tile .label { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 14px 12px; background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0)); color: #fff; font-weight: 800; font-size: clamp(15px, 2vw, 19px); text-shadow: 0 2px 6px rgba(0,0,0,0.5); letter-spacing: -0.01em; }
   .tile.pressing { transform: scale(0.94); filter: brightness(1.12); }
 
-  /* --- Bottom navigation banner --- */
+  /* --- Top navigation banner (was bottom; William leans on bottom edge) --- */
   :root { --bar-h: 92px; --bar-pad: 10px; --bar-gap: 8px; }
-  body { padding-bottom: calc(var(--bar-h) + var(--bar-pad) * 2 + max(8px, env(safe-area-inset-bottom))); }
+  body { padding-top: calc(var(--bar-h) + var(--bar-pad) * 2 + max(8px, env(safe-area-inset-top))); }
 
   .bottombar {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 100;
-    padding: var(--bar-pad) var(--bar-pad) max(var(--bar-pad), env(safe-area-inset-bottom)) var(--bar-pad);
+    position: fixed; left: 0; right: 0; top: 0; z-index: 100;
+    padding: max(var(--bar-pad), env(safe-area-inset-top)) var(--bar-pad) var(--bar-pad) var(--bar-pad);
     background: rgba(255, 247, 230, 0.96);
     -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-    box-shadow: 0 -2px 12px rgba(0,0,0,0.10);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
     display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: var(--bar-gap);
   }
   .bottombar > button {
@@ -92,10 +92,10 @@
     100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); transform: scale(1.0); }
   }
 
-  /* --- Full-screen still playback overlay (sits above grid, BELOW bottombar) --- */
+  /* --- Full-screen still playback overlay (sits above grid, BELOW chrome bar) --- */
   .player {
-    position: fixed; left: 0; right: 0; top: 0;
-    bottom: calc(var(--bar-h) + var(--bar-pad) * 2 + max(8px, env(safe-area-inset-bottom)));
+    position: fixed; left: 0; right: 0; bottom: 0;
+    top: calc(var(--bar-h) + var(--bar-pad) * 2 + max(8px, env(safe-area-inset-top)));
     background: #000; display: none; z-index: 50;
   }
   .player.visible { display: block; }

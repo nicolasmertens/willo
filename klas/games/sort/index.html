@@ -96,13 +96,13 @@
     top:0;
     background:linear-gradient(180deg,#cdeefb,var(--accentA));
     justify-content:flex-start;
-    padding-top:22px;
+    padding-top:calc(var(--bar-h) + 34px);
   }
   #zoneBottom{
     bottom:0;
     background:linear-gradient(0deg,#d7f0bd,var(--accentB));
     justify-content:flex-end;
-    padding-bottom:calc(var(--bar-h) + 34px);
+    padding-bottom:22px;
   }
   /* Ambient decoration: faded/desaturated silhouettes of other animals from
      the same size category, so each zone visually reads as "where big
@@ -199,7 +199,7 @@
   .again:active{transform:translateY(4px);box-shadow:0 4px 0 rgba(0,0,0,.12);}
 
   /* Bottom nav bar */
-  .bottombar { position: fixed; left:0; right:0; bottom:0; z-index:200; padding: var(--bar-pad) var(--bar-pad) max(var(--bar-pad), env(safe-area-inset-bottom)) var(--bar-pad); background: rgba(255,247,230,0.96); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow:0 -2px 12px rgba(0,0,0,0.10); display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap: var(--bar-gap); }
+  .bottombar { position: fixed; left:0; right:0; top:0; z-index:200; padding: max(var(--bar-pad), env(safe-area-inset-top)) var(--bar-pad) var(--bar-pad) var(--bar-pad); background: rgba(255,247,230,0.96); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 2px 12px rgba(0,0,0,0.10); display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap: var(--bar-gap); }
   .bottombar > button { height: var(--bar-h); border-radius:18px; border:4px solid transparent; background:#fff; padding:0; overflow:hidden; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,0.12),0 8px 18px rgba(0,0,0,0.08); }
   .bottombar .navtile img { width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
   .bottombar .navtile.active { border-color:#ff7043; box-shadow:0 0 0 3px rgba(255,112,67,0.25); }

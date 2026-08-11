@@ -4,10 +4,10 @@
   "parent_photo": "/liedjes/home/klas.jpg",
   "parent_href": "/liedjes/klas/",
   "active_taal": "klas",
-  "app_version": "rhymes-v5",
+  "app_version": "rhymes-v17",
   "storage_prefix": "rhymes",
-  "cache_name": "rhymes-v16",
-  "mp3_cache_name": "rhymes-mp3-v16",
+  "cache_name": "rhymes-v17",
+  "mp3_cache_name": "rhymes-mp3-v17",
   "manifest_name": "Rhymes",
   "seed_order": [
     1,
