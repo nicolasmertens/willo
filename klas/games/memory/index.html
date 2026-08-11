@@ -243,20 +243,50 @@
     return actx;
   }
 
+  // Reveal audio: spoken name, short gap, then animal sound (same chain as soundboard).
+  var playToken = 0;
   var current = null;
-  function stopSound(){
+  function stopReveal(){
+    playToken++;
     if(current){
       try{ current.pause(); current.currentTime = 0; }catch(e){}
       current = null;
     }
   }
-  function playSound(a){
+  function playClip(src, token, onDone){
     try{
-      stopSound();
-      current = new Audio("../" + a.sound);
-      var p = current.play();
-      if(p && p.catch){ p.catch(function(){}); }
-    }catch(e){}
+      if(current){ try{ current.pause(); }catch(e){} }
+      current = new Audio("../" + src);
+      var a = current;
+      a.onended = function(){ if(token === playToken) onDone(); };
+      a.onerror = function(){ if(token === playToken) onDone(); };
+      var p = a.play();
+      if(p && p.catch){ p.catch(function(){ if(token === playToken) onDone(); }); }
+    }catch(e){
+      if(token === playToken) onDone();
+    }
+  }
+  function playReveal(animal, onDone){
+    var token = ++playToken;
+    if(current){ try{ current.pause(); }catch(e){} current = null; }
+    var done = function(){ if(token === playToken && onDone) onDone(); };
+    if(animal && animal.nameClip){
+      playClip(animal.nameClip, token, function(){
+        if(token !== playToken) return;
+        setTimeout(function(){
+          if(token !== playToken) return;
+          if(animal.sound){
+            playClip(animal.sound, token, done);
+          } else {
+            done();
+          }
+        }, 120);
+      });
+    } else if(animal && animal.sound){
+      playClip(animal.sound, token, done);
+    } else {
+      done();
+    }
   }
 
   // gentle "uh-oh": two short descending notes
@@ -496,49 +526,51 @@
     if(card.classList.contains('up')) return;
 
     card.classList.add('up');
-    playSound(card._animal);
     totalFlips++;
     if(window.tel) window.tel("flip",{n:card._animal.n});
 
     if(!firstCard){
       firstCard = card;
+      playReveal(card._animal);
       return;
     }
 
-    // second card
-    if(firstCard.dataset.n === card.dataset.n){
-      // match
-      var a=firstCard, b=card;
-      a.classList.add('matched'); b.classList.add('matched');
-      matchedCount++;
-      firstCard=null;
-      if(window.tel) window.tel("match",{n:b._animal.n});
-      stopSound();
-      clap(false);
-      celebrateMatch(b);
-      if(matchedCount===totalPairs){
-        setTimeout(win, 650);
+    // Second card: lock until name + sound finish, then match/mismatch.
+    // (Previously stopSound ran immediately after the second flip, so the
+    // second animal never really got heard.)
+    lock = true;
+    var a2 = firstCard, b2 = card;
+    firstCard = null;
+    var isMatch = a2.dataset.n === b2.dataset.n;
+
+    playReveal(b2._animal, function(){
+      if(isMatch){
+        a2.classList.add('matched');
+        b2.classList.add('matched');
+        matchedCount++;
+        if(window.tel) window.tel("match",{n:b2._animal.n});
+        clap(false);
+        celebrateMatch(b2);
+        lock = false;
+        if(matchedCount === totalPairs){
+          setTimeout(win, 650);
+        }
+      } else {
+        mismatchCount++;
+        if(window.tel) window.tel("mismatch",{a:parseInt(a2.dataset.n,10), b:parseInt(b2.dataset.n,10)});
+        uhOh();
+        a2.classList.add('wiggle');
+        b2.classList.add('wiggle');
+        setTimeout(function(){
+          a2.classList.remove('wiggle');
+          b2.classList.remove('wiggle');
+          a2.classList.remove('up');
+          b2.classList.remove('up');
+          stopReveal();
+          lock = false;
+        }, 850);
       }
-    } else {
-      // mismatch: gentle uh-oh + wiggle, then flip back
-      lock=true;
-      var a2=firstCard, b2=card;
-      firstCard=null;
-      mismatchCount++;
-      if(window.tel) window.tel("mismatch",{a:parseInt(a2.dataset.n,10), b:parseInt(b2.dataset.n,10)});
-      stopSound();
-      uhOh();
-      a2.classList.add('wiggle');
-      b2.classList.add('wiggle');
-      setTimeout(function(){
-        a2.classList.remove('wiggle');
-        b2.classList.remove('wiggle');
-        a2.classList.remove('up');
-        b2.classList.remove('up');
-        stopSound();
-        lock=false;
-      }, 850);
-    }
+    });
   }
 
   function celebrateMatch(card){
@@ -549,7 +581,7 @@
   function win(){
     if(window.tel) window.tel("win",{pairs:totalPairs, flips:totalFlips, mismatches:mismatchCount, ms:Date.now()-gameStart});
     winEl.classList.add('active');
-    stopSound();
+    stopReveal();
     chime();
     clap(true);
     burstFullScreen();
@@ -568,19 +600,19 @@
 
   Array.prototype.forEach.call(document.querySelectorAll('.bottombar .navtile'), function(btn){
     attachButtonTap(btn, function(){
-      stopSound();
+      stopReveal();
       window.location = btn.dataset.href;
     });
   });
 
   attachButtonTap(document.getElementById('exitbtn'), function(){
-    stopSound();
+    stopReveal();
     window.location = "/liedjes/klas/";
   });
 
   attachButtonTap(document.getElementById('againBtn'), function(){
     if(window.tel) window.tel("play_again",{});
-    stopSound();
+    stopReveal();
     winEl.classList.remove('active');
     parts.length=0;
     show('start');
