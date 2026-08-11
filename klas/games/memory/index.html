@@ -38,8 +38,11 @@
   }
   .screen.active{display:flex;}
 
-  /* Start screen */
-  #start{justify-content:center;gap:6vh;padding:20px;}
+  /* Start screen — clear top chrome bar so title/choices are not under it */
+  #start{
+    justify-content:center;gap:6vh;padding:20px;
+    padding-top: calc(var(--bar-h) + var(--bar-pad) * 2 + env(safe-area-inset-top, 0px) + 16px);
+  }
   #start h1{
     font-size:clamp(48px,14vw,120px);
     margin:0;
@@ -148,7 +151,7 @@
   }
   .again:active{transform:translateY(4px);box-shadow:0 4px 0 rgba(0,0,0,.12);}
 
-  /* Bottom nav bar */
+  /* Top nav chrome (stop + mama/papa/klas) */
   .bottombar { position: fixed; left:0; right:0; top:0; z-index:200; padding: max(var(--bar-pad), env(safe-area-inset-top)) var(--bar-pad) var(--bar-pad) var(--bar-pad); background: rgba(255,247,230,0.96); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); box-shadow: 0 2px 12px rgba(0,0,0,0.10); display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap: var(--bar-gap); }
   .bottombar > button { height: var(--bar-h); border-radius:18px; border:4px solid transparent; background:#fff; padding:0; overflow:hidden; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,0.12),0 8px 18px rgba(0,0,0,0.08); }
   .bottombar .navtile img { width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
@@ -243,9 +246,12 @@
     return actx;
   }
 
-  // Reveal audio: spoken name, short gap, then animal sound (same chain as soundboard).
+  // Reveal audio: spoken name, short gap, then a SHORT burst of animal sound.
+  // Sound clips average ~3s; for memory we cap so flips stay snappy ("kort").
   var playToken = 0;
   var current = null;
+  var SOUND_CAP_MS = 1200;
+  var REVEAL_SAFETY_MS = 4500;
   function stopReveal(){
     playToken++;
     if(current){
@@ -253,37 +259,61 @@
       current = null;
     }
   }
-  function playClip(src, token, onDone){
+  function playClip(src, token, onDone, maxMs){
+    var finished = false;
+    var capTimer = null;
+    function finish(){
+      if(finished || token !== playToken) return;
+      finished = true;
+      if(capTimer){ clearTimeout(capTimer); capTimer = null; }
+      onDone();
+    }
     try{
       if(current){ try{ current.pause(); }catch(e){} }
       current = new Audio("../" + src);
       var a = current;
-      a.onended = function(){ if(token === playToken) onDone(); };
-      a.onerror = function(){ if(token === playToken) onDone(); };
+      a.onended = finish;
+      a.onerror = finish;
+      if(maxMs && maxMs > 0){
+        capTimer = setTimeout(function(){
+          if(token !== playToken) return;
+          try{ a.pause(); }catch(e){}
+          finish();
+        }, maxMs);
+      }
       var p = a.play();
-      if(p && p.catch){ p.catch(function(){ if(token === playToken) onDone(); }); }
+      if(p && p.catch){ p.catch(function(){ finish(); }); }
     }catch(e){
-      if(token === playToken) onDone();
+      finish();
     }
   }
   function playReveal(animal, onDone){
     var token = ++playToken;
     if(current){ try{ current.pause(); }catch(e){} current = null; }
-    var done = function(){ if(token === playToken && onDone) onDone(); };
+    var finished = false;
+    var safety = setTimeout(function(){
+      if(token === playToken) done();
+    }, REVEAL_SAFETY_MS);
+    function done(){
+      if(finished || token !== playToken) return;
+      finished = true;
+      clearTimeout(safety);
+      if(onDone) onDone();
+    }
     if(animal && animal.nameClip){
       playClip(animal.nameClip, token, function(){
         if(token !== playToken) return;
         setTimeout(function(){
           if(token !== playToken) return;
           if(animal.sound){
-            playClip(animal.sound, token, done);
+            playClip(animal.sound, token, done, SOUND_CAP_MS);
           } else {
             done();
           }
-        }, 120);
+        }, 100);
       });
     } else if(animal && animal.sound){
-      playClip(animal.sound, token, done);
+      playClip(animal.sound, token, done, SOUND_CAP_MS);
     } else {
       done();
     }
@@ -417,15 +447,19 @@
   var currentCards=0;
 
   /* ---------- responsive board layout ---------- */
+  // Size cards to the #game content box (already padded for the top chrome).
+  // Do NOT also subtract bar height from window — that double-counted after
+  // the bar moved to the top and left cards too small / bottom gap.
   var GAP = 12;
   function layoutBoard(){
     var n = currentCards;
     if(!n) return;
-    var barEl = document.getElementById('bottombar');
-    var barH = barEl ? barEl.offsetHeight : 112;
-    var pad = 12;
-    var availW = window.innerWidth - pad*2;
-    var availH = window.innerHeight - barH - pad - 16;
+    var gameEl = screens.game;
+    var cs = window.getComputedStyle(gameEl);
+    var padX = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+    var padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+    var availW = gameEl.clientWidth - padX;
+    var availH = gameEl.clientHeight - padY;
     if(availW < 40) availW = 40;
     if(availH < 40) availH = 40;
     var best = 0, bestCols = 1;

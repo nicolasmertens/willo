@@ -45,8 +45,11 @@
   }
   .screen.active{display:flex;}
 
-  /* Start screen */
-  #start{justify-content:center;gap:6vh;padding:20px;}
+  /* Start screen — clear top chrome bar */
+  #start{
+    justify-content:center;gap:6vh;padding:20px;
+    padding-top: calc(var(--bar-h) + var(--bar-pad) * 2 + env(safe-area-inset-top, 0px) + 16px);
+  }
   #start h1{
     font-size:clamp(36px,10vw,84px);
     margin:0;
@@ -96,7 +99,7 @@
     top:0;
     background:linear-gradient(180deg,#cdeefb,var(--accentA));
     justify-content:flex-start;
-    padding-top:calc(var(--bar-h) + 34px);
+    padding-top:calc(var(--bar-h) + var(--bar-pad) * 2 + env(safe-area-inset-top, 0px) + 12px);
   }
   #zoneBottom{
     bottom:0;

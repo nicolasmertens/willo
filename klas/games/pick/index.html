@@ -38,8 +38,11 @@
   }
   .screen.active{display:flex;}
 
-  /* Start screen */
-  #start{justify-content:center;gap:6vh;padding:20px;}
+  /* Start screen — clear top chrome bar */
+  #start{
+    justify-content:center;gap:6vh;padding:20px;
+    padding-top: calc(var(--bar-h) + var(--bar-pad) * 2 + env(safe-area-inset-top, 0px) + 16px);
+  }
   #start h1{
     font-size:clamp(40px,11vw,96px);
     margin:0;
@@ -450,13 +453,15 @@
   function layoutBoard(){
     var n = currentTileCount;
     if(!n) return;
-    var barEl = document.getElementById('bottombar');
-    var barH = barEl ? barEl.offsetHeight : 112;
+    // Use #game content box (already top-padded for chrome); only subtract stage row.
+    var gameEl = document.getElementById('game');
     var stageEl = document.getElementById('stageRow');
     var stageH = stageEl ? stageEl.offsetHeight : 104;
-    var pad = 12;
-    var availW = window.innerWidth - pad*2;
-    var availH = window.innerHeight - barH - stageH - pad*2 - 16;
+    var cs = window.getComputedStyle(gameEl);
+    var padX = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+    var padY = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+    var availW = gameEl.clientWidth - padX;
+    var availH = gameEl.clientHeight - padY - stageH - 14;
     if(availW < 40) availW = 40;
     if(availH < 40) availH = 40;
     var best = 0, bestCols = 1;
