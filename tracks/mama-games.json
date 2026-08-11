@@ -2,6 +2,23 @@
   "title": "Jeux",
   "lang": "fr",
   "tracks": [
-    {"n": 1, "title": "Sons", "icon": "/liedjes/klas/games/hero-sounds.jpg", "href": "/liedjes/mama/games/soundboard/"}
+    {
+      "n": 1,
+      "title": "Mémoire",
+      "icon": "/liedjes/klas/games/hero-memory.jpg",
+      "href": "/liedjes/mama/games/memory/"
+    },
+    {
+      "n": 2,
+      "title": "Sons",
+      "icon": "/liedjes/klas/games/hero-sounds.jpg",
+      "href": "/liedjes/mama/games/soundboard/"
+    },
+    {
+      "n": 3,
+      "title": "Lequel ?",
+      "icon": "/liedjes/klas/games/hero-pick.jpg",
+      "href": "/liedjes/mama/games/pick/"
+    }
   ]
 }
