@@ -161,6 +161,7 @@
     <input type="search" id="search" placeholder="Zoek naam / pad…" enterkeyhint="search">
     <button type="button" id="stopBtn" class="secondary">Stop audio</button>
     <button type="button" id="exportBtn" class="secondary">Kopieer open</button>
+    <button type="button" id="dlAllBtn" class="secondary">Download alle opnames</button>
     <button type="button" id="clearBtn" class="secondary">Wis vinkjes</button>
   </div>
   <div class="stats" id="stats">Laden…</div>
@@ -184,9 +185,10 @@
     </table>
   </div>
   <footer>
-    Record: tik om te starten, tik nog eens om te stoppen (max ~8s). Safari vraagt microfoon-toestemming.
-    Opnames liggen in IndexedDB op dit device (niet automatisch online). Download → bestand in Downloads;
-    zeg dan “installeer de opname” of sleep naar <code>klas/games/fx/</code> / het juiste pad.
+    <strong>Library-fix:</strong> namen (EN/FR/NL) en FX hier heropnemen → Memory, Which One én soundboard
+    delen die bestanden. Dierengeluiden (cri) zijn 1× gedeeld voor alle talen.<br>
+    Record: tik start · tik stop (max ~8s). Downloads heten <code>liedjes-rec__…</code> zodat
+    <code>python3 tools/audio-qa/install-recordings.py</code> ze in de repo zet (+ mp3).
   </footer>
 </main>
 <script>
@@ -399,8 +401,7 @@
     return row.url;
   }
 
-  function downloadName(row, mime) {
-    var base = (row.path.split("/").pop() || row.id).replace(/\.[^.]+$/, "");
+  function downloadExt(mime) {
     var ext = "webm";
     if (mime) {
       if (mime.indexOf("mp4") !== -1 || mime.indexOf("m4a") !== -1 || mime.indexOf("aac") !== -1) ext = "m4a";
@@ -408,10 +409,15 @@
       else if (mime.indexOf("wav") !== -1) ext = "wav";
       else if (mime.indexOf("ogg") !== -1) ext = "ogg";
     }
-    // Prefer name that matches repo basename for FX installs
-    if (row.path.indexOf("jaaa.mp3") !== -1) return "jaaa." + ext;
-    if (row.path.indexOf("neee.mp3") !== -1) return "neee." + ext;
-    return base + "." + ext;
+    return ext;
+  }
+
+  // Encodes repo path so install-recordings.py can place the file correctly.
+  // e.g. papa/games/name/01.mp3 -> liedjes-rec__papa__games__name__01.m4a
+  function downloadName(row, mime) {
+    var pathPart = (row.path || row.id).replace(/\\/g, "/").replace(/^\//, "").replace(/\.[^.]+$/, "");
+    pathPart = pathPart.replace(/\//g, "__");
+    return "liedjes-rec__" + pathPart + "." + downloadExt(mime);
   }
 
   function downloadOverride(row) {
@@ -423,6 +429,26 @@
     document.body.appendChild(a);
     a.click();
     a.remove();
+  }
+
+  function downloadAllOverrides() {
+    var ids = Object.keys(overrides);
+    if (!ids.length) {
+      alert("Nog geen eigen opnames.");
+      return;
+    }
+    var i = 0;
+    function next() {
+      if (i >= ids.length) {
+        alert(ids.length + " bestanden naar Downloads (liedjes-rec__…). Daarna: install-recordings.py of zeg ‘installeer opnames’.");
+        return;
+      }
+      var id = ids[i++];
+      var row = rows.find(function (r) { return r.id === id; });
+      if (row) downloadOverride(row);
+      setTimeout(next, 350); // stagger so Safari doesn't drop multi-downloads
+    }
+    next();
   }
 
   /* ---------- playback ---------- */
@@ -800,6 +826,7 @@
     stopPlay();
   });
   el.exportBtn.addEventListener("click", exportOpen);
+  document.getElementById("dlAllBtn").addEventListener("click", downloadAllOverrides);
   el.clearBtn.addEventListener("click", function () {
     if (!confirm("Alle ‘goed’-vinkjes wissen? (Eigen opnames blijven.)")) return;
     okMap = {};
