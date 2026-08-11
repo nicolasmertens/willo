@@ -213,12 +213,13 @@
     <button type="button" id="micRefreshBtn" class="secondary">Ververs lijst</button>
   </div>
   <div class="stats" id="stats">Laden…</div>
+  <div class="mic-banner warn" id="syncBanner">Auto-sync…</div>
   <div class="mic-banner warn" id="micBanner">Safari kiest soms een andere mic dan Systeeminstellingen. Kies hier <strong>AirPods Nico</strong> en tik Mic test.</div>
   <div id="levelWrap" hidden>
     <div class="level-label" id="levelLabel">Mic-niveau</div>
     <div class="level-track"><div class="level-fill" id="levelFill"></div></div>
   </div>
-  <div class="ver" id="verStamp">recorder v7</div>
+  <div class="ver" id="verStamp">recorder v8 · auto-sync library</div>
 </header>
 <main>
 <audio id="nativePlayer" controls playsinline style="display:none;width:100%;margin:8px 0 0;max-width:420px"></audio>
@@ -240,10 +241,8 @@
     </table>
   </div>
   <footer>
-    <strong>Library-fix:</strong> namen (EN/FR/NL) en FX hier heropnemen → Memory, Which One én soundboard
-    delen die bestanden. Dierengeluiden (cri) zijn 1× gedeeld voor alle talen.<br>
-    Record: tik start · tik stop (max ~8s). Downloads heten <code>liedjes-rec__…</code> zodat
-    <code>python3 tools/audio-qa/install-recordings.py</code> ze in de repo zet (+ mp3).
+    <strong>Auto-sync:</strong> altijd openen met <code>tools/audio-qa/open.sh</code>
+    (localhost:18787). Record→Stop schrijft mp3 in de repo en pusht. Memory / Which One / soundboard delen die files.
   </footer>
 </main>
 <script>
@@ -269,6 +268,14 @@
   var recState = null; // { id, recorder, chunks, stream, timer, btn, tr }
   var monitorState = null; // live mic test (level only)
   var MIC_PREF_KEY = "liedjes-audio-qa-mic-id";
+  var SYNC_URLS = [
+    (location.origin.indexOf("127.0.0.1") !== -1 || location.origin.indexOf("localhost") !== -1)
+      ? (location.origin + "/api/recording")
+      : null,
+    "http://127.0.0.1:18787/api/recording",
+  ].filter(Boolean);
+  var syncState = { ok: false, last: "", detail: "" };
+
 
   var el = {
     status: document.getElementById("status"),
@@ -445,13 +452,103 @@
     blob = typedBlob(blob, m);
     var url = URL.createObjectURL(blob);
     overrides[id] = { blob: blob, mime: m, url: url, updated: Date.now() };
+    var row = rows.find(function (r) { return r.id === id; }) || { id: id, path: "", label: id };
     return idbPut({
       id: id,
       blob: blob,
       mime: m,
       updated: overrides[id].updated,
-      path: (rows.find(function (r) { return r.id === id; }) || {}).path || "",
+      path: row.path || "",
+    }).then(function () {
+      return autoSyncRecording(row, blob, m).catch(function (e) {
+        console.warn("auto-sync failed", e);
+        syncState.ok = false;
+        syncState.detail = String(e && e.message ? e.message : e);
+        setSyncBanner();
+        return null;
+      });
     });
+  }
+
+  function setSyncBanner() {
+    var el = document.getElementById("syncBanner");
+    if (!el) return;
+    if (syncState.ok) {
+      el.className = "mic-banner ok";
+      el.innerHTML = "Auto-sync <strong>aan</strong> · elke take → library + git push. " +
+        (syncState.last ? ("Laatst: " + syncState.last) : "");
+    } else if (syncState.detail) {
+      el.className = "mic-banner bad";
+      el.innerHTML = "Auto-sync <strong>uit</strong> — " + syncState.detail +
+        " · open via <code>tools/audio-qa/open.sh</code>";
+    } else {
+      el.className = "mic-banner warn";
+      el.innerHTML = "Auto-sync zoekt server… gebruik <code>open.sh</code> (localhost:18787), niet GH Pages.";
+    }
+  }
+
+  function probeSync() {
+    var healthUrls = [
+      (location.origin.indexOf("127.0.0.1") !== -1 || location.origin.indexOf("localhost") !== -1)
+        ? (location.origin + "/api/health")
+        : null,
+      "http://127.0.0.1:18787/api/health",
+    ].filter(Boolean);
+    var i = 0;
+    function next() {
+      if (i >= healthUrls.length) {
+        syncState.ok = false;
+        syncState.detail = "geen server op :18787";
+        setSyncBanner();
+        return;
+      }
+      var u = healthUrls[i++];
+      fetch(u, { method: "GET", cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+        .then(function (j) {
+          if (j && j.ok) {
+            syncState.ok = true;
+            syncState.detail = "";
+            setSyncBanner();
+          } else next();
+        })
+        .catch(function () { next(); });
+    }
+    next();
+  }
+
+  function autoSyncRecording(row, blob, mime) {
+    if (!row || !row.path) return Promise.reject(new Error("geen target path"));
+    var headers = {
+      "Content-Type": mime || blob.type || "application/octet-stream",
+      "X-Liedjes-Path": row.path,
+      "X-Liedjes-Id": row.id || "",
+      "X-Liedjes-Label": row.label || "",
+    };
+    var errors = [];
+    function tryUrl(i) {
+      if (i >= SYNC_URLS.length) {
+        return Promise.reject(new Error(errors.join("; ") || "sync failed"));
+      }
+      var url = SYNC_URLS[i];
+      return fetch(url, { method: "POST", headers: headers, body: blob })
+        .then(function (r) {
+          return r.json().then(function (j) {
+            if (!r.ok || !j.ok) throw new Error((j && j.error) || ("HTTP " + r.status));
+            syncState.ok = true;
+            syncState.last = j.path + " (" + j.bytes + " B)";
+            syncState.detail = "";
+            setSyncBanner();
+            setMicBanner("ok", "Library: <strong>" + j.path + "</strong> · auto git push");
+            return j;
+          });
+        })
+        .catch(function (e) {
+          errors.push(url + ": " + (e && e.message ? e.message : e));
+          return tryUrl(i + 1);
+        });
+    }
+    return tryUrl(0);
   }
 
   function clearOverride(id) {
@@ -1604,9 +1701,9 @@
     } else if (!(window.AudioContext || window.webkitAudioContext)) {
       setMicBanner("bad", "Geen Web Audio — opnemen kan niet.");
     } else {
-      setMicBanner("ok", "recorder v7 · kies <strong>AirPods Nico</strong> → Mic test → Record. (geen shaky analyser-WAV meer)");
+      setMicBanner("ok", "recorder v8 · AirPods → Mic test → Record. Elke take → library + git push.");
       var vs = document.getElementById("verStamp");
-      if (vs) vs.textContent = "recorder v7 · MediaRecorder audio · analyser = meter only";
+      if (vs) vs.textContent = "recorder v8 · auto-sync · open via tools/audio-qa/open.sh";
 
       // Preload device list if we already have permission
       refreshMicList().catch(function () {});

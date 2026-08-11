@@ -1,40 +1,29 @@
-# Audio QA — review + re-record library
+# Audio QA — auto-sync library
 
-Safari page: https://nicolasmertens.github.io/liedjes/tools/audio-qa/
+## Why not GH Pages alone?
 
-## Why
+A browser on GitHub Pages **cannot write your git repo**. That is a browser security boundary, not a missing checkbox. So the integral path is:
 
-Name clips (especially NL) were batch AI-generated and many sound off. Same files feed:
+1. Local server on your Mac (`server.py`)
+2. Page records → **POST /api/recording**
+3. Server writes mp3 under `papa|mama|klas/games/...`
+4. Server **git commit + push**
 
-- Memory (flip reveal)
-- Which One? (prompt + wrong-answer name)
-- Soundboard (Noms / Namen toggle)
+Memory / Which One / soundboard all read those files.
 
-One good re-record updates all of those.
-
-| Kind | Scope |
-|------|--------|
-| Naam EN / FR / NL | per taal (`klas|mama|papa/games/name/NN.mp3`) |
-| Cri (dierengeluid) | 1× shared (`klas/games/sound/NN.mp3`) |
-| FX | shared (`klas/games/fx/jaaa.mp3`, `neee.mp3`) |
-
-## Workflow
-
-1. Open the QA page → filter (e.g. NL names, or FX).
-2. Play · leave **open** if bad · **✓** if good.
-3. **Record** bad ones yourself (mic).
-4. **Download alle opnames** (or ↓ per row) → `~/Downloads/liedjes-rec__…`
-5. Install into the repo:
+## Always open like this
 
 ```bash
 cd ~/dev/code/liedjes
-python3 tools/audio-qa/install-recordings.py          # from ~/Downloads
-python3 tools/audio-qa/install-recordings.py --dry-run
+./tools/audio-qa/open.sh
 ```
 
-6. Commit / push (or ask the agent: “installeer opnames”).
+Safari → `http://127.0.0.1:18787/tools/audio-qa/`  
+Banner must say **Auto-sync aan**.
 
-## Marking
+## Env
 
-- **Checked = good**
-- **Open = still needs work**
+| Var | Default |
+|-----|---------|
+| `LIEDJES_AUDIO_QA_PORT` | `18787` |
+| `LIEDJES_AUDIO_QA_GIT` | `1` (set `0` to skip push) |
