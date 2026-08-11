@@ -4,7 +4,6 @@
   "tracks": [
     {"n": 1, "title": "Memory", "icon": "games/hero-memory.jpg", "href": "/liedjes/klas/games/memory/"},
     {"n": 2, "title": "Sounds", "icon": "games/hero-sounds.jpg", "href": "/liedjes/klas/games/soundboard/"},
-    {"n": 3, "title": "Which One?", "icon": "games/hero-pick.jpg", "href": "/liedjes/klas/games/pick/"},
-    {"n": 4, "title": "Big vs Small", "icon": "games/hero-sort.jpg", "href": "/liedjes/klas/games/sort/"}
+    {"n": 3, "title": "Which One?", "icon": "games/hero-pick.jpg", "href": "/liedjes/klas/games/pick/"}
   ]
 }

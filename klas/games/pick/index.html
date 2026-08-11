@@ -484,13 +484,13 @@
   var sessionStart = 0;
   var target = null, roundChoices = [], locked = false, latencyStart = 0;
   // Toddlers commonly triple-tap in a burst rather than one clean tap.
-  // NEXT_ROUND_DELAY gives the whole burst time to finish before the next
-  // round's tiles even build. SETTLE_MS is a belt-and-suspenders grace
-  // period *after* the new round's tiles/audio appear, keeping input
-  // blocked a little longer so any still-straggling tap from the previous
-  // round's flurry lands on nothing rather than answering an unseen round.
-  var NEXT_ROUND_DELAY = 2000;
-  var SETTLE_MS = 400;
+  // After answer: short feedback then next round — William was hammering
+  // the board during the old ~2s dead wait. Still long enough that a
+  // flurry from the previous tap dies before the new board unlocks.
+  // SETTLE_MS: grace after the prompt name plays before tiles unlock.
+  var NEXT_CORRECT_MS = 700;
+  var NEXT_WRONG_MS = 1100;
+  var SETTLE_MS = 250;
 
   function startTier(choicesCount, roundsCount){
     tier = choicesCount;
@@ -584,23 +584,24 @@
     var correct = (a.n === target.n) ? 1 : 0;
     if(window.tel) window.tel("pick_answer", {target:target.n, tapped:a.n, correct:correct, ms:ms});
 
-    // confirmation: replay the correct answer's nameClip
-    playClip(target.nameClip);
-
     if(correct){
+      // Snappy: clap + confetti only. Name already played at round start;
+      // replaying it here made the lock feel endless for William.
       correctCount++;
       clap(false);
       celebrateTile(tile);
+      setTimeout(nextRound, NEXT_CORRECT_MS);
     } else {
+      // Wrong: uh-oh, then flash the right animal + say its name once.
       uhOh();
       tile.classList.add('wiggle');
       setTimeout(function(){
         tile.classList.remove('wiggle');
         highlightCorrectTile();
-      }, 550);
+        playClip(target.nameClip);
+      }, 350);
+      setTimeout(nextRound, NEXT_WRONG_MS);
     }
-
-    setTimeout(nextRound, NEXT_ROUND_DELAY);
   }
 
   function finishSession(){
