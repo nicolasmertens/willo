@@ -4,17 +4,16 @@
   "parent_photo": "/liedjes/home/klas.jpg",
   "parent_href": "/liedjes/klas/",
   "active_taal": "klas",
-  "app_version": "rhymes-v17",
+  "app_version": "rhymes-v18",
   "storage_prefix": "rhymes",
-  "cache_name": "rhymes-v17",
-  "mp3_cache_name": "rhymes-mp3-v17",
+  "cache_name": "rhymes-v18",
+  "mp3_cache_name": "rhymes-mp3-v18",
   "manifest_name": "Rhymes",
   "seed_order": [
     1,
     6,
     2,
-    7,
-    11
+    7
   ],
   "tracks": [
     {
@@ -76,13 +75,6 @@
       "title": "This Little Piggy",
       "audio": "audio/10.mp3",
       "icon": "icons/10.jpg"
-    },
-    {
-      "n": 11,
-      "title": "Old MacDonald Had a Farm",
-      "audio": "audio/11.mp3",
-      "icon": "icons/11.jpg",
-      "rev": 3
     }
   ]
 }
