@@ -97,32 +97,37 @@
   }
   .actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
   .btn {
-    width: 42px; height: 42px; border: none; border-radius: 50%;
-    color: #fff; font-size: 1rem; cursor: pointer;
+    height: 42px; border: none; border-radius: 12px;
+    color: #fff; font-size: .85rem; font-weight: 800; cursor: pointer;
     box-shadow: 0 3px 0 rgba(0,0,0,.12); line-height: 1;
+    padding: 0 12px; white-space: nowrap;
   }
+  .btn.round { width: 42px; border-radius: 50%; padding: 0; font-size: 1rem; font-weight: 600; }
   .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.12); }
   .btn.play { background: linear-gradient(145deg, #ffb347, #ff8c42); }
   .btn.play.playing { background: linear-gradient(145deg, #66bb6a, #2e7d32); }
-  .btn.rec { background: linear-gradient(145deg, #ef5350, #c62828); }
+  .btn.rec { background: linear-gradient(145deg, #ef5350, #c62828); min-width: 88px; }
   .btn.rec.hot {
     animation: pulse 1s ease-in-out infinite;
     box-shadow: 0 0 0 4px rgba(229,57,53,.25);
   }
-  .btn.dl, .btn.clr {
-    width: auto; min-width: 42px; border-radius: 12px; padding: 0 10px;
-    font-size: .75rem; font-weight: 800;
-  }
   .btn.dl { background: #5c6bc0; }
   .btn.clr { background: #78909c; }
   .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .mic-banner {
+    margin-top: 8px; padding: 8px 10px; border-radius: 10px;
+    font-size: .85rem; font-weight: 600;
+  }
+  .mic-banner.ok { background: #e8f5e9; color: #1b5e20; }
+  .mic-banner.bad { background: #ffebee; color: #b71c1c; }
+  .mic-banner.warn { background: #fff3e0; color: #e65100; }
   @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.06); }
   }
   .okbox { width: 28px; height: 28px; accent-color: var(--ok); }
   .okcell { text-align: center; width: 4.5rem; }
-  .actcell { width: 9.5rem; }
+  .actcell { min-width: 12rem; }
   footer {
     margin: 16px 4px 0; color: var(--muted); font-size: .82rem; line-height: 1.45;
   }
@@ -165,6 +170,7 @@
     <button type="button" id="clearBtn" class="secondary">Wis vinkjes</button>
   </div>
   <div class="stats" id="stats">Laden…</div>
+  <div class="mic-banner warn" id="micBanner">Microfoon: nog niet getest — tik <strong>Record</strong> op een rij.</div>
 </header>
 <main>
   <div id="status" class="loading">Audio-lijst laden…</div>
@@ -488,8 +494,16 @@
     }
   }
 
-  /* ---------- recording ---------- */
+  /* ---------- recording (Safari-friendly) ---------- */
+  function setMicBanner(kind, text) {
+    var b = document.getElementById("micBanner");
+    if (!b) return;
+    b.className = "mic-banner " + kind;
+    b.innerHTML = text;
+  }
+
   function pickMime() {
+    // Safari prefers mp4/aac; Chrome prefers webm. Empty = browser default.
     var candidates = [
       "audio/mp4",
       "audio/aac",
@@ -498,6 +512,7 @@
       "audio/ogg;codecs=opus",
     ];
     if (!window.MediaRecorder) return "";
+    if (typeof MediaRecorder.isTypeSupported !== "function") return "";
     for (var i = 0; i < candidates.length; i++) {
       try {
         if (MediaRecorder.isTypeSupported(candidates[i])) return candidates[i];
@@ -506,56 +521,85 @@
     return "";
   }
 
-  function stopRecording(save) {
-    if (!recState) return;
-    var st = recState;
-    recState = null;
-    if (st.timer) clearTimeout(st.timer);
-    try {
-      if (st.recorder && st.recorder.state !== "inactive") st.recorder.stop();
-    } catch (e) {}
-    // stream stopped in onstop after we may need tracks
-    if (st.btn) {
-      st.btn.classList.remove("hot");
-      st.btn.textContent = "⏺";
-      st.btn.title = "Opnemen";
-    }
-    if (st.tr) st.tr.classList.remove("recording");
+  function resetRecBtn(btn) {
+    if (!btn) return;
+    btn.classList.remove("hot");
+    btn.textContent = "Record";
+    btn.title = "Opnemen (tik start · tik stop)";
+    btn.disabled = false;
   }
 
   function startRecording(row, btn, tr) {
+    if (!window.isSecureContext) {
+      setMicBanner("bad", "Microfoon werkt alleen op HTTPS (of localhost). Open de GitHub Pages-URL.");
+      alert("Niet-veilige pagina — open https://nicolasmertens.github.io/liedjes/tools/audio-qa/");
+      return;
+    }
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert("Geen microfoon-API in deze browser. Gebruik Safari of Chrome.");
+      setMicBanner("bad", "Geen microfoon-API in deze browser.");
+      alert("Geen microfoon-API. Gebruik recente Safari of Chrome.");
       return;
     }
     if (!window.MediaRecorder) {
-      alert("MediaRecorder ontbreekt hier. Probeer desktop Safari/Chrome.");
+      setMicBanner("bad", "MediaRecorder ontbreekt (te oude Safari/iOS?).");
+      alert("MediaRecorder ontbreekt. Update Safari of gebruik Chrome op de Mac.");
       return;
     }
+
+    // Second tap on same row while recording → stop
+    if (recState && recState.id === row.id) {
+      try {
+        if (recState.recorder.state === "recording") {
+          // Safari: requestData before stop improves non-empty blobs
+          try { if (recState.recorder.requestData) recState.recorder.requestData(); } catch (e) {}
+          recState.recorder.stop();
+        }
+      } catch (e) {}
+      return;
+    }
+    // Different row recording → stop that first (discard incomplete via stop)
     if (recState) {
-      if (recState.id === row.id) {
-        // second tap = stop & save
-        try { recState.recorder.stop(); } catch (e) {}
-        return;
-      }
-      stopRecording(false);
+      try {
+        if (recState.recorder.state === "recording") recState.recorder.stop();
+      } catch (e) {}
+      recState = null;
     }
 
     stopPlay();
-    var mime = pickMime();
+    btn.disabled = true;
+    btn.textContent = "…";
+    setMicBanner("warn", "Microfoon vragen…");
 
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+    var mime = pickMime();
+    var audioConstraints = {
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      },
+    };
+
+    navigator.mediaDevices.getUserMedia(audioConstraints).then(function (stream) {
       var chunks = [];
-      var opts = mime ? { mimeType: mime } : undefined;
       var recorder;
       try {
-        recorder = opts ? new MediaRecorder(stream, opts) : new MediaRecorder(stream);
-      } catch (e) {
-        stream.getTracks().forEach(function (t) { t.stop(); });
-        alert("Kon recorder niet starten: " + e.message);
-        return;
+        recorder = mime
+          ? new MediaRecorder(stream, { mimeType: mime })
+          : new MediaRecorder(stream);
+      } catch (e1) {
+        try {
+          recorder = new MediaRecorder(stream);
+          mime = "";
+        } catch (e2) {
+          stream.getTracks().forEach(function (t) { t.stop(); });
+          resetRecBtn(btn);
+          setMicBanner("bad", "Recorder start faalde: " + e2.message);
+          alert("Kon recorder niet starten: " + e2.message);
+          return;
+        }
       }
 
+      var usedMime = recorder.mimeType || mime || "audio/mp4";
       recState = {
         id: row.id,
         row: row,
@@ -564,75 +608,99 @@
         stream: stream,
         btn: btn,
         tr: tr,
-        mime: recorder.mimeType || mime || "audio/webm",
+        mime: usedMime,
         timer: null,
       };
 
+      btn.disabled = false;
       btn.classList.add("hot");
-      btn.textContent = "⏹";
-      btn.title = "Stop opname";
+      btn.textContent = "Stop";
+      btn.title = "Stop opname en bewaar";
       tr.classList.add("recording");
+      setMicBanner("ok", "Opnemen… spreek nu · tik <strong>Stop</strong> (max 8s). Mime: " + usedMime);
 
       recorder.ondataavailable = function (ev) {
         if (ev.data && ev.data.size > 0) chunks.push(ev.data);
       };
+
+      recorder.onerror = function (ev) {
+        setMicBanner("bad", "Recorder error");
+        console.error(ev);
+      };
+
       recorder.onstop = function () {
-        stream.getTracks().forEach(function (t) { t.stop(); });
-        var usedMime = recState ? recState.mime : (recorder.mimeType || "audio/webm");
-        var theRow = recState ? recState.row : row;
-        var theBtn = recState ? recState.btn : btn;
-        var theTr = recState ? recState.tr : tr;
-        if (recState && recState.timer) clearTimeout(recState.timer);
-        recState = null;
-        if (theBtn) {
-          theBtn.classList.remove("hot");
-          theBtn.textContent = "⏺";
-          theBtn.title = "Opnemen";
+        try { stream.getTracks().forEach(function (t) { t.stop(); }); } catch (e) {}
+        var theRow = row;
+        var theBtn = btn;
+        var theTr = tr;
+        var theMime = usedMime;
+        if (recState && recState.id === row.id) {
+          theMime = recState.mime || usedMime;
+          if (recState.timer) clearTimeout(recState.timer);
         }
+        recState = null;
+        resetRecBtn(theBtn);
         if (theTr) theTr.classList.remove("recording");
 
         if (!chunks.length) {
-          alert("Lege opname — probeer opnieuw dichter bij de mic.");
+          setMicBanner("bad", "Lege opname — tik Record, spreek, tik Stop. Mic dichterbij?");
+          alert("Lege opname. Tik Record → spreek → Stop. Check Systeeminstellingen → Microfoon → Safari.");
           return;
         }
-        var blob = new Blob(chunks, { type: usedMime });
-        setOverride(theRow.id, blob, usedMime).then(function () {
+        var blob = new Blob(chunks, { type: theMime });
+        if (blob.size < 200) {
+          setMicBanner("bad", "Opname te kort/stil (" + blob.size + " bytes).");
+          alert("Opname te stil of te kort. Probeer opnieuw.");
+          return;
+        }
+        setOverride(theRow.id, blob, theMime).then(function () {
+          setMicBanner("ok", "Opname bewaard voor “" + theRow.label + "” (" + Math.round(blob.size / 1024) + " KB). Speel af met ▶.");
           render();
-          // auto preview
           setTimeout(function () {
             var tr2 = document.querySelector('tr[data-id="' + theRow.id + '"]');
             var playBtn = tr2 ? tr2.querySelector(".btn.play") : null;
             if (tr2 && playBtn) play(theRow, playBtn, tr2);
-          }, 80);
+          }, 100);
         }).catch(function (err) {
+          setMicBanner("bad", "Bewaren mislukt: " + err);
           alert("Opname bewaren mislukt: " + err);
         });
       };
 
+      // Safari: start() WITHOUT timeslice — one blob on stop is more reliable
       try {
-        recorder.start(100);
+        recorder.start();
       } catch (e) {
         stream.getTracks().forEach(function (t) { t.stop(); });
         recState = null;
+        resetRecBtn(btn);
+        setMicBanner("bad", "Start mislukt: " + e.message);
         alert("Start mislukt: " + e.message);
         return;
       }
 
       recState.timer = setTimeout(function () {
         if (recState && recState.id === row.id && recState.recorder.state === "recording") {
+          try {
+            if (recState.recorder.requestData) recState.recorder.requestData();
+          } catch (e) {}
           try { recState.recorder.stop(); } catch (e) {}
         }
       }, MAX_REC_MS);
     }).catch(function (err) {
-      alert("Microfoon geweigerd of niet beschikbaar.\n" + (err && err.message ? err.message : err));
+      resetRecBtn(btn);
+      var msg = (err && err.name) ? (err.name + ": " + err.message) : String(err);
+      setMicBanner("bad", "Microfoon geblokkeerd — " + msg);
+      alert(
+        "Microfoon niet beschikbaar.\n\n" +
+        msg +
+        "\n\nSafari → Instellingen voor deze website → Microfoon → Toestaan\n" +
+        "of macOS Systeeminstellingen → Privacy → Microfoon → Safari aan."
+      );
     });
   }
 
   function toggleRec(row, btn, tr) {
-    if (recState && recState.id === row.id) {
-      try { recState.recorder.stop(); } catch (e) {}
-      return;
-    }
     startRecording(row, btn, tr);
   }
 
@@ -722,7 +790,7 @@
 
       var playBtn = document.createElement("button");
       playBtn.type = "button";
-      playBtn.className = "btn play";
+      playBtn.className = "btn play round";
       playBtn.title = own ? "Speel eigen opname" : "Speel live";
       playBtn.setAttribute("aria-label", "Speel " + r.label);
       playBtn.textContent = "▶";
@@ -732,9 +800,9 @@
       var recBtn = document.createElement("button");
       recBtn.type = "button";
       recBtn.className = "btn rec";
-      recBtn.title = "Opnemen (tik start · tik stop)";
+      recBtn.title = "Opnemen: tik Record, spreek, tik Stop";
       recBtn.setAttribute("aria-label", "Record " + r.label);
-      recBtn.textContent = "⏺";
+      recBtn.textContent = "Record";
       recBtn.addEventListener("click", function () { toggleRec(r, recBtn, tr); });
       wrap.appendChild(recBtn);
 
@@ -743,7 +811,7 @@
         dlBtn.type = "button";
         dlBtn.className = "btn dl";
         dlBtn.title = "Download opname";
-        dlBtn.textContent = "↓";
+        dlBtn.textContent = "Download";
         dlBtn.addEventListener("click", function () { downloadOverride(r); });
         wrap.appendChild(dlBtn);
 
@@ -751,7 +819,7 @@
         clrBtn.type = "button";
         clrBtn.className = "btn clr";
         clrBtn.title = "Verwijder eigen opname";
-        clrBtn.textContent = "×";
+        clrBtn.textContent = "Wis";
         clrBtn.addEventListener("click", function () {
           if (!confirm("Eigen opname voor “" + r.label + "” wissen?")) return;
           clearOverride(r.id).then(function () { render(); });
@@ -868,6 +936,18 @@
     el.status.hidden = true;
     el.wrap.hidden = false;
     render();
+
+    // Capability probe (no mic prompt yet)
+    if (!window.isSecureContext) {
+      setMicBanner("bad", "Niet HTTPS — record werkt niet. Gebruik de GitHub Pages-link.");
+    } else if (!window.MediaRecorder) {
+      setMicBanner("bad", "Deze browser kan niet recorden (MediaRecorder ontbreekt).");
+    } else if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setMicBanner("bad", "Geen microfoon-API. Probeer desktop Safari/Chrome.");
+    } else {
+      var m = pickMime() || "(browser default)";
+      setMicBanner("ok", "Record klaar · tik <strong>Record</strong> op een rij (bv. filter FX → Jaaaa). Formaat: " + m);
+    }
   }).catch(function (err) {
     el.status.className = "error";
     el.status.textContent = "Kon data niet laden. Open via GitHub Pages. " + err;
