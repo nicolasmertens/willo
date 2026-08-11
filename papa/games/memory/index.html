@@ -319,8 +319,21 @@
     }
   }
 
-  // gentle "uh-oh": two short descending notes
+  // Shared voice FX (same Jaaaa / Neee on mama, papa, klas)
+  var FX_BASE = "/liedjes/klas/games/fx/";
+  var fxAudio = null;
+  function playFx(file){
+    try{
+      if(fxAudio){ try{ fxAudio.pause(); }catch(e){} }
+      fxAudio = new Audio(FX_BASE + file);
+      var p = fxAudio.play();
+      if(p && p.catch){ p.catch(function(){}); }
+    }catch(e){}
+  }
+
+  // uh-oh: "Neee" + two short descending notes
   function uhOh(){
+    playFx("neee.mp3");
     try{
       var ac = ensureAudio(); if(!ac) return;
       var seq=[{f:330,t:0},{f:247,t:0.22}];
@@ -337,8 +350,9 @@
     }catch(e){}
   }
 
-  // synthesized applause: bursts of bandpass-filtered white noise
+  // clap/confetti: "Jaaaa" + synthesized applause
   function clap(dense){
+    playFx("jaaa.mp3");
     try{
       var ac = ensureAudio(); if(!ac) return;
       var bursts = dense ? 28 : 12;
