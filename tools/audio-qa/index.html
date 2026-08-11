@@ -218,7 +218,7 @@
     <div class="level-label" id="levelLabel">Mic-niveau</div>
     <div class="level-track"><div class="level-fill" id="levelFill"></div></div>
   </div>
-  <div class="ver" id="verStamp">recorder v6</div>
+  <div class="ver" id="verStamp">recorder v7</div>
 </header>
 <main>
 <audio id="nativePlayer" controls playsinline style="display:none;width:100%;margin:8px 0 0;max-width:420px"></audio>
@@ -754,25 +754,22 @@
     resetRecBtn(st.btn);
     if (st.tr) st.tr.classList.remove("recording");
 
-    // Prefer PCM when we saw real mic energy; else MediaRecorder; else quiet PCM
+    // IMPORTANT: only MediaRecorder (or continuous ScriptProcessor) for the file.
+    // Analyser snapshots concatenated as WAV sound "shaky"/glitchy — meter only.
     var blob = null;
     var sec = 0;
     var peak = st.peak || 0;
-    var hasPcm = st.samples && st.samples.length > 0;
     var hasMr = st.mrChunks && st.mrChunks.length > 0;
+    var hasSp = st.spSamples && st.spSamples.length > 0;
 
-    if (hasPcm && peak >= 0.004) {
-      blob = encodeWav(st.samples, st.sampleRate);
-      sec = (blob.size - 44) / 2 / st.sampleRate;
-    } else if (hasMr) {
+    if (hasMr) {
       var mime = st.mrMime || "audio/mp4";
       blob = st.mrChunks.length === 1
         ? typedBlob(st.mrChunks[0], mime)
         : new Blob(st.mrChunks, { type: mime });
       sec = -1;
-    } else if (hasPcm) {
-      // frames arrived but almost silent — still save so user can hear how quiet it was
-      blob = encodeWav(st.samples, st.sampleRate);
+    } else if (hasSp) {
+      blob = encodeWav(st.spSamples, st.sampleRate);
       sec = (blob.size - 44) / 2 / st.sampleRate;
     }
 
@@ -1181,6 +1178,9 @@
       var processor = null;
       var interval = null;
 
+      // Meter only (analyser) — NEVER concatenate analyser frames into the file
+      // (that sounded "shaky"). Continuous PCM via ScriptProcessor as MR fallback.
+      var spSamples = [];
       if (ctx) {
         try {
           source = ctx.createMediaStreamSource(stream);
@@ -1188,26 +1188,34 @@
           analyser.fftSize = 1024;
           analyser.smoothingTimeConstant = 0;
           keepAlive = ctx.createGain();
-          // Tiny but non-zero — Safari drops fully silent graphs
           keepAlive.gain.value = 0.001;
           source.connect(analyser);
           analyser.connect(keepAlive);
           keepAlive.connect(ctx.destination);
 
+          try {
+            processor = ctx.createScriptProcessor(4096, 1, 1);
+            processor.onaudioprocess = function (e) {
+              var input = e.inputBuffer.getChannelData(0);
+              spSamples.push(new Float32Array(input));
+              if (recState) recState.spSamples = spSamples;
+            };
+            source.connect(processor);
+            processor.connect(keepAlive);
+          } catch (eSp) {
+            processor = null;
+          }
+
           var td = new Float32Array(analyser.fftSize);
           interval = setInterval(function () {
             if (!recState || recState.id !== row.id) return;
-            // force resume if Safari suspended again
             if (ctx.state === "suspended") {
               try { ctx.resume(); } catch (e) {}
             }
             analyser.getFloatTimeDomainData(td);
-            var copy = new Float32Array(td);
-            samples.push(copy);
-            recState.samples = samples;
             var localPeak = 0;
-            for (var i = 0; i < copy.length; i++) {
-              var a = Math.abs(copy[i]);
+            for (var i = 0; i < td.length; i++) {
+              var a = Math.abs(td[i]);
               if (a > localPeak) localPeak = a;
               if (a > peak) peak = a;
             }
@@ -1219,7 +1227,7 @@
         }
       }
 
-      // MediaRecorder = primary durable capture on Safari
+      // MediaRecorder = primary capture (smooth AAC/mp4 on Safari)
       var mrChunks = [];
       var recorder = null;
       var mrMime = "";
@@ -1253,13 +1261,15 @@
               st._finished = true;
               st.mrChunks = mrChunks;
               st.mrMime = mrMime;
+              st.spSamples = spSamples;
               finishWavRecording(st);
             }
           };
+          // No timeslice: one clean fragment on stop (less shaky than tiny slices)
           try {
-            recorder.start(100); // timeslice so we get chunks while speaking
+            recorder.start();
           } catch (e) {
-            try { recorder.start(); } catch (e2) { recorder = null; }
+            try { recorder.start(250); } catch (e2) { recorder = null; }
           }
         }
       }
@@ -1275,7 +1285,8 @@
         analyser: analyser,
         processor: processor,
         gain: keepAlive,
-        samples: samples,
+        samples: [], // not used for file anymore
+        spSamples: spSamples,
         sampleRate: ctx ? ctx.sampleRate : 48000,
         peak: 0,
         interval: interval,
@@ -1283,7 +1294,7 @@
         mrChunks: mrChunks,
         mrMime: mrMime,
         timer: null,
-        mode: "v5",
+        mode: "v7-mr",
         _finished: false,
         _finishOnMrStop: false,
       };
@@ -1593,9 +1604,10 @@
     } else if (!(window.AudioContext || window.webkitAudioContext)) {
       setMicBanner("bad", "Geen Web Audio — opnemen kan niet.");
     } else {
-      setMicBanner("ok", "recorder v6 · kies <strong>AirPods Nico</strong> → <strong>Mic test</strong> (balk beweegt) → pas daarna Record.");
+      setMicBanner("ok", "recorder v7 · kies <strong>AirPods Nico</strong> → Mic test → Record. (geen shaky analyser-WAV meer)");
       var vs = document.getElementById("verStamp");
-      if (vs) vs.textContent = "recorder v6 · kies mic expliciet (Safari ≠ Systeem default)";
+      if (vs) vs.textContent = "recorder v7 · MediaRecorder audio · analyser = meter only";
+
       // Preload device list if we already have permission
       refreshMicList().catch(function () {});
     }
