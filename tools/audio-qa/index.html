@@ -137,6 +137,17 @@
     transition: width 40ms linear;
   }
   .ver { margin-top: 6px; font-size: .72rem; color: var(--muted); font-family: ui-monospace, monospace; }
+  .mic-row {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    margin-top: 10px; padding: 10px 12px; border-radius: 12px;
+    background: #fff; border: 1px solid var(--line);
+  }
+  .mic-row label { font-size: .9rem; }
+  .mic-row select {
+    font: inherit; flex: 1 1 220px; min-width: 180px;
+    border-radius: 10px; border: 1px solid var(--line);
+    padding: 8px 10px; background: #fff;
+  }
   #nativePlayer {
     display: block !important;
     width: 100%;
@@ -193,13 +204,21 @@
     <button type="button" id="dlAllBtn" class="secondary">Download alle opnames</button>
     <button type="button" id="clearBtn" class="secondary">Wis vinkjes</button>
   </div>
+  <div class="mic-row">
+    <label for="micSelect"><strong>Microfoon</strong></label>
+    <select id="micSelect" aria-label="Kies microfoon">
+      <option value="">(klik “Mic test” om lijst te laden)</option>
+    </select>
+    <button type="button" id="micTestBtn" class="secondary">Mic test</button>
+    <button type="button" id="micRefreshBtn" class="secondary">Ververs lijst</button>
+  </div>
   <div class="stats" id="stats">Laden…</div>
-  <div class="mic-banner warn" id="micBanner">Microfoon: nog niet getest — tik <strong>Record</strong> op een rij.</div>
+  <div class="mic-banner warn" id="micBanner">Safari kiest soms een andere mic dan Systeeminstellingen. Kies hier <strong>AirPods Nico</strong> en tik Mic test.</div>
   <div id="levelWrap" hidden>
     <div class="level-label" id="levelLabel">Mic-niveau</div>
     <div class="level-track"><div class="level-fill" id="levelFill"></div></div>
   </div>
-  <div class="ver" id="verStamp">recorder v5</div>
+  <div class="ver" id="verStamp">recorder v6</div>
 </header>
 <main>
 <audio id="nativePlayer" controls playsinline style="display:none;width:100%;margin:8px 0 0;max-width:420px"></audio>
@@ -248,6 +267,8 @@
   var audio = null;
   var playingId = null;
   var recState = null; // { id, recorder, chunks, stream, timer, btn, tr }
+  var monitorState = null; // live mic test (level only)
+  var MIC_PREF_KEY = "liedjes-audio-qa-mic-id";
 
   var el = {
     status: document.getElementById("status"),
@@ -811,15 +832,221 @@
     }
   }
 
-  function setLevel(peak01) {
+  function setLevel(peak01, labelText) {
     var f = document.getElementById("levelFill");
     var lab = document.getElementById("levelLabel");
     if (f) f.style.width = Math.min(100, Math.round(peak01 * 100)) + "%";
     if (lab) {
-      lab.textContent = peak01 > 0.02
-        ? "Mic OK — spreek · tik Stop"
-        : "Mic stil — spreek luider of check input";
+      lab.textContent = labelText || (peak01 > 0.02
+        ? "Mic OK — spreek"
+        : "Mic stil — kies AirPods hierboven of verhoog input");
     }
+  }
+
+  function selectedMicId() {
+    var sel = document.getElementById("micSelect");
+    return sel && sel.value ? sel.value : "";
+  }
+
+  function scoreMicLabel(label) {
+    var s = (label || "").toLowerCase();
+    if (/airpods/.test(s)) return 100;
+    if (/bluetooth/.test(s) && !/continuity|iphone|ipad/.test(s)) return 80;
+    if (/usb|external|headset/.test(s)) return 60;
+    if (/macbook|built-?in|internal/.test(s)) return 20;
+    if (/continuity|iphone|ipad|camera/.test(s)) return 5; // often wrong/silent for this use
+    return 30;
+  }
+
+  function buildMicConstraints() {
+    var id = selectedMicId();
+    if (id) {
+      return {
+        audio: {
+          deviceId: { exact: id },
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: true,
+          channelCount: 1,
+        },
+      };
+    }
+    return {
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: true,
+        channelCount: 1,
+      },
+    };
+  }
+
+  function populateMicSelect(devices, preferredId) {
+    var sel = document.getElementById("micSelect");
+    if (!sel) return;
+    var inputs = (devices || []).filter(function (d) {
+      return d.kind === "audioinput";
+    });
+    // Sort: AirPods first, Continuity last
+    inputs.sort(function (a, b) {
+      return scoreMicLabel(b.label || b.deviceId) - scoreMicLabel(a.label || a.deviceId);
+    });
+    sel.innerHTML = "";
+    if (!inputs.length) {
+      var o0 = document.createElement("option");
+      o0.value = "";
+      o0.textContent = "(geen mics — geef Safari microfoon-toestemming)";
+      sel.appendChild(o0);
+      return;
+    }
+    inputs.forEach(function (d, i) {
+      var o = document.createElement("option");
+      o.value = d.deviceId;
+      var label = d.label || ("Microfoon " + (i + 1));
+      // Hide empty labels until permission granted
+      if (!d.label) label = "Microfoon " + (i + 1) + " (label na toestemming)";
+      o.textContent = label;
+      sel.appendChild(o);
+    });
+    var want = preferredId || localStorage.getItem(MIC_PREF_KEY) || "";
+    if (want && inputs.some(function (d) { return d.deviceId === want; })) {
+      sel.value = want;
+    } else {
+      // auto-pick best score (AirPods)
+      sel.value = inputs[0].deviceId;
+    }
+    try { localStorage.setItem(MIC_PREF_KEY, sel.value); } catch (e) {}
+  }
+
+  function refreshMicList() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+      setMicBanner("bad", "Kan microfoons niet opsommen in deze browser.");
+      return Promise.resolve();
+    }
+    return navigator.mediaDevices.enumerateDevices().then(function (list) {
+      populateMicSelect(list, selectedMicId());
+      var sel = document.getElementById("micSelect");
+      var opt = sel && sel.options[sel.selectedIndex];
+      setMicBanner(
+        "ok",
+        "Mic-lijst geladen. Geselecteerd: <strong>" +
+          (opt ? opt.textContent : "?") +
+          "</strong> · tik <strong>Mic test</strong> (balk moet bewegen)."
+      );
+    });
+  }
+
+  function stopMicMonitor() {
+    if (!monitorState) return;
+    try {
+      if (monitorState.interval) clearInterval(monitorState.interval);
+      if (monitorState.stream) monitorState.stream.getTracks().forEach(function (t) { t.stop(); });
+      if (monitorState.ctx && monitorState.ctx.state !== "closed") monitorState.ctx.close();
+    } catch (e) {}
+    monitorState = null;
+    var tbtn = document.getElementById("micTestBtn");
+    if (tbtn) tbtn.textContent = "Mic test";
+  }
+
+  function startMicMonitor() {
+    // Toggle off if already running
+    if (monitorState) {
+      stopMicMonitor();
+      showLevel(false);
+      setMicBanner("warn", "Mic test gestopt.");
+      return;
+    }
+    if (recState) {
+      setMicBanner("warn", "Stop eerst de opname.");
+      return;
+    }
+    if (!window.isSecureContext) {
+      setMicBanner("bad", "Alleen HTTPS.");
+      return;
+    }
+
+    // AudioContext in click gesture
+    var AC = window.AudioContext || window.webkitAudioContext;
+    var ctx = AC ? new AC() : null;
+    if (ctx && ctx.state === "suspended" && ctx.resume) ctx.resume();
+
+    var tbtn = document.getElementById("micTestBtn");
+    if (tbtn) tbtn.textContent = "Stop test";
+    setMicBanner("warn", "Mic test… toestemming / openen…");
+    showLevel(true);
+    setLevel(0, "Wachten op mic…");
+
+    navigator.mediaDevices.getUserMedia(buildMicConstraints()).then(function (stream) {
+      // Now labels are available
+      refreshMicList();
+      var track = stream.getAudioTracks()[0];
+      var settings = {};
+      try { settings = track.getSettings ? track.getSettings() : {}; } catch (e) {}
+      // If user picked a device but track is different, show it
+      var gotId = settings.deviceId || "";
+      var sel = document.getElementById("micSelect");
+      if (gotId && sel) {
+        // try select matching
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === gotId) { sel.selectedIndex = i; break; }
+        }
+        try { localStorage.setItem(MIC_PREF_KEY, gotId); } catch (e) {}
+      }
+
+      if (!ctx) ctx = AC ? new AC() : null;
+      if (ctx && ctx.state === "suspended" && ctx.resume) ctx.resume();
+
+      var source = ctx.createMediaStreamSource(stream);
+      var analyser = ctx.createAnalyser();
+      analyser.fftSize = 1024;
+      analyser.smoothingTimeConstant = 0;
+      var keep = ctx.createGain();
+      keep.gain.value = 0.001;
+      source.connect(analyser);
+      analyser.connect(keep);
+      keep.connect(ctx.destination);
+
+      var td = new Float32Array(analyser.fftSize);
+      var peakHold = 0;
+      var interval = setInterval(function () {
+        if (ctx.state === "suspended") try { ctx.resume(); } catch (e) {}
+        analyser.getFloatTimeDomainData(td);
+        var localPeak = 0;
+        for (var i = 0; i < td.length; i++) {
+          var a = Math.abs(td[i]);
+          if (a > localPeak) localPeak = a;
+        }
+        if (localPeak > peakHold) peakHold = localPeak;
+        setLevel(
+          localPeak,
+          (localPeak > 0.02 ? "Mic test OK · " : "Stil · ") +
+            (track.label || "mic") +
+            " · peak " + localPeak.toFixed(3)
+        );
+        setMicBanner(
+          localPeak > 0.02 ? "ok" : "warn",
+          localPeak > 0.02
+            ? "Mic test: signaal van <strong>" + (track.label || "mic") + "</strong> — deze input gebruiken we bij Record."
+            : "Mic test: <strong>geen niveau</strong> van “" + (track.label || "mic") + "”. Kies AirPods Nico in de dropdown (niet Continuity/iPhone)."
+        );
+      }, 50);
+
+      monitorState = { stream: stream, ctx: ctx, interval: interval };
+    }).catch(function (err) {
+      if (tbtn) tbtn.textContent = "Mic test";
+      showLevel(false);
+      var msg = (err && err.name) ? (err.name + ": " + err.message) : String(err);
+      // exact deviceId often fails if device unplugged — retry default
+      if (selectedMicId() && /Overconstrained|NotFound|DevicesNotFound/i.test(msg + (err && err.name))) {
+        setMicBanner("warn", "Gekozen mic faalde — probeer opnieuw met default…");
+        var sel = document.getElementById("micSelect");
+        if (sel) sel.value = "";
+        startMicMonitor();
+        return;
+      }
+      setMicBanner("bad", "Mic test faalde — " + msg);
+      alert("Mic test faalde:\n" + msg + "\n\nSafari → aA / website-instellingen → Microfoon → Toestaan");
+    });
   }
 
   function bindNativePlayer(url, label) {
@@ -889,6 +1116,7 @@
     }
 
     stopPlay();
+    stopMicMonitor(); // don't fight over the same mic
 
     // Safari: create + resume AudioContext SYNCHRONOUSLY in the click handler
     var AC = window.AudioContext || window.webkitAudioContext;
@@ -904,12 +1132,29 @@
 
     btn.disabled = true;
     btn.textContent = "…";
-    setMicBanner("warn", "Microfoon vragen…");
+    var wantLabel = "";
+    try {
+      var sel0 = document.getElementById("micSelect");
+      wantLabel = sel0 && sel0.options[sel0.selectedIndex] ? sel0.options[sel0.selectedIndex].textContent : "";
+    } catch (e) {}
+    setMicBanner("warn", "Microfoon openen" + (wantLabel ? (": <strong>" + wantLabel + "</strong>") : "…"));
     showLevel(true);
-    setLevel(0);
+    setLevel(0, "Wachten op mic…");
 
-    // Simplest constraints first (Safari is picky about advanced ones)
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+    // Prefer explicit device (AirPods). Fallback to default if overconstrained.
+    var tryConstraints = [buildMicConstraints()];
+    if (selectedMicId()) tryConstraints.push({ audio: true });
+
+    function openMic(i) {
+      var c = tryConstraints[i];
+      return navigator.mediaDevices.getUserMedia(c).catch(function (err) {
+        if (i + 1 < tryConstraints.length) return openMic(i + 1);
+        throw err;
+      });
+    }
+
+    openMic(0).then(function (stream) {
+      refreshMicList();
       var track = stream.getAudioTracks()[0];
       if (!track || track.readyState !== "live") {
         stream.getTracks().forEach(function (t) { t.stop(); });
@@ -1077,7 +1322,7 @@
       showLevel(false);
       var msg = (err && err.name) ? (err.name + ": " + err.message) : String(err);
       setMicBanner("bad", "Microfoon geblokkeerd — " + msg);
-      alert("Microfoon: " + msg + "\n\nSafari website-instellingen → Microfoon → Toestaan");
+      alert("Microfoon: " + msg + "\n\n1) Kies AirPods Nico in de mic-dropdown\n2) Safari → Microfoon → Toestaan");
     });
   }
 
@@ -1270,8 +1515,14 @@
   el.search.addEventListener("input", render);
   el.stopBtn.addEventListener("click", function () {
     if (recState) {
-      try { recState.recorder.stop(); } catch (e) {}
+      try {
+        if (recState.recorder && recState.recorder.state === "recording") {
+          recState._finishOnMrStop = true;
+          recState.recorder.stop();
+        }
+      } catch (e) {}
     }
+    stopMicMonitor();
     stopPlay();
   });
   el.exportBtn.addEventListener("click", exportOpen);
@@ -1281,6 +1532,20 @@
     okMap = {};
     saveOk();
     render();
+  });
+  document.getElementById("micTestBtn").addEventListener("click", startMicMonitor);
+  document.getElementById("micRefreshBtn").addEventListener("click", function () {
+    // Need a permissioned stream once for labels — use short getUserMedia
+    stopMicMonitor();
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (s) {
+      s.getTracks().forEach(function (t) { t.stop(); });
+      return refreshMicList();
+    }).catch(function () { refreshMicList(); });
+  });
+  document.getElementById("micSelect").addEventListener("change", function () {
+    try { localStorage.setItem(MIC_PREF_KEY, selectedMicId()); } catch (e) {}
+    stopMicMonitor();
+    setMicBanner("ok", "Mic gewijzigd — tik <strong>Mic test</strong> om te controleren.");
   });
 
   Promise.all([
@@ -1328,9 +1593,11 @@
     } else if (!(window.AudioContext || window.webkitAudioContext)) {
       setMicBanner("bad", "Geen Web Audio — opnemen kan niet.");
     } else {
-      setMicBanner("ok", "recorder v5 klaar · tik <strong>Record</strong> → zwarte balk moet bewegen → <strong>Stop</strong> → speler onderaan.");
+      setMicBanner("ok", "recorder v6 · kies <strong>AirPods Nico</strong> → <strong>Mic test</strong> (balk beweegt) → pas daarna Record.");
       var vs = document.getElementById("verStamp");
-      if (vs) vs.textContent = "recorder v5 · " + (window.MediaRecorder ? "MR ok" : "no MR") + " · " + (window.AudioContext || window.webkitAudioContext ? "AC ok" : "no AC");
+      if (vs) vs.textContent = "recorder v6 · kies mic expliciet (Safari ≠ Systeem default)";
+      // Preload device list if we already have permission
+      refreshMicList().catch(function () {});
     }
   }).catch(function (err) {
     el.status.className = "error";
