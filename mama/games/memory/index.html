@@ -636,13 +636,51 @@
   }
 
   /* ---------- wiring ---------- */
+  var animalsReady = null;
+  function loadAnimals(){
+    if(ANIMALS.length) return Promise.resolve(ANIMALS);
+    if(animalsReady) return animalsReady;
+    animalsReady = fetch('../animals.json')
+      .then(function(r){
+        if(!r.ok) throw new Error('animals ' + r.status);
+        return r.json();
+      })
+      .then(function(data){
+        ANIMALS = data || [];
+        if(!ANIMALS.length) throw new Error('empty animals');
+        return ANIMALS;
+      })
+      .catch(function(err){
+        animalsReady = null;
+        throw err;
+      });
+    return animalsReady;
+  }
+
+  function startGame(n){
+    ensureAudio();
+    if(window.tel) window.tel("level",{pairs:n});
+    // Wait for animals.json — early tap used to build an empty board (blank screen).
+    loadAnimals().then(function(){
+      if(ANIMALS.length < 1){
+        alert('Geen dieren geladen. Check verbinding en heropen.');
+        return;
+      }
+      show('game');
+      buildBoard(n);
+      // layout while display:none measures 0×0 — reflow after show
+      requestAnimationFrame(function(){ layoutBoard(); });
+      setTimeout(layoutBoard, 50);
+    }).catch(function(err){
+      console.error(err);
+      alert('Dieren laden mislukt. Heropen de app.');
+    });
+  }
+
   Array.prototype.forEach.call(document.querySelectorAll('.choice'), function(btn){
     attachButtonTap(btn, function(){
-      ensureAudio();
       var n = parseInt(btn.dataset.pairs,10);
-      if(window.tel) window.tel("level",{pairs:n});
-      buildBoard(n);
-      show('game');
+      startGame(n);
     });
   });
 
@@ -666,11 +704,8 @@
     show('start');
   });
 
-  /* ---------- load data ---------- */
-  fetch('../animals.json')
-    .then(function(r){ return r.json(); })
-    .then(function(data){ ANIMALS = data || []; })
-    .catch(function(){ ANIMALS = []; });
+  /* ---------- load data (prefetch) ---------- */
+  loadAnimals().catch(function(){});
 
 })();
 </script>
