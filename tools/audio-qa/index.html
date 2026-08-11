@@ -656,39 +656,77 @@
     return new Blob([buffer], { type: "audio/wav" });
   }
 
-  function finishWavRecording(st) {
+  function teardownRecGraph(st) {
     try {
+      if (st.raf) cancelAnimationFrame(st.raf);
+      if (st.interval) clearInterval(st.interval);
       if (st.processor) {
         st.processor.onaudioprocess = null;
-        st.processor.disconnect();
+        try { st.processor.disconnect(); } catch (e) {}
       }
-      if (st.source) st.source.disconnect();
-      if (st.gain) st.gain.disconnect();
+      if (st.analyser) try { st.analyser.disconnect(); } catch (e) {}
+      if (st.source) try { st.source.disconnect(); } catch (e) {}
+      if (st.gain) try { st.gain.disconnect(); } catch (e) {}
       if (st.stream) st.stream.getTracks().forEach(function (t) { t.stop(); });
       if (st.ctx && st.ctx.state !== "closed") {
         try { st.ctx.close(); } catch (e) {}
       }
     } catch (e) {}
+  }
 
+  function finishWavRecording(st) {
+    teardownRecGraph(st);
     resetRecBtn(st.btn);
     if (st.tr) st.tr.classList.remove("recording");
 
-    if (!st.samples.length) {
-      setMicBanner("bad", "Lege opname — spreek harder / dichter bij de mic.");
-      alert("Lege opname. Tik Record → spreek → Stop.");
+    // Prefer PCM when we saw real mic energy; else MediaRecorder; else quiet PCM
+    var blob = null;
+    var sec = 0;
+    var peak = st.peak || 0;
+    var hasPcm = st.samples && st.samples.length > 0;
+    var hasMr = st.mrChunks && st.mrChunks.length > 0;
+
+    if (hasPcm && peak >= 0.004) {
+      blob = encodeWav(st.samples, st.sampleRate);
+      sec = (blob.size - 44) / 2 / st.sampleRate;
+    } else if (hasMr) {
+      var mime = st.mrMime || "audio/mp4";
+      blob = st.mrChunks.length === 1
+        ? typedBlob(st.mrChunks[0], mime)
+        : new Blob(st.mrChunks, { type: mime });
+      sec = -1;
+    } else if (hasPcm) {
+      // frames arrived but almost silent — still save so user can hear how quiet it was
+      blob = encodeWav(st.samples, st.sampleRate);
+      sec = (blob.size - 44) / 2 / st.sampleRate;
+    }
+
+    if (!blob || blob.size < 100) {
+      setMicBanner(
+        "bad",
+        "Lege opname (geen mic-signaal). Check: microfoon-toestemming · niet op mute · juiste input in Systeeminstellingen."
+      );
+      alert(
+        "Lege opname — er kwam geen geluid binnen.\n\n" +
+        "1) Safari website-instellingen → Microfoon → Toestaan\n" +
+        "2) macOS Privacy → Microfoon → Safari AAN\n" +
+        "3) Controleer dat de juiste mic geselecteerd is\n" +
+        "4) Hard reload (Cmd+Shift+R) en probeer opnieuw"
+      );
       return;
     }
-    var blob = encodeWav(st.samples, st.sampleRate);
-    var sec = (blob.size - 44) / 2 / st.sampleRate;
-    if (sec < 0.15) {
-      setMicBanner("bad", "Opname te kort (" + sec.toFixed(2) + "s).");
-      alert("Opname te kort. Houd Record iets langer vast terwijl je spreekt.");
+    if (sec > 0 && sec < 0.12) {
+      setMicBanner("bad", "Opname te kort (" + sec.toFixed(2) + "s). Spreek langer.");
       return;
     }
-    setOverride(st.row.id, blob, "audio/wav").then(function () {
-      setMicBanner("ok", "WAV bewaard: “" + st.row.label + "” · " + sec.toFixed(2) + "s · " + Math.round(blob.size / 1024) + " KB · tik ▶");
+
+    var mimeOut = blob.type || "audio/wav";
+    setOverride(st.row.id, blob, mimeOut).then(function () {
+      var msg = "Opname bewaard: “" + st.row.label + "” · " + Math.round(blob.size / 1024) + " KB";
+      if (sec > 0) msg += " · " + sec.toFixed(2) + "s";
+      msg += " · peak " + (st.peak || 0).toFixed(2) + " · tik ▶";
+      setMicBanner("ok", msg);
       render();
-      // preview while still related to recent user gesture where possible
       setTimeout(function () {
         var tr2 = document.querySelector('tr[data-id="' + st.row.id + '"]');
         var playBtn = tr2 ? tr2.querySelector(".btn.play") : null;
@@ -715,18 +753,28 @@
     // Second tap on same row → stop & save
     if (recState && recState.id === row.id) {
       if (recState.timer) clearTimeout(recState.timer);
-      var st = recState;
+      var stStop = recState;
       recState = null;
-      finishWavRecording(st);
+      stStop._finished = true;
+      try {
+        if (stStop.recorder && stStop.recorder.state === "recording") {
+          try { if (stStop.recorder.requestData) stStop.recorder.requestData(); } catch (e) {}
+          try { stStop.recorder.stop(); } catch (e) {}
+        }
+      } catch (e) {}
+      // Give MediaRecorder a moment to flush last chunk, then encode
+      setTimeout(function () { finishWavRecording(stStop); }, 80);
       return;
     }
     // Other row recording → discard
     if (recState) {
       try {
         if (recState.timer) clearTimeout(recState.timer);
-        if (recState.processor) recState.processor.onaudioprocess = null;
-        if (recState.stream) recState.stream.getTracks().forEach(function (t) { t.stop(); });
-        if (recState.ctx) recState.ctx.close();
+        recState._finished = true;
+        teardownRecGraph(recState);
+        if (recState.recorder && recState.recorder.state === "recording") {
+          try { recState.recorder.stop(); } catch (e) {}
+        }
       } catch (e) {}
       resetRecBtn(recState.btn);
       if (recState.tr) recState.tr.classList.remove("recording");
@@ -740,12 +788,22 @@
 
     navigator.mediaDevices.getUserMedia({
       audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
+        echoCancellation: false, // less processing, more reliable signal
+        noiseSuppression: false,
         autoGainControl: true,
         channelCount: 1,
       },
     }).then(function (stream) {
+      // Verify track is live
+      var track = stream.getAudioTracks()[0];
+      if (!track || track.readyState !== "live") {
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        resetRecBtn(btn);
+        setMicBanner("bad", "Mic-track niet live. Andere app gebruikt de microfoon?");
+        alert("Microfoon-track niet actief. Sluit Zoom/Meet en probeer opnieuw.");
+        return;
+      }
+
       var AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) {
         stream.getTracks().forEach(function (t) { t.stop(); });
@@ -753,57 +811,152 @@
         setMicBanner("bad", "Geen Web Audio — kan niet opnemen.");
         return;
       }
+
       var ctx = new AC();
-      if (ctx.state === "suspended") {
-        try { ctx.resume(); } catch (e) {}
-      }
-      var source = ctx.createMediaStreamSource(stream);
-      // ScriptProcessor is deprecated but still the most reliable cross-Safari path
-      var processor = ctx.createScriptProcessor(4096, 1, 1);
-      var mute = ctx.createGain();
-      mute.gain.value = 0; // don't monitor mic into speakers (feedback)
-      var samples = [];
+      var startGraph = function () {
+        var source = ctx.createMediaStreamSource(stream);
+        var analyser = ctx.createAnalyser();
+        analyser.fftSize = 2048;
+        analyser.smoothingTimeConstant = 0;
 
-      processor.onaudioprocess = function (e) {
-        var input = e.inputBuffer.getChannelData(0);
-        // copy — buffer is reused
-        samples.push(new Float32Array(input));
-      };
+        // Non-zero gain so Safari does not optimize the graph away
+        var keepAlive = ctx.createGain();
+        keepAlive.gain.value = 0.0001;
 
-      source.connect(processor);
-      processor.connect(mute);
-      mute.connect(ctx.destination);
+        source.connect(analyser);
+        analyser.connect(keepAlive);
+        keepAlive.connect(ctx.destination);
 
-      recState = {
-        id: row.id,
-        row: row,
-        btn: btn,
-        tr: tr,
-        stream: stream,
-        ctx: ctx,
-        source: source,
-        processor: processor,
-        gain: mute,
-        samples: samples,
-        sampleRate: ctx.sampleRate,
-        timer: null,
-        mode: "wav",
-      };
-
-      btn.disabled = false;
-      btn.classList.add("hot");
-      btn.textContent = "Stop";
-      btn.title = "Stop opname en bewaar";
-      tr.classList.add("recording");
-      setMicBanner("ok", "Opnemen (WAV)… spreek nu · tik <strong>Stop</strong> (max 8s)");
-
-      recState.timer = setTimeout(function () {
-        if (recState && recState.id === row.id) {
-          var s = recState;
-          recState = null;
-          finishWavRecording(s);
+        // ScriptProcessor backup (may be silent on some Safari builds)
+        var processor = null;
+        var samples = [];
+        var peak = 0;
+        try {
+          processor = ctx.createScriptProcessor(4096, 1, 1);
+          processor.onaudioprocess = function (e) {
+            var input = e.inputBuffer.getChannelData(0);
+            var copy = new Float32Array(input);
+            samples.push(copy);
+            for (var i = 0; i < copy.length; i++) {
+              var v = Math.abs(copy[i]);
+              if (v > peak) peak = v;
+            }
+          };
+          source.connect(processor);
+          processor.connect(keepAlive);
+        } catch (e) {
+          processor = null;
         }
-      }, MAX_REC_MS);
+
+        // Analyser polling — primary path on Safari (ScriptProcessor often never fires)
+        var td = new Float32Array(analyser.fftSize);
+        var pollMs = Math.max(20, Math.floor((analyser.fftSize / ctx.sampleRate) * 1000 * 0.85));
+        var interval = setInterval(function () {
+          if (!recState || recState.id !== row.id) return;
+          analyser.getFloatTimeDomainData(td);
+          var copy = new Float32Array(td);
+          // Only keep frames that have some energy OR always keep for continuity
+          samples.push(copy);
+          recState.samples = samples;
+          var localPeak = 0;
+          for (var i = 0; i < copy.length; i++) {
+            var a = Math.abs(copy[i]);
+            if (a > localPeak) localPeak = a;
+            if (a > peak) peak = a;
+          }
+          recState.peak = peak;
+          var bars = Math.min(20, Math.round(localPeak * 40));
+          var meter = "";
+          for (var b = 0; b < 20; b++) meter += b < bars ? "█" : "░";
+          setMicBanner(
+            localPeak > 0.01 ? "ok" : "warn",
+            (localPeak > 0.01 ? "Opnemen… " : "Stil… spreek luider · ") +
+              meter + " · tik <strong>Stop</strong> · " + (track.label || "mic")
+          );
+        }, pollMs);
+
+        // MediaRecorder parallel backup (for when PCM path fails)
+        var mrChunks = [];
+        var recorder = null;
+        var mrMime = "";
+        if (window.MediaRecorder) {
+          var candidates = ["audio/mp4", "audio/aac", "audio/webm;codecs=opus", "audio/webm"];
+          for (var c = 0; c < candidates.length; c++) {
+            try {
+              if (MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(candidates[c])) {
+                mrMime = candidates[c];
+                break;
+              }
+            } catch (e) {}
+          }
+          try {
+            recorder = mrMime
+              ? new MediaRecorder(stream, { mimeType: mrMime })
+              : new MediaRecorder(stream);
+            mrMime = recorder.mimeType || mrMime || "audio/mp4";
+            recorder.ondataavailable = function (ev) {
+              if (ev.data && ev.data.size > 0) mrChunks.push(ev.data);
+            };
+            recorder.onstop = function () {
+              // no-op if WAV path already finished
+            };
+            try { recorder.start(250); } catch (e) {
+              try { recorder.start(); } catch (e2) { recorder = null; }
+            }
+          } catch (e) {
+            recorder = null;
+          }
+        }
+
+        recState = {
+          id: row.id,
+          row: row,
+          btn: btn,
+          tr: tr,
+          stream: stream,
+          ctx: ctx,
+          source: source,
+          analyser: analyser,
+          processor: processor,
+          gain: keepAlive,
+          samples: samples,
+          sampleRate: ctx.sampleRate,
+          peak: 0,
+          interval: interval,
+          recorder: recorder,
+          mrChunks: mrChunks,
+          mrMime: mrMime,
+          timer: null,
+          mode: "wav+mr",
+          _finished: false,
+        };
+
+        btn.disabled = false;
+        btn.classList.add("hot");
+        btn.textContent = "Stop";
+        btn.title = "Stop opname en bewaar";
+        tr.classList.add("recording");
+        setMicBanner("ok", "Opnemen… spreek nu · tik <strong>Stop</strong> (max 8s) · " + (track.label || "default mic"));
+
+        recState.timer = setTimeout(function () {
+          if (recState && recState.id === row.id && !recState._finished) {
+            var s = recState;
+            recState = null;
+            s._finished = true;
+            try {
+              if (s.recorder && s.recorder.state === "recording") s.recorder.stop();
+            } catch (e) {}
+            finishWavRecording(s);
+          }
+        }, MAX_REC_MS);
+      };
+
+      // Critical on Safari: must resume before graph runs
+      var resumeP = ctx.resume ? ctx.resume() : Promise.resolve();
+      Promise.resolve(resumeP).then(startGraph).catch(function () {
+        // resume failed — try anyway
+        startGraph();
+      });
     }).catch(function (err) {
       resetRecBtn(btn);
       var msg = (err && err.name) ? (err.name + ": " + err.message) : String(err);
