@@ -17,6 +17,7 @@
     --ok-bg: #e8f5e9;
     --bad: #c62828;
     --open-bg: #fff8e7;
+    --rec: #e53935;
   }
   * { box-sizing: border-box; }
   html, body {
@@ -34,138 +35,109 @@
     border-bottom: 1px solid var(--line);
     padding: 12px 14px max(12px, env(safe-area-inset-top));
   }
-  h1 {
-    margin: 0 0 4px;
-    font-size: 1.25rem;
-    letter-spacing: -0.02em;
-  }
-  .sub { color: var(--muted); font-size: .9rem; margin: 0 0 10px; }
-  .toolbar {
-    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-  }
+  h1 { margin: 0 0 4px; font-size: 1.25rem; letter-spacing: -0.02em; }
+  .sub { color: var(--muted); font-size: .9rem; margin: 0 0 10px; line-height: 1.35; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
   .toolbar select, .toolbar button, .toolbar input[type="search"] {
-    font: inherit;
-    border-radius: 10px;
-    border: 1px solid var(--line);
-    background: #fff;
-    padding: 8px 10px;
-    color: var(--ink);
+    font: inherit; border-radius: 10px; border: 1px solid var(--line);
+    background: #fff; padding: 8px 10px; color: var(--ink);
   }
   .toolbar input[type="search"] { min-width: 140px; flex: 1 1 140px; }
   .toolbar button {
-    cursor: pointer;
-    background: var(--accent);
-    color: #fff;
-    border-color: transparent;
-    font-weight: 700;
+    cursor: pointer; background: var(--accent); color: #fff;
+    border-color: transparent; font-weight: 700;
   }
   .toolbar button.secondary {
-    background: #fff;
-    color: var(--ink);
-    border-color: var(--line);
-    font-weight: 600;
+    background: #fff; color: var(--ink); border-color: var(--line); font-weight: 600;
   }
-  .stats {
-    margin-top: 8px;
-    font-size: .9rem;
-    color: var(--muted);
-  }
+  .stats { margin-top: 8px; font-size: .9rem; color: var(--muted); }
   .stats strong.ok { color: var(--ok); }
   .stats strong.open { color: var(--bad); }
-  main { padding: 10px 10px 40px; max-width: 1100px; margin: 0 auto; }
-  .loading, .error {
-    padding: 24px; text-align: center; color: var(--muted);
-  }
+  .stats strong.rec { color: #6a1b9a; }
+  main { padding: 10px 10px 48px; max-width: 1180px; margin: 0 auto; }
+  .loading, .error { padding: 24px; text-align: center; color: var(--muted); }
   .error { color: var(--bad); }
   table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--card);
-    border-radius: 14px;
-    overflow: hidden;
+    width: 100%; border-collapse: collapse; background: var(--card);
+    border-radius: 14px; overflow: hidden;
     box-shadow: 0 4px 16px rgba(90,70,40,.08);
   }
   th, td {
-    padding: 10px 8px;
-    text-align: left;
-    border-bottom: 1px solid var(--line);
-    vertical-align: middle;
-    font-size: .92rem;
+    padding: 10px 8px; text-align: left; border-bottom: 1px solid var(--line);
+    vertical-align: middle; font-size: .92rem;
   }
   th {
-    background: rgba(255,140,66,.12);
-    font-size: .78rem;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    color: var(--muted);
-    position: sticky;
-    top: 0;
+    background: rgba(255,140,66,.12); font-size: .72rem; text-transform: uppercase;
+    letter-spacing: .04em; color: var(--muted);
   }
-  /* header is sticky too; thead sticky under it is hard on iOS — skip double sticky */
   tr.is-ok { background: var(--ok-bg); }
   tr.is-open { background: var(--open-bg); }
   tr.playing { outline: 2px solid var(--accent); outline-offset: -2px; }
+  tr.recording { outline: 2px solid var(--rec); outline-offset: -2px; background: #ffebee; }
   .n { font-variant-numeric: tabular-nums; color: var(--muted); width: 2.5rem; }
   .kind {
-    display: inline-block;
-    font-size: .72rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: .03em;
-    padding: 3px 7px;
-    border-radius: 999px;
+    display: inline-block; font-size: .72rem; font-weight: 800; text-transform: uppercase;
+    letter-spacing: .03em; padding: 3px 7px; border-radius: 999px;
     background: rgba(90,70,40,.08);
   }
   .kind.name { background: #e3f2fd; color: #1565c0; }
   .kind.cry { background: #e8f5e9; color: #2e7d32; }
   .kind.fx { background: #fce4ec; color: #ad1457; }
-  .lang {
-    font-weight: 700;
-    font-size: .8rem;
-    color: var(--muted);
-  }
+  .lang { font-weight: 700; font-size: .8rem; color: var(--muted); }
   .label { font-weight: 700; }
+  .badge {
+    display: inline-block; margin-left: 6px; font-size: .68rem; font-weight: 800;
+    padding: 2px 6px; border-radius: 999px; background: #f3e5f5; color: #6a1b9a;
+    vertical-align: middle;
+  }
   .path {
-    display: block;
-    font-size: .72rem;
-    color: var(--muted);
+    display: block; font-size: .72rem; color: var(--muted);
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    word-break: break-all;
-    margin-top: 2px;
+    word-break: break-all; margin-top: 2px;
   }
-  .play {
-    width: 44px; height: 44px;
-    border: none; border-radius: 50%;
-    background: linear-gradient(145deg, #ffb347, #ff8c42);
-    color: #fff;
-    font-size: 1.1rem;
-    cursor: pointer;
-    box-shadow: 0 3px 0 rgba(0,0,0,.12);
+  .actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .btn {
+    width: 42px; height: 42px; border: none; border-radius: 50%;
+    color: #fff; font-size: 1rem; cursor: pointer;
+    box-shadow: 0 3px 0 rgba(0,0,0,.12); line-height: 1;
   }
-  .play:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.12); }
-  .play.playing { background: linear-gradient(145deg, #66bb6a, #2e7d32); }
-  .okbox {
-    width: 28px; height: 28px;
-    accent-color: var(--ok);
+  .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0,0,0,.12); }
+  .btn.play { background: linear-gradient(145deg, #ffb347, #ff8c42); }
+  .btn.play.playing { background: linear-gradient(145deg, #66bb6a, #2e7d32); }
+  .btn.rec { background: linear-gradient(145deg, #ef5350, #c62828); }
+  .btn.rec.hot {
+    animation: pulse 1s ease-in-out infinite;
+    box-shadow: 0 0 0 4px rgba(229,57,53,.25);
   }
+  .btn.dl, .btn.clr {
+    width: auto; min-width: 42px; border-radius: 12px; padding: 0 10px;
+    font-size: .75rem; font-weight: 800;
+  }
+  .btn.dl { background: #5c6bc0; }
+  .btn.clr { background: #78909c; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+  .okbox { width: 28px; height: 28px; accent-color: var(--ok); }
   .okcell { text-align: center; width: 4.5rem; }
-  .playcell { width: 3.5rem; text-align: center; }
+  .actcell { width: 9.5rem; }
   footer {
-    margin: 16px 4px 0;
-    color: var(--muted);
-    font-size: .82rem;
-    line-height: 1.4;
+    margin: 16px 4px 0; color: var(--muted); font-size: .82rem; line-height: 1.45;
   }
-  @media (max-width: 640px) {
-    th:nth-child(5), td:nth-child(5) { display: none; } /* hide path col on phone */
-    .label { font-size: .95rem; }
+  @media (max-width: 720px) {
+    th:nth-child(5), td:nth-child(5) { display: none; }
   }
 </style>
 </head>
 <body>
 <header>
   <h1>Audio QA — dieren &amp; FX</h1>
-  <p class="sub">Speel af · vink aan als hij <strong>goed</strong> is. Open laten = nog niet ok / vervangen. Vinkjes blijven bewaard op dit device.</p>
+  <p class="sub">
+    Speel af · <strong>vink aan = goed</strong> · open laten = nog niet ok.<br>
+    <strong>Record</strong> = zelf inspreken (microfoon). Opname blijft op dit device en kun je downloaden voor in de app.
+  </p>
   <div class="toolbar">
     <select id="filterKind" aria-label="Soort">
       <option value="all">Alle soorten</option>
@@ -181,10 +153,13 @@
       <option value="shared">Gedeeld</option>
     </select>
     <label style="display:flex;align-items:center;gap:6px;font-size:.9rem;">
-      <input type="checkbox" id="onlyOpen"> Alleen open (niet goed)
+      <input type="checkbox" id="onlyOpen"> Alleen open
+    </label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:.9rem;">
+      <input type="checkbox" id="onlyRec"> Alleen eigen opnames
     </label>
     <input type="search" id="search" placeholder="Zoek naam / pad…" enterkeyhint="search">
-    <button type="button" id="stopBtn" class="secondary">Stop</button>
+    <button type="button" id="stopBtn" class="secondary">Stop audio</button>
     <button type="button" id="exportBtn" class="secondary">Kopieer open</button>
     <button type="button" id="clearBtn" class="secondary">Wis vinkjes</button>
   </div>
@@ -201,7 +176,7 @@
           <th>Taal</th>
           <th>Label</th>
           <th>Pad</th>
-          <th>Play</th>
+          <th>Acties</th>
           <th>Goed ✓</th>
         </tr>
       </thead>
@@ -209,27 +184,32 @@
     </table>
   </div>
   <footer>
-    Namen: 50× EN + 50× FR + 50× NL. Dierengeluiden: 50× (één set voor alle talen).
-    FX: Jaaaa / Neee. <strong>Aanvinken = goed</strong>. Open laten = nog werk.
+    Record: tik om te starten, tik nog eens om te stoppen (max ~8s). Safari vraagt microfoon-toestemming.
+    Opnames liggen in IndexedDB op dit device (niet automatisch online). Download → bestand in Downloads;
+    zeg dan “installeer de opname” of sleep naar <code>klas/games/fx/</code> / het juiste pad.
   </footer>
 </main>
 <script>
 (function () {
   "use strict";
 
-  // v2: checked = good (ok). Unchecked/open = not good yet.
   var STORAGE_KEY = "liedjes-audio-qa-v2-ok";
-  // GH Pages: /liedjes/tools/audio-qa/ · local server from repo root: /tools/audio-qa/
+  var IDB_NAME = "liedjes-audio-qa";
+  var IDB_STORE = "recordings";
+  var MAX_REC_MS = 8000;
+
   var BASE = (function () {
     var m = location.pathname.match(/^(.*)\/tools\/audio-qa\/?/);
     if (m) return m[1] || "";
     return "/liedjes";
   })();
 
-  var rows = []; // {id, kind, lang, n, label, url, path}
+  var rows = [];
   var okMap = loadOk();
+  var overrides = {}; // id -> { blob, mime, url, updated }
   var audio = null;
   var playingId = null;
+  var recState = null; // { id, recorder, chunks, stream, timer, btn, tr }
 
   var el = {
     status: document.getElementById("status"),
@@ -239,6 +219,7 @@
     filterKind: document.getElementById("filterKind"),
     filterLang: document.getElementById("filterLang"),
     onlyOpen: document.getElementById("onlyOpen"),
+    onlyRec: document.getElementById("onlyRec"),
     search: document.getElementById("search"),
     stopBtn: document.getElementById("stopBtn"),
     exportBtn: document.getElementById("exportBtn"),
@@ -253,11 +234,11 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(okMap)); } catch (e) {}
   }
   function isOk(id) { return !!okMap[id]; }
+  function hasRec(id) { return !!overrides[id]; }
 
   function pad2(n) { return (n < 10 ? "0" : "") + n; }
 
   function absUrl(relFromGames, taal) {
-    // relFromGames e.g. "name/01.mp3" under mama/games, or klas paths
     if (relFromGames.indexOf("../../klas/games/") === 0) {
       return BASE + "/klas/games/" + relFromGames.slice("../../klas/games/".length);
     }
@@ -268,14 +249,11 @@
     return BASE + "/" + relFromGames.replace(/^\//, "");
   }
 
-  function addRow(r) {
-    rows.push(r);
-  }
+  function addRow(r) { rows.push(r); }
 
   function buildFromAnimals(taal, langCode, animals) {
     animals.forEach(function (a) {
       var n = a.n;
-      // name clip (per language)
       addRow({
         id: "name-" + langCode + "-" + pad2(n),
         kind: "name",
@@ -289,11 +267,9 @@
   }
 
   function buildSharedCries(animals) {
-    // only once from klas list
     animals.forEach(function (a) {
       var n = a.n;
       var soundRel = a.sound || ("sound/" + pad2(n) + ".mp3");
-      // normalize to klas sound path
       var url = absUrl(soundRel, "klas");
       if (soundRel.indexOf("../../klas/games/") === 0) {
         url = BASE + "/klas/games/" + soundRel.slice("../../klas/games/".length);
@@ -347,7 +323,110 @@
     return l;
   }
 
-  function stop() {
+  /* ---------- IndexedDB overrides ---------- */
+  function idbOpen() {
+    return new Promise(function (resolve, reject) {
+      var req = indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = function () {
+        var db = req.result;
+        if (!db.objectStoreNames.contains(IDB_STORE)) {
+          db.createObjectStore(IDB_STORE, { keyPath: "id" });
+        }
+      };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+    });
+  }
+
+  function idbPut(rec) {
+    return idbOpen().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(IDB_STORE, "readwrite");
+        tx.objectStore(IDB_STORE).put(rec);
+        tx.oncomplete = function () { resolve(); };
+        tx.onerror = function () { reject(tx.error); };
+      });
+    });
+  }
+
+  function idbDelete(id) {
+    return idbOpen().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(IDB_STORE, "readwrite");
+        tx.objectStore(IDB_STORE).delete(id);
+        tx.oncomplete = function () { resolve(); };
+        tx.onerror = function () { reject(tx.error); };
+      });
+    });
+  }
+
+  function idbLoadAll() {
+    return idbOpen().then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx = db.transaction(IDB_STORE, "readonly");
+        var req = tx.objectStore(IDB_STORE).getAll();
+        req.onsuccess = function () { resolve(req.result || []); };
+        req.onerror = function () { reject(req.error); };
+      });
+    }).catch(function () { return []; });
+  }
+
+  function setOverride(id, blob, mime) {
+    if (overrides[id] && overrides[id].url) {
+      try { URL.revokeObjectURL(overrides[id].url); } catch (e) {}
+    }
+    var url = URL.createObjectURL(blob);
+    overrides[id] = { blob: blob, mime: mime || blob.type || "audio/webm", url: url, updated: Date.now() };
+    return idbPut({
+      id: id,
+      blob: blob,
+      mime: overrides[id].mime,
+      updated: overrides[id].updated,
+      path: (rows.find(function (r) { return r.id === id; }) || {}).path || "",
+    });
+  }
+
+  function clearOverride(id) {
+    if (overrides[id] && overrides[id].url) {
+      try { URL.revokeObjectURL(overrides[id].url); } catch (e) {}
+    }
+    delete overrides[id];
+    return idbDelete(id);
+  }
+
+  function playUrlFor(row) {
+    if (overrides[row.id]) return overrides[row.id].url;
+    return row.url;
+  }
+
+  function downloadName(row, mime) {
+    var base = (row.path.split("/").pop() || row.id).replace(/\.[^.]+$/, "");
+    var ext = "webm";
+    if (mime) {
+      if (mime.indexOf("mp4") !== -1 || mime.indexOf("m4a") !== -1 || mime.indexOf("aac") !== -1) ext = "m4a";
+      else if (mime.indexOf("mpeg") !== -1 || mime.indexOf("mp3") !== -1) ext = "mp3";
+      else if (mime.indexOf("wav") !== -1) ext = "wav";
+      else if (mime.indexOf("ogg") !== -1) ext = "ogg";
+    }
+    // Prefer name that matches repo basename for FX installs
+    if (row.path.indexOf("jaaa.mp3") !== -1) return "jaaa." + ext;
+    if (row.path.indexOf("neee.mp3") !== -1) return "neee." + ext;
+    return base + "." + ext;
+  }
+
+  function downloadOverride(row) {
+    var o = overrides[row.id];
+    if (!o) return;
+    var a = document.createElement("a");
+    a.href = o.url;
+    a.download = downloadName(row, o.mime);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  /* ---------- playback ---------- */
+  function stopPlay() {
     if (audio) {
       try { audio.pause(); audio.currentTime = 0; } catch (e) {}
       audio = null;
@@ -356,42 +435,193 @@
     Array.prototype.forEach.call(document.querySelectorAll("tr.playing"), function (tr) {
       tr.classList.remove("playing");
     });
-    Array.prototype.forEach.call(document.querySelectorAll(".play.playing"), function (b) {
+    Array.prototype.forEach.call(document.querySelectorAll(".btn.play.playing"), function (b) {
       b.classList.remove("playing");
       b.textContent = "▶";
     });
   }
 
   function play(row, btn, tr) {
-    if (playingId === row.id) { stop(); return; }
-    stop();
+    if (playingId === row.id) { stopPlay(); return; }
+    stopPlay();
     try {
-      audio = new Audio(row.url);
+      audio = new Audio(playUrlFor(row));
       playingId = row.id;
       btn.classList.add("playing");
       btn.textContent = "■";
       tr.classList.add("playing");
-      audio.onended = function () { stop(); };
+      audio.onended = function () { stopPlay(); };
       audio.onerror = function () {
         btn.textContent = "!";
-        setTimeout(stop, 600);
+        setTimeout(stopPlay, 600);
       };
       var p = audio.play();
-      if (p && p.catch) p.catch(function () { stop(); });
+      if (p && p.catch) p.catch(function () { stopPlay(); });
     } catch (e) {
-      stop();
+      stopPlay();
     }
   }
 
+  /* ---------- recording ---------- */
+  function pickMime() {
+    var candidates = [
+      "audio/mp4",
+      "audio/aac",
+      "audio/webm;codecs=opus",
+      "audio/webm",
+      "audio/ogg;codecs=opus",
+    ];
+    if (!window.MediaRecorder) return "";
+    for (var i = 0; i < candidates.length; i++) {
+      try {
+        if (MediaRecorder.isTypeSupported(candidates[i])) return candidates[i];
+      } catch (e) {}
+    }
+    return "";
+  }
+
+  function stopRecording(save) {
+    if (!recState) return;
+    var st = recState;
+    recState = null;
+    if (st.timer) clearTimeout(st.timer);
+    try {
+      if (st.recorder && st.recorder.state !== "inactive") st.recorder.stop();
+    } catch (e) {}
+    // stream stopped in onstop after we may need tracks
+    if (st.btn) {
+      st.btn.classList.remove("hot");
+      st.btn.textContent = "⏺";
+      st.btn.title = "Opnemen";
+    }
+    if (st.tr) st.tr.classList.remove("recording");
+  }
+
+  function startRecording(row, btn, tr) {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert("Geen microfoon-API in deze browser. Gebruik Safari of Chrome.");
+      return;
+    }
+    if (!window.MediaRecorder) {
+      alert("MediaRecorder ontbreekt hier. Probeer desktop Safari/Chrome.");
+      return;
+    }
+    if (recState) {
+      if (recState.id === row.id) {
+        // second tap = stop & save
+        try { recState.recorder.stop(); } catch (e) {}
+        return;
+      }
+      stopRecording(false);
+    }
+
+    stopPlay();
+    var mime = pickMime();
+
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
+      var chunks = [];
+      var opts = mime ? { mimeType: mime } : undefined;
+      var recorder;
+      try {
+        recorder = opts ? new MediaRecorder(stream, opts) : new MediaRecorder(stream);
+      } catch (e) {
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        alert("Kon recorder niet starten: " + e.message);
+        return;
+      }
+
+      recState = {
+        id: row.id,
+        row: row,
+        recorder: recorder,
+        chunks: chunks,
+        stream: stream,
+        btn: btn,
+        tr: tr,
+        mime: recorder.mimeType || mime || "audio/webm",
+        timer: null,
+      };
+
+      btn.classList.add("hot");
+      btn.textContent = "⏹";
+      btn.title = "Stop opname";
+      tr.classList.add("recording");
+
+      recorder.ondataavailable = function (ev) {
+        if (ev.data && ev.data.size > 0) chunks.push(ev.data);
+      };
+      recorder.onstop = function () {
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        var usedMime = recState ? recState.mime : (recorder.mimeType || "audio/webm");
+        var theRow = recState ? recState.row : row;
+        var theBtn = recState ? recState.btn : btn;
+        var theTr = recState ? recState.tr : tr;
+        if (recState && recState.timer) clearTimeout(recState.timer);
+        recState = null;
+        if (theBtn) {
+          theBtn.classList.remove("hot");
+          theBtn.textContent = "⏺";
+          theBtn.title = "Opnemen";
+        }
+        if (theTr) theTr.classList.remove("recording");
+
+        if (!chunks.length) {
+          alert("Lege opname — probeer opnieuw dichter bij de mic.");
+          return;
+        }
+        var blob = new Blob(chunks, { type: usedMime });
+        setOverride(theRow.id, blob, usedMime).then(function () {
+          render();
+          // auto preview
+          setTimeout(function () {
+            var tr2 = document.querySelector('tr[data-id="' + theRow.id + '"]');
+            var playBtn = tr2 ? tr2.querySelector(".btn.play") : null;
+            if (tr2 && playBtn) play(theRow, playBtn, tr2);
+          }, 80);
+        }).catch(function (err) {
+          alert("Opname bewaren mislukt: " + err);
+        });
+      };
+
+      try {
+        recorder.start(100);
+      } catch (e) {
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        recState = null;
+        alert("Start mislukt: " + e.message);
+        return;
+      }
+
+      recState.timer = setTimeout(function () {
+        if (recState && recState.id === row.id && recState.recorder.state === "recording") {
+          try { recState.recorder.stop(); } catch (e) {}
+        }
+      }, MAX_REC_MS);
+    }).catch(function (err) {
+      alert("Microfoon geweigerd of niet beschikbaar.\n" + (err && err.message ? err.message : err));
+    });
+  }
+
+  function toggleRec(row, btn, tr) {
+    if (recState && recState.id === row.id) {
+      try { recState.recorder.stop(); } catch (e) {}
+      return;
+    }
+    startRecording(row, btn, tr);
+  }
+
+  /* ---------- table ---------- */
   function filtered() {
     var kind = el.filterKind.value;
     var lang = el.filterLang.value;
     var onlyOpen = el.onlyOpen.checked;
+    var onlyRec = el.onlyRec.checked;
     var q = (el.search.value || "").trim().toLowerCase();
     return rows.filter(function (r) {
       if (kind !== "all" && r.kind !== kind) return false;
       if (lang !== "all" && r.lang !== lang) return false;
-      if (onlyOpen && isOk(r.id)) return false; // hide approved
+      if (onlyOpen && isOk(r.id)) return false;
+      if (onlyRec && !hasRec(r.id)) return false;
       if (q) {
         var hay = (r.label + " " + r.path + " " + r.id + " " + r.n).toLowerCase();
         if (hay.indexOf(q) === -1) return false;
@@ -403,13 +633,12 @@
   function updateStats(visible) {
     var okTotal = rows.filter(function (r) { return isOk(r.id); }).length;
     var openTotal = rows.length - okTotal;
-    var okVis = visible.filter(function (r) { return isOk(r.id); }).length;
-    var openVis = visible.length - okVis;
+    var recTotal = Object.keys(overrides).length;
     el.stats.innerHTML =
       visible.length + " zichtbaar" +
       " · <strong class=\"ok\">" + okTotal + " goed</strong>" +
       " · <strong class=\"open\">" + openTotal + " open</strong>" +
-      " (" + openVis + " open in filter)" +
+      " · <strong class=\"rec\">" + recTotal + " eigen opnames</strong>" +
       " · " + rows.length + " totaal";
   }
 
@@ -419,6 +648,7 @@
     list.forEach(function (r) {
       var tr = document.createElement("tr");
       var ok = isOk(r.id);
+      var own = hasRec(r.id);
       tr.classList.add(ok ? "is-ok" : "is-open");
       tr.dataset.id = r.id;
 
@@ -443,6 +673,12 @@
       var lab = document.createElement("div");
       lab.className = "label";
       lab.textContent = r.label;
+      if (own) {
+        var badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = "eigen opname";
+        lab.appendChild(badge);
+      }
       tdLabel.appendChild(lab);
       tr.appendChild(tdLabel);
 
@@ -453,23 +689,59 @@
       tdPath.appendChild(path);
       tr.appendChild(tdPath);
 
-      var tdPlay = document.createElement("td");
-      tdPlay.className = "playcell";
-      var btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "play";
-      btn.setAttribute("aria-label", "Speel " + r.label);
-      btn.textContent = "▶";
-      btn.addEventListener("click", function () { play(r, btn, tr); });
-      tdPlay.appendChild(btn);
-      tr.appendChild(tdPlay);
+      var tdAct = document.createElement("td");
+      tdAct.className = "actcell";
+      var wrap = document.createElement("div");
+      wrap.className = "actions";
+
+      var playBtn = document.createElement("button");
+      playBtn.type = "button";
+      playBtn.className = "btn play";
+      playBtn.title = own ? "Speel eigen opname" : "Speel live";
+      playBtn.setAttribute("aria-label", "Speel " + r.label);
+      playBtn.textContent = "▶";
+      playBtn.addEventListener("click", function () { play(r, playBtn, tr); });
+      wrap.appendChild(playBtn);
+
+      var recBtn = document.createElement("button");
+      recBtn.type = "button";
+      recBtn.className = "btn rec";
+      recBtn.title = "Opnemen (tik start · tik stop)";
+      recBtn.setAttribute("aria-label", "Record " + r.label);
+      recBtn.textContent = "⏺";
+      recBtn.addEventListener("click", function () { toggleRec(r, recBtn, tr); });
+      wrap.appendChild(recBtn);
+
+      if (own) {
+        var dlBtn = document.createElement("button");
+        dlBtn.type = "button";
+        dlBtn.className = "btn dl";
+        dlBtn.title = "Download opname";
+        dlBtn.textContent = "↓";
+        dlBtn.addEventListener("click", function () { downloadOverride(r); });
+        wrap.appendChild(dlBtn);
+
+        var clrBtn = document.createElement("button");
+        clrBtn.type = "button";
+        clrBtn.className = "btn clr";
+        clrBtn.title = "Verwijder eigen opname";
+        clrBtn.textContent = "×";
+        clrBtn.addEventListener("click", function () {
+          if (!confirm("Eigen opname voor “" + r.label + "” wissen?")) return;
+          clearOverride(r.id).then(function () { render(); });
+        });
+        wrap.appendChild(clrBtn);
+      }
+
+      tdAct.appendChild(wrap);
+      tr.appendChild(tdAct);
 
       var tdOk = document.createElement("td");
       tdOk.className = "okcell";
       var cb = document.createElement("input");
       cb.type = "checkbox";
       cb.className = "okbox";
-      cb.title = "Aan = goed · uit = open (nog niet ok)";
+      cb.title = "Aan = goed · uit = open";
       cb.checked = ok;
       cb.addEventListener("change", function () {
         if (cb.checked) okMap[r.id] = true;
@@ -478,7 +750,6 @@
         tr.classList.toggle("is-ok", cb.checked);
         tr.classList.toggle("is-open", !cb.checked);
         updateStats(filtered());
-        // If filtering "only open", approved rows disappear on next render
         if (el.onlyOpen.checked && cb.checked) render();
       });
       tdOk.appendChild(cb);
@@ -492,7 +763,7 @@
   function exportOpen() {
     var list = rows.filter(function (r) { return !isOk(r.id); });
     if (!list.length) {
-      alert("Alles is goed gemarkeerd — geen open items.");
+      alert("Alles is goed — geen open items.");
       return;
     }
     var lines = list.map(function (r) {
@@ -503,16 +774,15 @@
         r.n || "",
         r.label,
         r.path,
+        hasRec(r.id) ? "HAS_RECORDING" : "",
         r.url,
       ].join("\t");
     });
-    var text = "id\tkind\tlang\tn\tlabel\tpath\turl\n" + lines.join("\n");
+    var text = "id\tkind\tlang\tn\tlabel\tpath\trecording\turl\n" + lines.join("\n");
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(function () {
-        alert(list.length + " open (niet-goed) items gekopieerd (TSV).");
-      }).catch(function () {
-        prompt("Kopieer:", text);
-      });
+        alert(list.length + " open items gekopieerd (TSV).");
+      }).catch(function () { prompt("Kopieer:", text); });
     } else {
       prompt("Kopieer:", text);
     }
@@ -521,29 +791,34 @@
   el.filterKind.addEventListener("change", render);
   el.filterLang.addEventListener("change", render);
   el.onlyOpen.addEventListener("change", render);
+  el.onlyRec.addEventListener("change", render);
   el.search.addEventListener("input", render);
-  el.stopBtn.addEventListener("click", stop);
+  el.stopBtn.addEventListener("click", function () {
+    if (recState) {
+      try { recState.recorder.stop(); } catch (e) {}
+    }
+    stopPlay();
+  });
   el.exportBtn.addEventListener("click", exportOpen);
   el.clearBtn.addEventListener("click", function () {
-    if (!confirm("Alle ‘goed’-vinkjes wissen op dit device? Alles wordt weer open.")) return;
+    if (!confirm("Alle ‘goed’-vinkjes wissen? (Eigen opnames blijven.)")) return;
     okMap = {};
     saveOk();
     render();
   });
 
-  // Load animals from three talen
   Promise.all([
     fetch(BASE + "/klas/games/animals.json").then(function (r) { return r.json(); }),
     fetch(BASE + "/mama/games/animals.json").then(function (r) { return r.json(); }),
     fetch(BASE + "/papa/games/animals.json").then(function (r) { return r.json(); }),
+    idbLoadAll(),
   ]).then(function (arr) {
-    var klas = arr[0], mama = arr[1], papa = arr[2];
+    var klas = arr[0], mama = arr[1], papa = arr[2], saved = arr[3];
     buildFromAnimals("klas", "en", klas);
     buildFromAnimals("mama", "fr", mama);
     buildFromAnimals("papa", "nl", papa);
     buildSharedCries(klas);
     buildFx();
-    // stable order: cries by n, names by n per lang, fx last already
     rows.sort(function (a, b) {
       var ko = { cry: 0, name: 1, fx: 2 };
       if (ko[a.kind] !== ko[b.kind]) return ko[a.kind] - ko[b.kind];
@@ -551,12 +826,24 @@
       var lo = { en: 0, fr: 1, nl: 2, shared: 3 };
       return (lo[a.lang] || 0) - (lo[b.lang] || 0);
     });
+
+    (saved || []).forEach(function (rec) {
+      if (!rec || !rec.id || !rec.blob) return;
+      var url = URL.createObjectURL(rec.blob);
+      overrides[rec.id] = {
+        blob: rec.blob,
+        mime: rec.mime || rec.blob.type || "audio/webm",
+        url: url,
+        updated: rec.updated || Date.now(),
+      };
+    });
+
     el.status.hidden = true;
     el.wrap.hidden = false;
     render();
   }).catch(function (err) {
     el.status.className = "error";
-    el.status.textContent = "Kon animals.json niet laden. Open via GitHub Pages (/liedjes/tools/audio-qa/). " + err;
+    el.status.textContent = "Kon data niet laden. Open via GitHub Pages. " + err;
   });
 })();
 </script>
