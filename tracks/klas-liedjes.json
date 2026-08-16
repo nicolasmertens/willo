@@ -20,7 +20,8 @@
       "n": 1,
       "title": "Vroom Vroom",
       "audio": "liedjes/audio/01.mp3",
-      "icon": "liedjes/icons/01.jpg"
+      "icon": "liedjes/icons/01.jpg",
+      "rev": 2
     },
     {
       "n": 2,
