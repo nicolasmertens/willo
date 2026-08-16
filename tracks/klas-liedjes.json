@@ -75,13 +75,15 @@
       "n": 10,
       "title": "Slippery Fish",
       "audio": "liedjes/audio/10.mp3",
-      "icon": "liedjes/icons/10.jpg"
+      "icon": "liedjes/icons/10.jpg",
+      "rev": 2
     },
     {
       "n": 11,
       "title": "Old MacDonald",
       "audio": "liedjes/audio/11.mp3",
-      "icon": "liedjes/icons/11.jpg"
+      "icon": "liedjes/icons/11.jpg",
+      "rev": 2
     }
   ]
 }
