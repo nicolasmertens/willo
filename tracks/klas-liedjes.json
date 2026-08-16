@@ -70,6 +70,12 @@
       "audio": "liedjes/audio/09.mp3",
       "icon": "liedjes/icons/09.jpg",
       "rev": 3
+    },
+    {
+      "n": 10,
+      "title": "Slippery Fish",
+      "audio": "liedjes/audio/10.mp3",
+      "icon": "liedjes/icons/10.jpg"
     }
   ]
 }
