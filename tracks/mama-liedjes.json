@@ -47,6 +47,18 @@
       "title": "La chanson de l'alphabet",
       "audio": "liedjes/audio/08.mp3",
       "icon": "liedjes/icons/08.jpg"
+    },
+    {
+      "n": 9,
+      "title": "Bébé Requin",
+      "audio": "liedjes/audio/09.mp3",
+      "icon": "liedjes/icons/09.jpg"
+    },
+    {
+      "n": 10,
+      "title": "Un tout petit doigt",
+      "audio": "liedjes/audio/10.mp3",
+      "icon": "liedjes/icons/10.jpg"
     }
   ]
 }

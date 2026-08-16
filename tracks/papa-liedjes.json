@@ -29,6 +29,18 @@
       "title": "Het ABC",
       "audio": "liedjes/audio/05.mp3",
       "icon": "liedjes/icons/05.jpg"
+    },
+    {
+      "n": 6,
+      "title": "Babyhaai",
+      "audio": "liedjes/audio/06.mp3",
+      "icon": "liedjes/icons/06.jpg"
+    },
+    {
+      "n": 7,
+      "title": "Eén kleine vinger",
+      "audio": "liedjes/audio/07.mp3",
+      "icon": "liedjes/icons/07.jpg"
     }
   ]
 }
