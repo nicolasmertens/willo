@@ -76,6 +76,12 @@
       "title": "Slippery Fish",
       "audio": "liedjes/audio/10.mp3",
       "icon": "liedjes/icons/10.jpg"
+    },
+    {
+      "n": 11,
+      "title": "Old MacDonald",
+      "audio": "liedjes/audio/11.mp3",
+      "icon": "liedjes/icons/11.jpg"
     }
   ]
 }
