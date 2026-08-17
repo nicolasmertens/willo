@@ -353,17 +353,25 @@
       <input id="child-name" type="text" enterkeyhint="done" autocomplete="nickname" maxlength="24" value="${st.childName || ""}">
       <label for="child-birth">${copy.birth}</label>
       <input id="child-birth" type="date">
-      <label for="child-photo">${copy.photo}</label>
-      <input id="child-photo" type="file" accept="image/*">
-      <button type="button" id="child-photo-btn">${copy.photo}</button>
+      <label>${copy.photo}</label>
+      <div class="photo-well">
+        <input id="child-photo" type="file" accept="image/*">
+        <img id="child-photo-preview" alt="" hidden>
+        <span>${copy.pick}</span>
+      </div>
       <p class="willo-err" id="child-err"></p>
       <button type="button" id="child-go">${copy.go}</button>
     `;
     const birth = el.querySelector("#child-birth");
     if (birth && st.birth) birth.value = st.birth;
-    const pick = el.querySelector("#child-photo-btn");
     const file = el.querySelector("#child-photo");
-    if (pick && file) pick.addEventListener("click", (e) => { e.preventDefault(); file.click(); });
+    const prev = el.querySelector("#child-photo-preview");
+    if (file && prev) file.addEventListener("change", () => {
+      const f = file.files && file.files[0];
+      if (!f) return;
+      prev.src = URL.createObjectURL(f);
+      prev.hidden = false;
+    });
     const go = el.querySelector("#child-go");
     if (go) go.addEventListener("click", submitChild);
   }

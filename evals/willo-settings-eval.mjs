@@ -29,6 +29,7 @@ ok("hasChild needs face", S.hasChild({ childName: "Ada", birth: "2024-09-24", ch
 ok("hasChild ok", S.hasChild({ childName: "Ada", birth: "2024-09-24", childFace: true }));
 ok("setChild ok", S.setChild(S.defaultState(), "Ada", "2024-09-24").ok);
 ok("child copy nl", S.childCopy("nl").photo.indexOf("Foto") !== -1);
+ok("child copy pick", !!S.childCopy("en").pick);
 
 const iphoneUa = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
 const crios = "Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/129.0.0.0 Mobile/15E148 Safari/604.1";
@@ -94,7 +95,7 @@ ok("import empty langs stay empty", (() => {
   return r.ok && S.LANGS.every((l) => !r.state.langs[l]);
 })());
 
-console.log("checks: 47  fails: " + fails.length);
+console.log("checks: 48  fails: " + fails.length);
 fails.forEach((f) => console.log("FAIL", f));
 if (fails.length) process.exit(1);
 console.log("PASS willo settings");

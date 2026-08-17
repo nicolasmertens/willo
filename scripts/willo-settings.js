@@ -76,10 +76,10 @@
   function childCopy(lang) {
     const l = String(lang || "en").toLowerCase().slice(0, 2);
     const table = {
-      nl: { title: "Wie speelt er?", name: "Naam", birth: "Geboortedatum", photo: "Foto van het kind", go: "Verder" },
-      fr: { title: "Qui joue ?", name: "Prénom", birth: "Naissance", photo: "Photo de l'enfant", go: "Continuer" },
-      de: { title: "Wer spielt?", name: "Name", birth: "Geburtstag", photo: "Foto vom Kind", go: "Weiter" },
-      en: { title: "Who is playing?", name: "Name", birth: "Birthday", photo: "Photo of the child", go: "Continue" },
+      nl: { title: "Wie speelt er?", name: "Naam", birth: "Geboortedatum", photo: "Foto van het kind", pick: "Tik voor een foto", go: "Verder" },
+      fr: { title: "Qui joue ?", name: "Prénom", birth: "Naissance", photo: "Photo de l'enfant", pick: "Touchez pour une photo", go: "Continuer" },
+      de: { title: "Wer spielt?", name: "Name", birth: "Geburtstag", photo: "Foto vom Kind", pick: "Tippen für ein Foto", go: "Weiter" },
+      en: { title: "Who is playing?", name: "Name", birth: "Birthday", photo: "Photo of the child", pick: "Tap to add a photo", go: "Continue" },
     };
     return table[l] || table.en;
   }
