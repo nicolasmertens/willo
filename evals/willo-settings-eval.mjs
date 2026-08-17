@@ -19,11 +19,16 @@ ok("old ipad ua", S.isIosBrowser({ ua: "Mozilla/5.0 (iPad; CPU OS 16_0 like Mac 
 ok("ipad desktop ua + 5 points", S.isIosBrowser({ ua: ipadDesktop, platform: "", maxTouchPoints: 5 }));
 ok("ipad desktop ua + coarse, 0 points", S.isIosBrowser({ ua: ipadDesktop, platform: "", maxTouchPoints: 0, coarse: true }));
 ok("mac safari not ios", S.isIosBrowser({ ua: macSafari, platform: "MacIntel", maxTouchPoints: 0, coarse: false }) === false);
-ok("ios tab is install", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5 }) === "install");
-ok("ios tab stays install", S.homeSurface(false, 2, { ua: ipadDesktop, maxTouchPoints: 5 }) === "install");
-ok("pwa empty is plus", S.homeSurface(true, 0, { ua: ipadDesktop, maxTouchPoints: 5 }) === "plus");
-ok("pwa with lang is home", S.homeSurface(true, 1, { ua: ipadDesktop, maxTouchPoints: 5 }) === "home");
-ok("desktop tab empty is plus", S.homeSurface(false, 0, { ua: macSafari, maxTouchPoints: 0 }) === "plus");
+ok("no child is child form", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5 }) === "child");
+ok("ios tab after child is install", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "install");
+ok("pwa empty after child is plus", S.homeSurface(true, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "plus");
+ok("pwa with lang is home", S.homeSurface(true, 1, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "home");
+ok("desktop after child is plus", S.homeSurface(false, 0, { ua: macSafari, maxTouchPoints: 0, hasChild: true }) === "plus");
+ok("springboard first name", S.springboardName("William Mertens") === "William");
+ok("hasChild needs face", S.hasChild({ childName: "Ada", birth: "2024-09-24", childFace: false }) === false);
+ok("hasChild ok", S.hasChild({ childName: "Ada", birth: "2024-09-24", childFace: true }));
+ok("setChild ok", S.setChild(S.defaultState(), "Ada", "2024-09-24").ok);
+ok("child copy nl", S.childCopy("nl").photo.indexOf("Foto") !== -1);
 
 const iphoneUa = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
 const crios = "Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/129.0.0.0 Mobile/15E148 Safari/604.1";
@@ -89,7 +94,7 @@ ok("import empty langs stay empty", (() => {
   return r.ok && S.LANGS.every((l) => !r.state.langs[l]);
 })());
 
-console.log("checks: 42  fails: " + fails.length);
+console.log("checks: 47  fails: " + fails.length);
 fails.forEach((f) => console.log("FAIL", f));
 if (fails.length) process.exit(1);
 console.log("PASS willo settings");

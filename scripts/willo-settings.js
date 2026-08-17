@@ -73,10 +73,34 @@
     return table[l] || table.en;
   }
 
+  function childCopy(lang) {
+    const l = String(lang || "en").toLowerCase().slice(0, 2);
+    const table = {
+      nl: { title: "Wie speelt er?", name: "Naam", birth: "Geboortedatum", photo: "Foto van het kind", go: "Verder" },
+      fr: { title: "Qui joue ?", name: "Prénom", birth: "Naissance", photo: "Photo de l'enfant", go: "Continuer" },
+      de: { title: "Wer spielt?", name: "Name", birth: "Geburtstag", photo: "Foto vom Kind", go: "Weiter" },
+      en: { title: "Who is playing?", name: "Name", birth: "Birthday", photo: "Photo of the child", go: "Continue" },
+    };
+    return table[l] || table.en;
+  }
+
+  function springboardName(name) {
+    const n = String(name || "").trim().split(/\s+/)[0] || "";
+    return n.slice(0, 12);
+  }
+
+  function hasChild(state) {
+    return !!(state && springboardName(state.childName) && state.birth && state.childFace);
+  }
+
   function homeSurface(standalone, langOnCount, opts) {
     const iosBrowser = opts && Object.prototype.hasOwnProperty.call(opts, "iosBrowser")
       ? !!opts.iosBrowser
       : isIosBrowser(opts);
+    const child = opts && Object.prototype.hasOwnProperty.call(opts, "hasChild")
+      ? !!opts.hasChild
+      : false;
+    if (!child) return "child";
     if (iosBrowser && !standalone) return "install";
     if (!langOnCount) return "plus";
     return "home";
@@ -86,10 +110,22 @@
     return {
       pinHash: "",
       birth: "",
+      childName: "",
+      childFace: false,
       langs: { mama: false, papa: false, klas: false },
       sections: { boeken: true, games: true, liedjes: true, verhalen: true },
       items: {},
     };
+  }
+
+  function setChild(state, name, birth) {
+    const label = springboardName(name);
+    if (!label) return { ok: false, reason: "bad-name" };
+    if (!birth || !/^\d{4}-\d{2}-\d{2}$/.test(birth)) return { ok: false, reason: "bad-birth" };
+    const next = clone(state);
+    next.childName = label;
+    next.birth = birth;
+    return { ok: true, state: next };
   }
 
   function clone(s) {
@@ -208,6 +244,8 @@
     const s = data.state;
     if (s.pinHash) base.pinHash = String(s.pinHash);
     if (s.birth) base.birth = String(s.birth);
+    if (s.childName) base.childName = springboardName(s.childName);
+    if (s.childFace) base.childFace = true;
     LANGS.forEach((l) => { if (s.langs && typeof s.langs[l] === "boolean") base.langs[l] = s.langs[l]; });
     SECTIONS.forEach((sec) => { if (s.sections && typeof s.sections[sec] === "boolean") base.sections[sec] = s.sections[sec]; });
     if (s.items && typeof s.items === "object") base.items = s.items;
@@ -239,7 +277,8 @@
 
   const api = {
     KEY, LANGS, SECTIONS, STAGES,
-    homeSurface, isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
+    homeSurface, hasChild, setChild, springboardName, childCopy,
+    isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
     defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
     setLang, setSection, setItem, setBirth, setPin, checkPin,

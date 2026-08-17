@@ -1,6 +1,7 @@
 // One Willo worker for /willo/. Does not wipe per-taal caches.
-const CORE_CACHE = "willo-core-v7";
+const CORE_CACHE = "willo-core-v8";
 const MP3_CACHE = "willo-mp3-v1";
+const KID_CACHE = "willo-kid-icon-v1";
 
 const CORE = [
   "./",
@@ -41,6 +42,15 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (url.origin !== self.location.origin) return;
+  if (/kid-icon-\d+\.png$/.test(url.pathname)) {
+    const bare = url.origin + url.pathname;
+    e.respondWith(
+      caches.open(KID_CACHE).then((c) =>
+        c.match(bare).then((r) => r || caches.match("./apple-touch-icon.png"))
+      )
+    );
+    return;
+  }
 
   const isHTML = e.request.mode === "navigate"
     || e.request.destination === "document"

@@ -335,12 +335,112 @@
   function surfaceNow() {
     const st = S.load();
     const n = S.LANGS.filter((l) => S.isLangOn(st, l)).length;
-    return S.homeSurface(isStandalone(), n, iosProbe());
+    return S.homeSurface(isStandalone(), n, Object.assign(iosProbe(), { hasChild: S.hasChild(st) }));
   }
 
   const SVG_SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.2 8.5H7A2.5 2.5 0 0 0 4.5 11v8A2.5 2.5 0 0 0 7 21.5h10a2.5 2.5 0 0 0 2.5-2.5v-8A2.5 2.5 0 0 0 17 8.5h-1.2"/><path d="M12 15.5V3.5"/><path d="M8 7l4-4 4 4"/></svg>';
   const SVG_DOTS = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="6" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18" cy="12" r="1.8"/></svg>';
   const SVG_ADD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
+
+  function paintChild() {
+    const el = document.getElementById("child-card");
+    if (!el) return;
+    const copy = S.childCopy(navigator.language || document.documentElement.lang || "nl");
+    const st = S.load();
+    el.innerHTML = `
+      <h1>${copy.title}</h1>
+      <label>${copy.name}<input id="child-name" type="text" autocomplete="nickname" maxlength="24" value="${st.childName || ""}"></label>
+      <label>${copy.birth}<input id="child-birth" type="date" value="${st.birth || ""}"></label>
+      <label>${copy.photo}<input id="child-photo" type="file" accept="image/*"></label>
+      <p class="willo-err" id="child-err"></p>
+      <button type="button" id="child-go">${copy.go}</button>
+    `;
+    const go = el.querySelector("#child-go");
+    if (go) go.addEventListener("click", submitChild);
+  }
+
+  function squareBlob(src, size) {
+    return new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement("canvas");
+        c.width = c.height = size;
+        const ctx = c.getContext("2d");
+        const s = Math.min(img.width, img.height);
+        const sx = (img.width - s) / 2;
+        const sy = (img.height - s) / 2;
+        ctx.drawImage(img, sx, sy, s, s, 0, 0, size, size);
+        c.toBlob((b) => (b ? res(b) : rej(new Error("blob"))), "image/png");
+      };
+      img.onerror = () => rej(new Error("img"));
+      img.src = src;
+    });
+  }
+
+  async function cacheKidIcon(blob, file) {
+    const cache = await caches.open("willo-kid-icon-v1");
+    const abs = new URL(file, location.href);
+    abs.search = "";
+    const resp = new Response(blob, { headers: { "Content-Type": "image/png", "Cache-Control": "no-cache" } });
+    await cache.put(abs.href, resp);
+    return abs.href;
+  }
+
+  async function applySpringboard(name, dataUrl) {
+    const label = S.springboardName(name) || "Willo";
+    const title = document.querySelector("meta[name='apple-mobile-web-app-title']");
+    if (title) title.setAttribute("content", label);
+    document.title = label;
+    if (!dataUrl) return;
+    try {
+      const b180 = await squareBlob(dataUrl, 180);
+      const b512 = await squareBlob(dataUrl, 512);
+      const u180 = await cacheKidIcon(b180, "kid-icon-180.png");
+      const u512 = await cacheKidIcon(b512, "kid-icon-512.png");
+      const stamp = Date.now();
+      const icon180 = document.getElementById("willo-touch-icon");
+      if (icon180) icon180.href = u180 + "?v=" + stamp;
+      document.querySelectorAll("link[rel='icon']").forEach((l) => { l.href = u180 + "?v=" + stamp; });
+      const man = document.getElementById("willo-manifest");
+      if (man) {
+        const spec = {
+          name: label,
+          short_name: label,
+          start_url: "./",
+          scope: "./",
+          display: "standalone",
+          background_color: "#fff7e6",
+          theme_color: "#fff7e6",
+          icons: [
+            { src: u180 + "?v=" + stamp, sizes: "180x180", type: "image/png" },
+            { src: u512 + "?v=" + stamp, sizes: "512x512", type: "image/png" },
+          ],
+        };
+        const blob = new Blob([JSON.stringify(spec)], { type: "application/json" });
+        man.href = URL.createObjectURL(blob);
+      }
+    } catch (e) {}
+  }
+
+  async function submitChild() {
+    const nameEl = document.getElementById("child-name");
+    const birthEl = document.getElementById("child-birth");
+    const photoEl = document.getElementById("child-photo");
+    const err = document.getElementById("child-err");
+    const file = photoEl && photoEl.files && photoEl.files[0];
+    const r = S.setChild(S.load(), nameEl ? nameEl.value : "", birthEl ? birthEl.value : "");
+    if (!r.ok || !file) {
+      if (err) err.textContent = "!";
+      return;
+    }
+    const dataUrl = await fileToData(file);
+    await photoSet("child", dataUrl);
+    r.state.childFace = true;
+    S.save(r.state);
+    if (navigator.serviceWorker) await navigator.serviceWorker.ready;
+    await applySpringboard(r.state.childName, dataUrl);
+    renderHome();
+  }
 
   function paintInstall() {
     const el = document.getElementById("install-card");
@@ -380,8 +480,15 @@
     const install = document.getElementById("install-card");
     if (!grid) return;
     const mode = surfaceNow();
+    const child = document.getElementById("child-card");
+    if (child) child.hidden = mode !== "child";
     if (install) install.hidden = mode !== "install";
-    grid.hidden = mode === "install";
+    grid.hidden = mode === "install" || mode === "child";
+    if (mode === "child") {
+      grid.innerHTML = "";
+      paintChild();
+      return;
+    }
     if (mode === "install") {
       grid.innerHTML = "";
       paintInstall();
@@ -456,7 +563,8 @@
   }
 
   function openUnlock() {
-    if (surfaceNow() === "install") return;
+    const mode = surfaceNow();
+    if (mode === "install" || mode === "child") return;
     pinBuf = "";
     mode = "gate";
     mount(renderGate());
@@ -466,6 +574,8 @@
     applyLangs();
     applyCatalog();
     applyFaceImages();
+    const st = S.load();
+    if (S.hasChild(st)) photoGet("child").then((data) => applySpringboard(st.childName, data));
     const relayout = () => { if (document.getElementById("install-card") && surfaceNow() === "install") paintInstall(); };
     window.addEventListener("resize", relayout);
     window.addEventListener("orientationchange", () => setTimeout(relayout, 250));
