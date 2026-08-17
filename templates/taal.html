@@ -51,8 +51,8 @@
      consistency: same tile size everywhere, just more rows where there are
      more items (e.g. Liedjes). */
   .grid { display: grid; grid-template-columns: repeat(auto-fill, 154px); gap: 14px; }
-  /* Liedjes overflow needs more air than books/games so 196px art cannot smash. */
-  section.liedjes .grid { gap: 28px; }
+  /* Hang is 12px on 1-2 sides only; 20px gap keeps a neighbor from touching. */
+  section.liedjes .grid { gap: 20px; }
 
   /* --- Tile (same as grid.html) --- */
   .tile { aspect-ratio: 1 / 1; border: 4px solid transparent; border-radius: 22px; padding: 0; background: #fff; cursor: pointer; overflow: hidden; position: relative; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); transition: transform .08s ease, box-shadow .08s ease; font-family: inherit; }
@@ -82,8 +82,37 @@
     object-fit: cover; border-radius: 22px; z-index: 1;
   }
   .tile.tile-audio.tile-pop img {
-    width: 196px; height: 196px; inset: auto; left: 50%; top: 48%;
-    transform: translate(-50%, -50%); border-radius: 0; object-fit: contain;
+    --hang: 12px;
+    width: 154px; height: 154px; inset: auto; left: 0; top: 0;
+    transform: none; border-radius: 0; object-fit: cover; object-position: center;
+  }
+  .tile.tile-audio.tile-pop.over-right img {
+    width: calc(154px + var(--hang)); object-position: left center;
+  }
+  .tile.tile-audio.tile-pop.over-left img {
+    width: calc(154px + var(--hang)); left: auto; right: 0; object-position: right center;
+  }
+  .tile.tile-audio.tile-pop.over-bottom img {
+    height: calc(154px + var(--hang)); object-position: center top;
+  }
+  .tile.tile-audio.tile-pop.over-top img {
+    height: calc(154px + var(--hang)); top: auto; bottom: 0; object-position: center bottom;
+  }
+  .tile.tile-audio.tile-pop.over-right.over-top img {
+    width: calc(154px + var(--hang)); height: calc(154px + var(--hang));
+    left: 0; right: auto; top: auto; bottom: 0; object-position: left bottom;
+  }
+  .tile.tile-audio.tile-pop.over-right.over-bottom img {
+    width: calc(154px + var(--hang)); height: calc(154px + var(--hang));
+    left: 0; right: auto; top: 0; bottom: auto; object-position: left top;
+  }
+  .tile.tile-audio.tile-pop.over-left.over-top img {
+    width: calc(154px + var(--hang)); height: calc(154px + var(--hang));
+    left: auto; right: 0; top: auto; bottom: 0; object-position: right bottom;
+  }
+  .tile.tile-audio.tile-pop.over-left.over-bottom img {
+    width: calc(154px + var(--hang)); height: calc(154px + var(--hang));
+    left: auto; right: 0; top: 0; bottom: auto; object-position: right top;
   }
   .tile.tile-audio:active { box-shadow: none; }
   .tile.tile-audio:active .tile-face { box-shadow: 0 2px 0 rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08); }
@@ -543,6 +572,36 @@ function attachBarButton(btn, opts) {
   });
 }
 
+// --- Overflow sides (injected from scripts/overflow-assign.js) ---
+/*__OVERFLOW_ASSIGN__*/
+
+function liedjesColCount(grid) {
+  const tile = 154, gap = 20;
+  const w = grid.clientWidth || grid.parentElement.clientWidth || 0;
+  return Math.max(1, Math.floor((w + gap) / (tile + gap)));
+}
+
+function applyLiedjesOverflow(grid) {
+  if (typeof assignOverflow !== "function") return;
+  const tiles = [...grid.querySelectorAll(".tile-audio")];
+  if (!tiles.length) return;
+  const prefs = tiles.map(b => {
+    if (!b.classList.contains("tile-pop")) return null;
+    return (b.dataset.overPref || "").split(/\s+/).filter(Boolean);
+  });
+  const assigned = assignOverflow(prefs, liedjesColCount(grid), 20260817);
+  tiles.forEach((b, i) => {
+    if (!b.classList.contains("tile-pop")) return;
+    b.classList.remove("over-left", "over-right", "over-top", "over-bottom");
+    (assigned[i] || []).forEach(s => b.classList.add("over-" + s));
+    b.dataset.over = (assigned[i] || []).join(" ");
+  });
+}
+
+function refreshLiedjesOverflow() {
+  document.querySelectorAll("section.liedjes .grid").forEach(applyLiedjesOverflow);
+}
+
 // --- Build sections ---
 function build() {
   const bySection = { boeken: [], games: [], liedjes: [], verhalen: [] };
@@ -558,7 +617,12 @@ function build() {
       const btn = document.createElement("button");
       const isLiedjeAudio = section === "liedjes" && !!track.audio;
       btn.className = isLiedjeAudio ? "tile tile-audio" : "tile";
-      if (isLiedjeAudio && /\.png(\?|$)/i.test(track.icon || "")) btn.classList.add("tile-pop");
+      if (isLiedjeAudio && /\.png(\?|$)/i.test(track.icon || "")) {
+        btn.classList.add("tile-pop");
+        if (Array.isArray(track.over) && track.over.length) {
+          btn.dataset.overPref = track.over.join(" ");
+        }
+      }
       if (isLiedjeAudio && track.face) btn.style.setProperty("--face", track.face);
       btn.setAttribute("aria-label", `${track.title}`);
       const labelHtml = track.href ? `<div class="label">${track.title}</div>` : "";
@@ -581,6 +645,13 @@ const PAGE = document.body.dataset.page;  // "mama" | "papa" | "klas"
 attachBarButton(document.getElementById("stopbtn"), { kind: "stop", label: "stop", lockable: false });
 
 build();
+refreshLiedjesOverflow();
+requestAnimationFrame(refreshLiedjesOverflow);
+let overResizeT = 0;
+window.addEventListener("resize", () => {
+  clearTimeout(overResizeT);
+  overResizeT = setTimeout(refreshLiedjesOverflow, 80);
+});
 </script>
 </body>
 </html>

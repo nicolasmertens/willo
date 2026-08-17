@@ -14,7 +14,8 @@
       "audio": "liedjes/audio/02.mp3",
       "icon": "liedjes/icons/02.png",
       "irev": 3,
-      "face": "#e24b3c"
+      "face": "#e24b3c",
+      "over": ["right", "left"]
     },
     {
       "n": 3,
@@ -22,7 +23,8 @@
       "audio": "liedjes/audio/03.mp3",
       "icon": "liedjes/icons/03.png",
       "irev": 3,
-      "face": "#7cbf2a"
+      "face": "#7cbf2a",
+      "over": ["right", "bottom"]
     },
     {
       "n": 4,
@@ -30,7 +32,8 @@
       "audio": "liedjes/audio/04.mp3",
       "icon": "liedjes/icons/04.png",
       "irev": 3,
-      "face": "#f0d48a"
+      "face": "#f0d48a",
+      "over": ["right", "bottom"]
     },
     {
       "n": 5,
@@ -38,7 +41,8 @@
       "audio": "liedjes/audio/05.mp3",
       "icon": "liedjes/icons/05.png",
       "irev": 3,
-      "face": "#2aa8a8"
+      "face": "#2aa8a8",
+      "over": ["left"]
     },
     {
       "n": 6,
@@ -46,7 +50,8 @@
       "audio": "liedjes/audio/06.mp3",
       "icon": "liedjes/icons/06.png",
       "irev": 5,
-      "face": "#1a6db5"
+      "face": "#1a6db5",
+      "over": ["top", "left"]
     },
     {
       "n": 7,
@@ -54,7 +59,8 @@
       "audio": "liedjes/audio/07.mp3",
       "icon": "liedjes/icons/07.png",
       "irev": 3,
-      "face": "#efc44a"
+      "face": "#efc44a",
+      "over": ["right", "top"]
     }
   ]
 }

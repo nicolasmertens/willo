@@ -35,27 +35,28 @@ for label, src in (("template", tmpl), ("papa", papa)):
     if "width: 100%" not in block:
         fails.append(f"{label} tile-audio img is not width 100%")
 
-# 3. tile-pop img must be explicit px, and smaller than tile+2*gap
+# 3. directional hang: 12px on 1-2 sides, never a 196px 4-side sticker
 pop = css_block(tmpl, ".tile.tile-audio.tile-pop img")
 if not pop:
     fails.append("missing tile-pop img rule")
 else:
     if has_auto(pop, "width") or has_auto(pop, "height"):
         fails.append("tile-pop img uses auto")
-    wm = re.search(r"width:\s*(\d+)px", pop)
-    if not wm:
-        fails.append("tile-pop img width is not explicit px")
-    else:
-        pop_w = int(wm.group(1))
-        if pop_w > 220:
-            fails.append(f"tile-pop {pop_w}px is too large for a 154px tile")
-        gap_m = re.search(r"section\.liedjes \.grid \{[^}]*gap:\s*(\d+)px", tmpl)
-        gap = int(gap_m.group(1)) if gap_m else 14
-        hang = (pop_w - 154) / 2
-        if hang * 2 > gap * 2 - 4:
-            # hang on both neighbors must fit in gap with 2px air
-            if hang > gap - 2:
-                fails.append(f"tile-pop hang {hang:.0f}px exceeds liedjes gap {gap}px (smash)")
+    if "196px" in pop:
+        fails.append("tile-pop still uses 196px 4-side hang")
+    if "--hang: 12px" not in pop:
+        fails.append("tile-pop hang is not 12px")
+    if "154px" not in pop:
+        fails.append("tile-pop base size is not 154px")
+    gap_m = re.search(r"section\.liedjes \.grid \{[^}]*gap:\s*(\d+)px", tmpl)
+    gap = int(gap_m.group(1)) if gap_m else 14
+    if 12 > gap - 2:
+        fails.append(f"12px hang exceeds liedjes gap {gap}px (smash if neighbor fights)")
+    for side in ("over-right", "over-left", "over-top", "over-bottom"):
+        if f".tile.tile-audio.tile-pop.{side} img" not in tmpl:
+            fails.append(f"missing {side} CSS")
+    if "assignOverflow" not in tmpl and "/*__OVERFLOW_ASSIGN__*/" not in tmpl:
+        fails.append("template missing overflow assigner hook")
 
 # 4. papa house: 6 overflow pngs + croc jpg
 if tracks.count(".png") < 6:

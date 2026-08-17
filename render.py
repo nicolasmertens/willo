@@ -158,7 +158,8 @@ def render_taal(name, config):
     # Auto-derive cache versions from a content hash so any content/template
     # change automatically invalidates PWA caches on next page load.
     sw_template = (ROOT / "templates/service-worker.js").read_text()
-    ver = content_hash(all_tracks, template, sw_template, config["lang"], labels)
+    overflow_js = (ROOT / "scripts/overflow-assign.js").read_text()
+    ver = content_hash(all_tracks, template, sw_template, overflow_js, config["lang"], labels)
     app_version = f"{name}-{ver}"
     cache_name = f"{name}-{ver}"
     mp3_cache_name = f"{name}-mp3-{ver}"
@@ -176,6 +177,7 @@ def render_taal(name, config):
         .replace("__LABEL_VERHALEN__",  labels["verhalen"])
         .replace("__ALL_TRACKS_JSON__", json.dumps(all_tracks, ensure_ascii=False))
         .replace("__SEED_ORDER__",      json.dumps(audio_keys))
+        .replace("/*__OVERFLOW_ASSIGN__*/", overflow_js)
     )
     (out_dir / "index.html").write_text(html, encoding="utf-8")
 
