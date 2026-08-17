@@ -5,49 +5,56 @@
       "title": "En de krokodil",
       "audio": "liedjes/audio/01.mp3",
       "icon": "liedjes/icons/01.jpg",
-      "irev": 2
+      "irev": 2,
+      "face": "#7cbf2a"
     },
     {
       "n": 2,
       "title": "De wielen van de bus",
       "audio": "liedjes/audio/02.mp3",
-      "icon": "liedjes/icons/02.jpg",
-      "irev": 2
+      "icon": "liedjes/icons/02.png",
+      "irev": 3,
+      "face": "#e24b3c"
     },
     {
       "n": 3,
       "title": "Hansje Pansje Kevertje",
       "audio": "liedjes/audio/03.mp3",
-      "icon": "liedjes/icons/03.jpg",
-      "irev": 2
+      "icon": "liedjes/icons/03.png",
+      "irev": 3,
+      "face": "#7cbf2a"
     },
     {
       "n": 4,
       "title": "Ze kunnen zeggen wat ze willen",
       "audio": "liedjes/audio/04.mp3",
-      "icon": "liedjes/icons/04.jpg",
-      "irev": 2
+      "icon": "liedjes/icons/04.png",
+      "irev": 3,
+      "face": "#f0d48a"
     },
     {
       "n": 5,
       "title": "Het ABC",
       "audio": "liedjes/audio/05.mp3",
-      "icon": "liedjes/icons/05.jpg",
-      "irev": 2
+      "icon": "liedjes/icons/05.png",
+      "irev": 3,
+      "face": "#2aa8a8"
     },
     {
       "n": 6,
       "title": "Babyhaai",
       "audio": "liedjes/audio/06.mp3",
       "icon": "liedjes/icons/06.png",
-      "irev": 4
+      "irev": 5,
+      "face": "#1a6db5"
     },
     {
       "n": 7,
       "title": "Eén kleine vinger",
       "audio": "liedjes/audio/07.mp3",
-      "icon": "liedjes/icons/07.jpg",
-      "irev": 2
+      "icon": "liedjes/icons/07.png",
+      "irev": 3,
+      "face": "#efc44a"
     }
   ]
 }
