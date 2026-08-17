@@ -49,11 +49,14 @@
   button.tile-plus .plus { font-size: 72px; font-weight: 200; line-height: 1; color: #2b2b2b; pointer-events: none; }
   button.tile-plus .label { position: static; background: none; color: #2b2b2b; text-shadow: none; padding: 8px 0 0; font-size: 18px; }
 
-  #child-card { width: min(380px, calc(100vw - 32px)); background: #fff; border-radius: 26px; padding: 22px 20px 18px; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); }
+  #child-card, #child-card * { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; touch-action: manipulation; pointer-events: auto; }
+  #child-card { width: min(380px, calc(100vw - 32px)); background: #fff; border-radius: 26px; padding: 22px 20px 18px; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); position: relative; z-index: 50; }
   #child-card h1 { margin: 0 0 14px; font-size: 24px; }
   #child-card label { display: block; font-weight: 800; margin: 10px 0; }
-  #child-card input { display: block; width: 100%; margin-top: 6px; font: inherit; padding: 10px; border-radius: 12px; border: 1px solid #ddd; }
-  #child-card button { margin-top: 12px; width: 100%; border: 0; border-radius: 14px; padding: 14px; font-weight: 800; background: #111; color: #fff; }
+  #child-card input[type=text], #child-card input[type=date] { display: block; width: 100%; margin-top: 6px; font: inherit; font-size: 16px; padding: 12px; border-radius: 12px; border: 1px solid #ddd; background: #fff; min-height: 48px; }
+  #child-card input[type=file] { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+  #child-card button { margin-top: 12px; width: 100%; border: 0; border-radius: 14px; padding: 14px; font-weight: 800; font-size: 16px; background: #111; color: #fff; }
+  #child-card #child-photo-btn { background: #fff; color: #111; border: 2px solid #111; }
   #child-card .willo-err { color: #c0392b; min-height: 1.2em; font-weight: 800; }
 </style>
 </head>
@@ -75,6 +78,7 @@ document.addEventListener("gestureend", e => e.preventDefault(), { passive: fals
 
 let lastTouchEnd = 0;
 document.addEventListener("touchend", e => {
+  if (e.target.closest("#child-card, #install-card, input, textarea, select, label, button")) return;
   const now = Date.now();
   if (now - lastTouchEnd <= 350) e.preventDefault();
   lastTouchEnd = now;
@@ -208,8 +212,8 @@ window.addEventListener("load", () => {
   if (window.WilloHold) {
     WilloHold.attach(document, {
       shouldStart(e) {
-        if (e.target.closest("button.tile")) return false;
-        if (e.target.closest("#willo-sheet, .willo-sheet, .willo-gate")) return false;
+        if (e.target.closest("input, textarea, select, label, button, a")) return false;
+        if (e.target.closest("#child-card, #install-card, #willo-mask, #willo-sheet, .willo-sheet, button.tile")) return false;
         return true;
       },
       onHold() { if (window.WilloUI) WilloUI.openUnlock(); },

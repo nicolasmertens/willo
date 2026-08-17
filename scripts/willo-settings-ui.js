@@ -349,12 +349,21 @@
     const st = S.load();
     el.innerHTML = `
       <h1>${copy.title}</h1>
-      <label>${copy.name}<input id="child-name" type="text" autocomplete="nickname" maxlength="24" value="${st.childName || ""}"></label>
-      <label>${copy.birth}<input id="child-birth" type="date" value="${st.birth || ""}"></label>
-      <label>${copy.photo}<input id="child-photo" type="file" accept="image/*"></label>
+      <label for="child-name">${copy.name}</label>
+      <input id="child-name" type="text" enterkeyhint="done" autocomplete="nickname" maxlength="24" value="${st.childName || ""}">
+      <label for="child-birth">${copy.birth}</label>
+      <input id="child-birth" type="date">
+      <label for="child-photo">${copy.photo}</label>
+      <input id="child-photo" type="file" accept="image/*">
+      <button type="button" id="child-photo-btn">${copy.photo}</button>
       <p class="willo-err" id="child-err"></p>
       <button type="button" id="child-go">${copy.go}</button>
     `;
+    const birth = el.querySelector("#child-birth");
+    if (birth && st.birth) birth.value = st.birth;
+    const pick = el.querySelector("#child-photo-btn");
+    const file = el.querySelector("#child-photo");
+    if (pick && file) pick.addEventListener("click", (e) => { e.preventDefault(); file.click(); });
     const go = el.querySelector("#child-go");
     if (go) go.addEventListener("click", submitChild);
   }
