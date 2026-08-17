@@ -324,14 +324,18 @@
   function isStandalone() {
     return !!(navigator.standalone || matchMedia("(display-mode: standalone)").matches);
   }
-  function isIosBrowser() {
-    const ua = navigator.userAgent || "";
-    return /iP(hone|ad|od)/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  function iosProbe() {
+    return {
+      ua: navigator.userAgent || "",
+      platform: navigator.platform || "",
+      maxTouchPoints: navigator.maxTouchPoints || 0,
+      coarse: !!(window.matchMedia && matchMedia("(pointer: coarse)").matches),
+    };
   }
   function surfaceNow() {
     const st = S.load();
     const n = S.LANGS.filter((l) => S.isLangOn(st, l)).length;
-    return S.homeSurface(isStandalone(), n, { iosBrowser: isIosBrowser() });
+    return S.homeSurface(isStandalone(), n, iosProbe());
   }
 
   function openAddLang() {

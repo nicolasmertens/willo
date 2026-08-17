@@ -232,7 +232,7 @@ const ALL_TRACKS = [{"n": 1, "title": "Alle Eendjes", "href": "/willo/eendjes/",
 const SEED_ORDER = ["liedjes:1", "liedjes:2", "liedjes:3", "liedjes:4", "liedjes:5"];
 const PARENT_HREF = "/willo/";
 const STORAGE_PREFIX = "papa";
-const APP_VERSION = "papa-98dcfbdb";
+const APP_VERSION = "papa-cfdfd43c";
 
 const audio = new Audio();
 audio.preload = "none";
@@ -817,8 +817,24 @@ function attachBarButton(btn, opts) {
     { id: "31+", from: 31, to: 120 },
   ];
 
+  function isIosBrowser(info) {
+    info = info || {};
+    const ua = String(info.ua || "");
+    const platform = String(info.platform || "");
+    const points = Number(info.maxTouchPoints || 0);
+    const coarse = !!info.coarse;
+    if (/iP(hone|ad|od)/.test(ua)) return true;
+    const blob = ua + " " + platform;
+    if (points > 1 && /Mac/.test(blob)) return true;
+    const safari = /Safari/.test(ua) && !/Chrome|CriOS|FxiOS|EdgiOS|Android/.test(ua);
+    if (safari && (points > 1 || coarse)) return true;
+    return false;
+  }
+
   function homeSurface(standalone, langOnCount, opts) {
-    const iosBrowser = !!(opts && opts.iosBrowser);
+    const iosBrowser = opts && Object.prototype.hasOwnProperty.call(opts, "iosBrowser")
+      ? !!opts.iosBrowser
+      : isIosBrowser(opts);
     if (iosBrowser && !standalone) return "install";
     if (!langOnCount) return "plus";
     return "home";
@@ -981,7 +997,7 @@ function attachBarButton(btn, opts) {
 
   const api = {
     KEY, LANGS, SECTIONS, STAGES,
-    homeSurface, defaultState, hashPin, ageMonths, stageFor, itemKey,
+    homeSurface, isIosBrowser, defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
     setLang, setSection, setItem, setBirth, setPin, checkPin,
     exportPayload, importPayload, load, save,
@@ -1317,14 +1333,18 @@ function attachBarButton(btn, opts) {
   function isStandalone() {
     return !!(navigator.standalone || matchMedia("(display-mode: standalone)").matches);
   }
-  function isIosBrowser() {
-    const ua = navigator.userAgent || "";
-    return /iP(hone|ad|od)/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  function iosProbe() {
+    return {
+      ua: navigator.userAgent || "",
+      platform: navigator.platform || "",
+      maxTouchPoints: navigator.maxTouchPoints || 0,
+      coarse: !!(window.matchMedia && matchMedia("(pointer: coarse)").matches),
+    };
   }
   function surfaceNow() {
     const st = S.load();
     const n = S.LANGS.filter((l) => S.isLangOn(st, l)).length;
-    return S.homeSurface(isStandalone(), n, { iosBrowser: isIosBrowser() });
+    return S.homeSurface(isStandalone(), n, iosProbe());
   }
 
   function openAddLang() {

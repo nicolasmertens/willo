@@ -12,11 +12,18 @@ function ok(name, cond, extra) {
   if (!cond) fails.push(name + (extra ? " " + extra : ""));
 }
 
-ok("ios tab is install", S.homeSurface(false, 0, { iosBrowser: true }) === "install");
-ok("ios tab stays install", S.homeSurface(false, 2, { iosBrowser: true }) === "install");
-ok("pwa empty is plus", S.homeSurface(true, 0, { iosBrowser: true }) === "plus");
-ok("pwa with lang is home", S.homeSurface(true, 1, { iosBrowser: true }) === "home");
-ok("desktop tab empty is plus", S.homeSurface(false, 0, { iosBrowser: false }) === "plus");
+const ipadDesktop = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15";
+const macSafari = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15";
+ok("iphone ua", S.isIosBrowser({ ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)" }));
+ok("old ipad ua", S.isIosBrowser({ ua: "Mozilla/5.0 (iPad; CPU OS 16_0 like Mac OS X)" }));
+ok("ipad desktop ua + 5 points", S.isIosBrowser({ ua: ipadDesktop, platform: "", maxTouchPoints: 5 }));
+ok("ipad desktop ua + coarse, 0 points", S.isIosBrowser({ ua: ipadDesktop, platform: "", maxTouchPoints: 0, coarse: true }));
+ok("mac safari not ios", S.isIosBrowser({ ua: macSafari, platform: "MacIntel", maxTouchPoints: 0, coarse: false }) === false);
+ok("ios tab is install", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5 }) === "install");
+ok("ios tab stays install", S.homeSurface(false, 2, { ua: ipadDesktop, maxTouchPoints: 5 }) === "install");
+ok("pwa empty is plus", S.homeSurface(true, 0, { ua: ipadDesktop, maxTouchPoints: 5 }) === "plus");
+ok("pwa with lang is home", S.homeSurface(true, 1, { ua: ipadDesktop, maxTouchPoints: 5 }) === "home");
+ok("desktop tab empty is plus", S.homeSurface(false, 0, { ua: macSafari, maxTouchPoints: 0 }) === "plus");
 
 const now = Date.parse("2026-08-17T12:00:00");
 ok("age william 22", S.ageMonths("2024-09-24", now) === 22);
@@ -70,7 +77,7 @@ ok("import empty langs stay empty", (() => {
   return r.ok && S.LANGS.every((l) => !r.state.langs[l]);
 })());
 
-console.log("checks: 28  fails: " + fails.length);
+console.log("checks: 33  fails: " + fails.length);
 fails.forEach((f) => console.log("FAIL", f));
 if (fails.length) process.exit(1);
 console.log("PASS willo settings");

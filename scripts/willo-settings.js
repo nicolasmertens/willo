@@ -19,8 +19,24 @@
     { id: "31+", from: 31, to: 120 },
   ];
 
+  function isIosBrowser(info) {
+    info = info || {};
+    const ua = String(info.ua || "");
+    const platform = String(info.platform || "");
+    const points = Number(info.maxTouchPoints || 0);
+    const coarse = !!info.coarse;
+    if (/iP(hone|ad|od)/.test(ua)) return true;
+    const blob = ua + " " + platform;
+    if (points > 1 && /Mac/.test(blob)) return true;
+    const safari = /Safari/.test(ua) && !/Chrome|CriOS|FxiOS|EdgiOS|Android/.test(ua);
+    if (safari && (points > 1 || coarse)) return true;
+    return false;
+  }
+
   function homeSurface(standalone, langOnCount, opts) {
-    const iosBrowser = !!(opts && opts.iosBrowser);
+    const iosBrowser = opts && Object.prototype.hasOwnProperty.call(opts, "iosBrowser")
+      ? !!opts.iosBrowser
+      : isIosBrowser(opts);
     if (iosBrowser && !standalone) return "install";
     if (!langOnCount) return "plus";
     return "home";
@@ -183,7 +199,7 @@
 
   const api = {
     KEY, LANGS, SECTIONS, STAGES,
-    homeSurface, defaultState, hashPin, ageMonths, stageFor, itemKey,
+    homeSurface, isIosBrowser, defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
     setLang, setSection, setItem, setBirth, setPin, checkPin,
     exportPayload, importPayload, load, save,
