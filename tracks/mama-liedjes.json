@@ -5,9 +5,9 @@
       "title": "Les roues de l'autobus",
       "audio": "liedjes/audio/01.mp3",
       "icon": "liedjes/icons/01.png",
-      "irev": 3,
-      "face": "#e24b3c",
-      "over": ["bottom", "right"]
+      "irev": 4,
+      "face": "#f0c01a",
+      "over": ["bottom"]
     },
     {
       "n": 2,

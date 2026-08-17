@@ -13,9 +13,9 @@
       "title": "De wielen van de bus",
       "audio": "liedjes/audio/02.mp3",
       "icon": "liedjes/icons/02.png",
-      "irev": 5,
-      "face": "#e24b3c",
-      "over": ["bottom", "right"]
+      "irev": 6,
+      "face": "#f0c01a",
+      "over": ["bottom"]
     },
     {
       "n": 3,

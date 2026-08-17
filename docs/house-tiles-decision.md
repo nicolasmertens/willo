@@ -24,7 +24,9 @@ William taps a **thing he can name**, not a show he has seen. Parent tab already
 | Same animal, different song | **Different** (papa side-snout croc ≠ mama front-grin “gros crocodiles”) |
 | Two recordings on one tab | Distinct only if he must pick a version (klas Old Mac 09 vs 11). Otherwise one icon. |
 
-TV / YouTube: keep the **subject** (red bus, pink-dress girl, a shark). Drop the **packaging** (Cocomelon still, Pinkfong, burned-in lyrics).
+TV / YouTube: keep the **subject** (yellow bus, pink-dress girl, a shark). Drop the **packaging** (Cocomelon still, Pinkfong, burned-in lyrics).
+
+Bus is yellow so it does not collide with the red pompier tile. No glare/bubble nose.
 
 ## Shared now
 
