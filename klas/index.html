@@ -232,7 +232,7 @@ const ALL_TRACKS = [{"n": 1, "title": "Nursery Rhymes", "href": "/willo/rhymes/"
 const SEED_ORDER = ["liedjes:1", "liedjes:2", "liedjes:3", "liedjes:4", "liedjes:5"];
 const PARENT_HREF = "/willo/";
 const STORAGE_PREFIX = "klas";
-const APP_VERSION = "klas-0a176696";
+const APP_VERSION = "klas-b3a926a6";
 
 const audio = new Audio();
 audio.preload = "none";
@@ -817,6 +817,13 @@ function attachBarButton(btn, opts) {
     { id: "31+", from: 31, to: 120 },
   ];
 
+  function homeSurface(standalone, langOnCount, opts) {
+    const iosBrowser = !!(opts && opts.iosBrowser);
+    if (iosBrowser && !standalone) return "install";
+    if (!langOnCount) return "plus";
+    return "home";
+  }
+
   function defaultState() {
     return {
       pinHash: "",
@@ -974,7 +981,7 @@ function attachBarButton(btn, opts) {
 
   const api = {
     KEY, LANGS, SECTIONS, STAGES,
-    defaultState, hashPin, ageMonths, stageFor, itemKey,
+    homeSurface, defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
     setLang, setSection, setItem, setBirth, setPin, checkPin,
     exportPayload, importPayload, load, save,
@@ -1307,7 +1314,21 @@ function attachBarButton(btn, opts) {
     `;
   }
 
+  function isStandalone() {
+    return !!(navigator.standalone || matchMedia("(display-mode: standalone)").matches);
+  }
+  function isIosBrowser() {
+    const ua = navigator.userAgent || "";
+    return /iP(hone|ad|od)/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }
+  function surfaceNow() {
+    const st = S.load();
+    const n = S.LANGS.filter((l) => S.isLangOn(st, l)).length;
+    return S.homeSurface(isStandalone(), n, { iosBrowser: isIosBrowser() });
+  }
+
   function openAddLang() {
+    if (surfaceNow() === "install") return;
     const st = S.load();
     const off = S.LANGS.filter((l) => !S.isLangOn(st, l));
     if (!off.length) return;
@@ -1322,7 +1343,15 @@ function attachBarButton(btn, opts) {
 
   function renderHome() {
     const grid = document.getElementById("home-grid");
+    const install = document.getElementById("install-card");
     if (!grid) return;
+    const mode = surfaceNow();
+    if (install) install.hidden = mode !== "install";
+    grid.hidden = mode === "install";
+    if (mode === "install") {
+      grid.innerHTML = "";
+      return;
+    }
     const st = S.load();
     const on = S.LANGS.filter((l) => S.isLangOn(st, l));
     const canAdd = on.length < S.LANGS.length;
@@ -1357,11 +1386,6 @@ function attachBarButton(btn, opts) {
         else if (btn.dataset.href) window.location = btn.dataset.href;
       });
     });
-    const hint = document.getElementById("install-hint");
-    if (hint) {
-      const standalone = !!(navigator.standalone || matchMedia("(display-mode: standalone)").matches);
-      hint.hidden = standalone;
-    }
     applyFaceImages();
   }
 
@@ -1397,6 +1421,7 @@ function attachBarButton(btn, opts) {
   }
 
   function openUnlock() {
+    if (surfaceNow() === "install") return;
     pinBuf = "";
     mode = "gate";
     mount(renderGate());

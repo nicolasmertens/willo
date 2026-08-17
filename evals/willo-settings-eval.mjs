@@ -12,6 +12,12 @@ function ok(name, cond, extra) {
   if (!cond) fails.push(name + (extra ? " " + extra : ""));
 }
 
+ok("ios tab is install", S.homeSurface(false, 0, { iosBrowser: true }) === "install");
+ok("ios tab stays install", S.homeSurface(false, 2, { iosBrowser: true }) === "install");
+ok("pwa empty is plus", S.homeSurface(true, 0, { iosBrowser: true }) === "plus");
+ok("pwa with lang is home", S.homeSurface(true, 1, { iosBrowser: true }) === "home");
+ok("desktop tab empty is plus", S.homeSurface(false, 0, { iosBrowser: false }) === "plus");
+
 const now = Date.parse("2026-08-17T12:00:00");
 ok("age william 22", S.ageMonths("2024-09-24", now) === 22);
 ok("age 0-2 stage", S.stageFor(1).id === "0-2");
@@ -64,7 +70,7 @@ ok("import empty langs stay empty", (() => {
   return r.ok && S.LANGS.every((l) => !r.state.langs[l]);
 })());
 
-console.log("checks: 23  fails: " + fails.length);
+console.log("checks: 28  fails: " + fails.length);
 fails.forEach((f) => console.log("FAIL", f));
 if (fails.length) process.exit(1);
 console.log("PASS willo settings");

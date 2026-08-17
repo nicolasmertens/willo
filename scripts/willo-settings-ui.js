@@ -321,7 +321,21 @@
     `;
   }
 
+  function isStandalone() {
+    return !!(navigator.standalone || matchMedia("(display-mode: standalone)").matches);
+  }
+  function isIosBrowser() {
+    const ua = navigator.userAgent || "";
+    return /iP(hone|ad|od)/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  }
+  function surfaceNow() {
+    const st = S.load();
+    const n = S.LANGS.filter((l) => S.isLangOn(st, l)).length;
+    return S.homeSurface(isStandalone(), n, { iosBrowser: isIosBrowser() });
+  }
+
   function openAddLang() {
+    if (surfaceNow() === "install") return;
     const st = S.load();
     const off = S.LANGS.filter((l) => !S.isLangOn(st, l));
     if (!off.length) return;
@@ -336,7 +350,15 @@
 
   function renderHome() {
     const grid = document.getElementById("home-grid");
+    const install = document.getElementById("install-card");
     if (!grid) return;
+    const mode = surfaceNow();
+    if (install) install.hidden = mode !== "install";
+    grid.hidden = mode === "install";
+    if (mode === "install") {
+      grid.innerHTML = "";
+      return;
+    }
     const st = S.load();
     const on = S.LANGS.filter((l) => S.isLangOn(st, l));
     const canAdd = on.length < S.LANGS.length;
@@ -371,11 +393,6 @@
         else if (btn.dataset.href) window.location = btn.dataset.href;
       });
     });
-    const hint = document.getElementById("install-hint");
-    if (hint) {
-      const standalone = !!(navigator.standalone || matchMedia("(display-mode: standalone)").matches);
-      hint.hidden = standalone;
-    }
     applyFaceImages();
   }
 
@@ -411,6 +428,7 @@
   }
 
   function openUnlock() {
+    if (surfaceNow() === "install") return;
     pinBuf = "";
     mode = "gate";
     mount(renderGate());

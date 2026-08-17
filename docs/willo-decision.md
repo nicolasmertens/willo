@@ -11,7 +11,7 @@ Brand: **Willo**. Icon pixels: William’s face, no word. iOS label: Willo.
 
 Public URL: `https://nicolasmertens.github.io/willo/`. Languages stay `/mama/`, `/papa/`, `/klas/`.
 
-Home starts empty. One plus tile: tap = add mama/papa/klas + photo. Hold 2s on plus or empty space = settings (teaches the parent gesture). iOS cannot save-as-PWA from a button; Safari-only hint: Deel → Zet op beginscherm.
+One first step at a time. iPhone/iPad Safari tab: only “Zet op beginscherm” (no photo yet). After the icon: plus = add mama/papa/klas + photo. Hold 2s = settings. Desktop browser still shows plus so we can test.
 
 Settings live on this device. Long-press 2s + 4-digit PIN. Languages, sections, per-tile toggles, birth date (Lovevery month buckets), face photos, export/import.
 

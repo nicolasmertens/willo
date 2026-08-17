@@ -21,7 +21,10 @@
   .grid.home-empty { grid-template-columns: 1fr; max-width: 280px; }
   @media (max-width: 640px) { .grid { grid-template-columns: 1fr; max-width: 480px; } .grid.home-empty { max-width: 280px; } }
 
-  #install-hint { margin: 0 8px 4px; text-align: center; font-weight: 700; color: rgba(0,0,0,.45); font-size: 15px; max-width: 360px; line-height: 1.35; }
+  #install-card { width: 100%; max-width: 360px; background: #fff; border-radius: 26px; padding: 28px 22px 24px; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); }
+  #install-card h1 { margin: 0 0 10px; font-size: 28px; letter-spacing: -0.02em; }
+  #install-card p { margin: 0 0 16px; font-weight: 600; color: rgba(0,0,0,.55); line-height: 1.35; }
+  #install-card ol { margin: 0; padding-left: 1.2em; font-weight: 800; line-height: 1.6; }
 
   button.tile { display: block; aspect-ratio: 1 / 1; border: 0; border-radius: 26px; overflow: hidden; position: relative; background: #fff; padding: 0; cursor: pointer; font-family: inherit; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
   button.tile:active, button.tile.pressing { transform: translateY(2px) scale(0.98); filter: brightness(1.08); box-shadow: 0 2px 0 rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08); }
@@ -38,7 +41,14 @@
 </style>
 </head>
 <body>
-  <p id="install-hint" hidden>Zet Willo op het beginscherm: deelknop → Zet op beginscherm</p>
+  <section id="install-card" hidden>
+    <h1>Willo</h1>
+    <p>Eerst op het beginscherm. Foto en taal komen daarna.</p>
+    <ol>
+      <li>Tik op de deelknop</li>
+      <li>Zet op beginscherm</li>
+    </ol>
+  </section>
   <main class="grid home-empty" id="home-grid"></main>
 <script>
 if ("serviceWorker" in navigator) {

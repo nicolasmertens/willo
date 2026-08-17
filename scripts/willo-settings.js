@@ -19,6 +19,13 @@
     { id: "31+", from: 31, to: 120 },
   ];
 
+  function homeSurface(standalone, langOnCount, opts) {
+    const iosBrowser = !!(opts && opts.iosBrowser);
+    if (iosBrowser && !standalone) return "install";
+    if (!langOnCount) return "plus";
+    return "home";
+  }
+
   function defaultState() {
     return {
       pinHash: "",
@@ -176,7 +183,7 @@
 
   const api = {
     KEY, LANGS, SECTIONS, STAGES,
-    defaultState, hashPin, ageMonths, stageFor, itemKey,
+    homeSurface, defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
     setLang, setSection, setItem, setBirth, setPin, checkPin,
     exportPayload, importPayload, load, save,
