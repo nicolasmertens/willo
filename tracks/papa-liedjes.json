@@ -13,9 +13,9 @@
       "title": "De wielen van de bus",
       "audio": "liedjes/audio/02.mp3",
       "icon": "liedjes/icons/02.png",
-      "irev": 3,
+      "irev": 4,
       "face": "#e24b3c",
-      "over": ["right", "left"]
+      "over": ["bottom", "right"]
     },
     {
       "n": 3,
@@ -58,9 +58,9 @@
       "title": "Eén kleine vinger",
       "audio": "liedjes/audio/07.mp3",
       "icon": "liedjes/icons/07.png",
-      "irev": 3,
+      "irev": 4,
       "face": "#efc44a",
-      "over": ["right", "top"]
+      "over": ["top"]
     }
   ]
 }

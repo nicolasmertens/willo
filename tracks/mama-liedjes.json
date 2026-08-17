@@ -4,67 +4,98 @@
       "n": 1,
       "title": "Les roues de l'autobus",
       "audio": "liedjes/audio/01.mp3",
-      "icon": "liedjes/icons/01.jpg"
+      "icon": "liedjes/icons/01.png",
+      "irev": 2,
+      "face": "#e24b3c",
+      "over": ["bottom", "right"]
     },
     {
       "n": 2,
       "title": "L'araignée Gypsie",
       "audio": "liedjes/audio/02.mp3",
-      "icon": "liedjes/icons/02.jpg"
+      "icon": "liedjes/icons/02.png",
+      "irev": 2,
+      "face": "#e07a2f",
+      "over": ["left", "right"]
     },
     {
       "n": 3,
       "title": "Il y avait de gros crocodiles",
       "audio": "liedjes/audio/03.mp3",
-      "icon": "liedjes/icons/03.jpg"
+      "icon": "liedjes/icons/03.jpg",
+      "irev": 2,
+      "face": "#e6c31a"
     },
     {
       "n": 4,
       "title": "Une souris verte",
       "audio": "liedjes/audio/04.mp3",
-      "icon": "liedjes/icons/04.jpg"
+      "icon": "liedjes/icons/04.png",
+      "irev": 2,
+      "face": "#1d4ed8",
+      "over": ["left"]
     },
     {
       "n": 5,
       "title": "Les 3 poules",
       "audio": "liedjes/audio/05.mp3",
-      "icon": "liedjes/icons/05.jpg"
+      "icon": "liedjes/icons/05.png",
+      "irev": 2,
+      "face": "#c46a3a",
+      "over": ["bottom"]
     },
     {
       "n": 6,
       "title": "Bateau sur l'eau",
       "audio": "liedjes/audio/06.mp3",
-      "icon": "liedjes/icons/06.jpg"
+      "icon": "liedjes/icons/06.jpg",
+      "irev": 2,
+      "face": "#1aa3e6"
     },
     {
       "n": 7,
       "title": "Au feu les pompiers",
       "audio": "liedjes/audio/07.mp3",
-      "icon": "liedjes/icons/07.jpg"
+      "icon": "liedjes/icons/07.png",
+      "irev": 2,
+      "face": "#e24b3c",
+      "over": ["bottom"]
     },
     {
       "n": 8,
       "title": "La chanson de l'alphabet",
       "audio": "liedjes/audio/08.mp3",
-      "icon": "liedjes/icons/08.jpg"
+      "icon": "liedjes/icons/08.png",
+      "irev": 2,
+      "face": "#2aa8a8",
+      "over": ["left"]
     },
     {
       "n": 9,
       "title": "Bébé Requin",
       "audio": "liedjes/audio/09.mp3",
-      "icon": "liedjes/icons/09.jpg"
+      "icon": "liedjes/icons/09.png",
+      "irev": 2,
+      "face": "#1a6db5",
+      "over": ["top", "left"]
     },
     {
       "n": 10,
       "title": "Un tout petit doigt",
       "audio": "liedjes/audio/10.mp3",
-      "icon": "liedjes/icons/10.jpg"
+      "icon": "liedjes/icons/10.png",
+      "irev": 2,
+      "face": "#efc44a",
+      "over": ["top"]
     },
     {
       "n": 11,
       "title": "Le vieux MacDonald",
       "audio": "liedjes/audio/11.mp3",
-      "icon": "liedjes/icons/11.jpg"
+      "icon": "liedjes/icons/11.png",
+      "irev": 2,
+      "face": "#5eb3e6",
+      "over": ["left"]
     }
   ]
 }
