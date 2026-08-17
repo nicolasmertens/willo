@@ -37,12 +37,21 @@
     return out;
   }
 
+  const LANG_LABEL = { mama: "Mama", papa: "Papa", klas: "Klas" };
+  let sessionOk = false;
+  let pendingAfterPin = "";
+
   async function applyFaceImages() {
     for (const l of S.LANGS) {
       const data = await photoGet(l);
-      if (!data) continue;
-      document.querySelectorAll(`img[src*="home/${l}.jpg"], img[data-face="${l}"]`).forEach((img) => {
-        img.src = data;
+      document.querySelectorAll(`img[data-face="${l}"], img[src*="home/${l}.jpg"]`).forEach((img) => {
+        if (data) {
+          img.src = data;
+          img.classList.remove("missing");
+        } else {
+          img.removeAttribute("src");
+          img.classList.add("missing");
+        }
       });
     }
   }
@@ -78,6 +87,8 @@
     if (el) el.remove();
     pinBuf = "";
     mode = "gate";
+    sessionOk = false;
+    pendingAfterPin = "";
   }
 
   function renderGate() {
@@ -85,7 +96,7 @@
     const first = !st.pinHash;
     return `
       <h2>${first ? "Kies een PIN" : "PIN"}</h2>
-      <p class="willo-hint">${first ? "Vier cijfers. Alleen voor ouders." : "Lang drukken op stop opent dit."}</p>
+      <p class="willo-hint">${first ? "Vier cijfers. Alleen voor ouders." : "Twee seconden indrukken opent dit."}</p>
       <div class="willo-err" id="willo-err"></div>
       <div class="willo-pins" id="willo-dots"><b>${"• ".repeat(pinBuf.length)}${"○ ".repeat(4 - pinBuf.length)}</b></div>
       <div class="willo-pins" style="flex-wrap:wrap;max-width:240px;margin:0 auto;">
@@ -163,8 +174,25 @@
     mask.querySelectorAll("[data-k]").forEach((b) => b.addEventListener("click", () => digit(b.getAttribute("data-k"))));
     mask.querySelectorAll("[data-lang]").forEach((el) => el.addEventListener("change", () => {
       const r = S.setLang(S.load(), el.getAttribute("data-lang"), el.checked);
-      if (!r.ok) { el.checked = true; return; }
+      if (!r.ok) { el.checked = !el.checked; return; }
       S.save(r.state); applyLangs();
+    }));
+    mask.querySelectorAll("[data-add-lang]").forEach((b) => b.addEventListener("click", () => {
+      const lang = b.getAttribute("data-add-lang");
+      const inp = mask.querySelector("#willo-add-photo");
+      if (!inp) return;
+      inp.onchange = async () => {
+        const f = inp.files && inp.files[0];
+        if (!f) return;
+        const url = await fileToData(f);
+        await photoSet(lang, url);
+        const r = S.setLang(S.load(), lang, true);
+        if (r.ok) S.save(r.state);
+        close();
+        applyLangs();
+        await applyFaceImages();
+      };
+      inp.click();
     }));
     mask.querySelectorAll("[data-sec]").forEach((el) => el.addEventListener("change", () => {
       const r = S.setSection(S.load(), el.getAttribute("data-sec"), el.checked);
@@ -234,6 +262,7 @@
     applyLangs();
     applyCatalog();
     await applyFaceImages();
+    renderHome();
     mount(renderSheet());
   }
 
@@ -248,8 +277,8 @@
       const r = S.setPin(st, pinBuf);
       if (r.ok) S.save(r.state);
       pinBuf = "";
-      mode = "sheet";
-      mount(renderSheet());
+      sessionOk = true;
+      afterPin();
       return;
     }
     const chk = S.checkPin(st, pinBuf);
@@ -260,8 +289,94 @@
       if (err) err.textContent = "Fout";
       return;
     }
+    sessionOk = true;
+    afterPin();
+  }
+
+  function afterPin() {
+    if (pendingAfterPin === "add") {
+      pendingAfterPin = "";
+      mode = "add";
+      mount(renderAddLang());
+      return;
+    }
     mode = "sheet";
     mount(renderSheet());
+  }
+
+  function renderAddLang() {
+    const st = S.load();
+    const off = S.LANGS.filter((l) => !S.isLangOn(st, l));
+    if (!off.length) {
+      return `<h2>Talen</h2><p class="willo-hint">Mama, papa en klas staan al aan.</p><div class="willo-actions"><button type="button" data-close>Klaar</button></div>`;
+    }
+    return `
+      <h2>Taal toevoegen</h2>
+      <p class="willo-hint">Kies er een. Daarna een foto van dat gezicht.</p>
+      <div class="willo-actions" style="flex-direction:column">
+        ${off.map((l) => `<button type="button" class="willo-go" data-add-lang="${l}">${LANG_LABEL[l] || l}</button>`).join("")}
+      </div>
+      <input type="file" accept="image/*" id="willo-add-photo" hidden>
+      <div class="willo-actions"><button type="button" data-close>Sluiten</button></div>
+    `;
+  }
+
+  function openAddLang() {
+    const st = S.load();
+    const off = S.LANGS.filter((l) => !S.isLangOn(st, l));
+    if (!off.length) return;
+    if (st.pinHash && !sessionOk) {
+      pendingAfterPin = "add";
+      openUnlock();
+      return;
+    }
+    mode = "add";
+    mount(renderAddLang());
+  }
+
+  function renderHome() {
+    const grid = document.getElementById("home-grid");
+    if (!grid) return;
+    const st = S.load();
+    const on = S.LANGS.filter((l) => S.isLangOn(st, l));
+    const canAdd = on.length < S.LANGS.length;
+    grid.classList.toggle("home-empty", on.length === 0);
+    const tiles = on.map((l) => `
+      <button class="tile" data-href="/willo/${l}/" data-label="${l}" aria-label="${LANG_LABEL[l] || l}">
+        <img data-face="${l}" alt="" class="missing">
+        <div class="text-fallback">${LANG_LABEL[l] || l}</div>
+        <div class="label">${LANG_LABEL[l] || l}</div>
+      </button>`).join("");
+    const plus = canAdd ? `
+      <button class="tile tile-plus" data-label="add" aria-label="Taal toevoegen">
+        <span class="plus" aria-hidden="true">+</span>
+        <div class="label">Taal</div>
+      </button>` : "";
+    grid.innerHTML = tiles + plus;
+    grid.querySelectorAll("button.tile").forEach((btn) => {
+      const add = btn.dataset.label === "add";
+      if (window.WilloHold) {
+        WilloHold.attach(btn, {
+          onTap() {
+            if (add) openAddLang();
+            else if (btn.dataset.href) window.location = btn.dataset.href;
+          },
+          onHold() { openUnlock(); },
+        });
+      }
+      btn.addEventListener("click", (e) => {
+        if ("ontouchstart" in window) return;
+        if (e.detail === 0) return;
+        if (add) openAddLang();
+        else if (btn.dataset.href) window.location = btn.dataset.href;
+      });
+    });
+    const hint = document.getElementById("install-hint");
+    if (hint) {
+      const standalone = !!(navigator.standalone || matchMedia("(display-mode: standalone)").matches);
+      hint.hidden = standalone;
+    }
+    applyFaceImages();
   }
 
   function applyLangs() {
@@ -278,6 +393,7 @@
     if (PAGE && S.LANGS.indexOf(PAGE) !== -1 && !S.isLangOn(st, PAGE)) {
       window.location = "/willo/";
     }
+    renderHome();
   }
 
   function applyCatalog() {
@@ -306,5 +422,5 @@
     applyFaceImages();
   }
 
-  root.WilloUI = { openUnlock, boot, applyFaceImages, applyLangs, applyCatalog };
+  root.WilloUI = { openUnlock, openAddLang, boot, applyFaceImages, applyLangs, applyCatalog, renderHome };
 })(typeof globalThis !== "undefined" ? globalThis : this);

@@ -1,6 +1,6 @@
 /** Willo parent settings. Browser + Node (evals). */
 (function (root) {
-  const KEY = "willo_settings_v1";
+  const KEY = "willo_settings_v2";
   const LANGS = ["mama", "papa", "klas"];
   const SECTIONS = ["boeken", "games", "liedjes", "verhalen"];
   const STAGES = [
@@ -23,7 +23,7 @@
     return {
       pinHash: "",
       birth: "",
-      langs: { mama: true, papa: true, klas: true },
+      langs: { mama: false, papa: false, klas: false },
       sections: { boeken: true, games: true, liedjes: true, verhalen: true },
       items: {},
     };
@@ -90,8 +90,6 @@
     if (LANGS.indexOf(lang) === -1) return { ok: false, reason: "bad-lang" };
     const next = clone(state);
     next.langs[lang] = !!on;
-    const live = LANGS.filter((l) => next.langs[l]);
-    if (!live.length) return { ok: false, reason: "need-one-lang", state: state };
     return { ok: true, state: next };
   }
 
@@ -150,8 +148,6 @@
     LANGS.forEach((l) => { if (s.langs && typeof s.langs[l] === "boolean") base.langs[l] = s.langs[l]; });
     SECTIONS.forEach((sec) => { if (s.sections && typeof s.sections[sec] === "boolean") base.sections[sec] = s.sections[sec]; });
     if (s.items && typeof s.items === "object") base.items = s.items;
-    const live = LANGS.filter((l) => base.langs[l]);
-    if (!live.length) base.langs.papa = true;
     return { ok: true, state: base, photos: data.photos || {} };
   }
 

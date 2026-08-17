@@ -18,37 +18,28 @@
   body { padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: max(16px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; }
 
   .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; max-width: 900px; }
-  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; max-width: 480px; } }
+  .grid.home-empty { grid-template-columns: 1fr; max-width: 280px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; max-width: 480px; } .grid.home-empty { max-width: 280px; } }
+
+  #install-hint { margin: 0 8px 4px; text-align: center; font-weight: 700; color: rgba(0,0,0,.45); font-size: 15px; max-width: 360px; line-height: 1.35; }
 
   button.tile { display: block; aspect-ratio: 1 / 1; border: 0; border-radius: 26px; overflow: hidden; position: relative; background: #fff; padding: 0; cursor: pointer; font-family: inherit; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
   button.tile:active, button.tile.pressing { transform: translateY(2px) scale(0.98); filter: brightness(1.08); box-shadow: 0 2px 0 rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08); }
   button.tile img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
   button.tile .label { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 16px; background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0)); color: #fff; font-weight: 800; font-size: clamp(18px, 2.4vw, 22px); text-shadow: 0 2px 6px rgba(0,0,0,0.5); letter-spacing: -0.01em; pointer-events: none; }
 
-  /* Image fallback when home/{taal}.jpg is missing */
   button.tile .text-fallback { display: none; width: 100%; height: 100%; align-items: center; justify-content: center; font-weight: 900; font-size: clamp(28px, 5vw, 48px); color: #2b2b2b; background: linear-gradient(135deg, #ffd8a8, #ffa94d); }
   button.tile img.missing { display: none; }
   button.tile img.missing + .text-fallback { display: flex; }
+
+  button.tile-plus { display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; border: 4px dashed rgba(0,0,0,.14); box-shadow: none; }
+  button.tile-plus .plus { font-size: 72px; font-weight: 200; line-height: 1; color: #2b2b2b; pointer-events: none; }
+  button.tile-plus .label { position: static; background: none; color: #2b2b2b; text-shadow: none; padding: 8px 0 0; font-size: 18px; }
 </style>
 </head>
 <body>
-  <main class="grid">
-    <button class="tile" data-href="/willo/mama/" data-label="mama" aria-label="Mama">
-      <img src="home/mama.jpg" alt="" onerror="this.classList.add('missing')">
-      <div class="text-fallback">Mama</div>
-      <div class="label">Mama</div>
-    </button>
-    <button class="tile" data-href="/willo/papa/" data-label="papa" aria-label="Papa">
-      <img src="home/papa.jpg" alt="" onerror="this.classList.add('missing')">
-      <div class="text-fallback">Papa</div>
-      <div class="label">Papa</div>
-    </button>
-    <button class="tile" data-href="/willo/klas/" data-label="klas" aria-label="Klas">
-      <img src="home/klas.jpg" alt="" onerror="this.classList.add('missing')">
-      <div class="text-fallback">Klas</div>
-      <div class="label">Klas</div>
-    </button>
-  </main>
+  <p id="install-hint" hidden>Zet Willo op het beginscherm: deelknop → Zet op beginscherm</p>
+  <main class="grid home-empty" id="home-grid"></main>
 <script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -191,8 +182,6 @@ function attachTileHandlers(btn) {
     window.location = href;
   });
 }
-
-document.querySelectorAll("button.tile").forEach(attachTileHandlers);
 
 window.addEventListener("load", () => {
   if (window.WilloHold) {

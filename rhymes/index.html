@@ -45,7 +45,9 @@
     background: #fff; overflow: hidden; cursor: pointer; font-family: inherit;
     position: relative;
   }
+  .bottombar .navtile { background: #ffe0b2; }
   .bottombar .navtile img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+  .bottombar .navtile img.missing { display: none; }
   .bottombar .navtile.active { border-color: #ff7043; box-shadow: 0 0 0 3px rgba(255,112,67,0.25); }
   .bottombar .stopbtn { background: #e53935; border-color: #fff; display: flex; align-items: center; justify-content: center; }
   .bottombar .stopbtn svg { width: 56%; height: 56%; fill: #fff; pointer-events: none; }
@@ -76,9 +78,9 @@
   <div class="player" id="player"><img id="player-img" alt=""></div>
 
   <nav class="bottombar" id="bottombar" aria-label="navigatie">
-    <button class="navtile" id="nav-mama" data-href="/willo/mama/" data-nav="mama" aria-label="mama"><img src="/willo/home/mama.jpg" alt=""></button>
-    <button class="navtile" id="nav-papa" data-href="/willo/papa/" data-nav="papa" aria-label="papa"><img src="/willo/home/papa.jpg" alt=""></button>
-    <button class="navtile" id="nav-klas" data-href="/willo/klas/" data-nav="klas" aria-label="klas"><img src="/willo/home/klas.jpg" alt=""></button>
+    <button class="navtile" id="nav-mama" data-href="/willo/mama/" data-nav="mama" aria-label="mama"><img data-face="mama" alt="" class="missing"></button>
+    <button class="navtile" id="nav-papa" data-href="/willo/papa/" data-nav="papa" aria-label="papa"><img data-face="papa" alt="" class="missing"></button>
+    <button class="navtile" id="nav-klas" data-href="/willo/klas/" data-nav="klas" aria-label="klas"><img data-face="klas" alt="" class="missing"></button>
     <button class="stopbtn" id="stopbtn" aria-label="stop"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
   </nav>
 

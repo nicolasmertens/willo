@@ -19,9 +19,11 @@ ok("age 22-24 stage", S.stageFor(22).id === "22-24");
 ok("age 23-24", S.stageFor(23).id === "22-24");
 
 let st = S.defaultState();
-ok("default all langs", S.LANGS.every((l) => S.isLangOn(st, l)));
-ok("cannot kill last lang", S.setLang(S.setLang(S.setLang(st, "mama", false).state, "klas", false).state, "papa", false).ok === false);
+ok("default no langs", S.LANGS.every((l) => !S.isLangOn(st, l)));
+ok("can add papa", S.setLang(st, "papa", true).ok && S.isLangOn(S.setLang(st, "papa", true).state, "papa"));
+ok("can empty home", S.setLang(S.setLang(st, "papa", true).state, "papa", false).ok);
 
+st = S.setLang(S.setLang(S.defaultState(), "papa", true).state, "klas", true).state;
 st = S.setLang(st, "klas", false).state;
 ok("klas off", !S.isLangOn(st, "klas") && S.isLangOn(st, "papa"));
 
@@ -56,10 +58,10 @@ const back = S.importPayload(JSON.stringify(packed));
 ok("import ok", back.ok && back.state.pinHash === pin.state.pinHash);
 ok("import photo", back.photos.mama === "data:image/png;base64,xx");
 ok("import garbage", S.importPayload("nope").ok === false);
-ok("import empty langs repaired", (() => {
+ok("import empty langs stay empty", (() => {
   const bad = S.exportPayload({ ...S.defaultState(), langs: { mama: false, papa: false, klas: false } });
   const r = S.importPayload(bad);
-  return r.ok && S.LANGS.some((l) => r.state.langs[l]);
+  return r.ok && S.LANGS.every((l) => !r.state.langs[l]);
 })());
 
 console.log("checks: 23  fails: " + fails.length);
