@@ -33,6 +33,46 @@
     return false;
   }
 
+  function installBrowser(ua) {
+    ua = String(ua || "");
+    if (/CriOS|Chrome\//.test(ua) && !/Edg/.test(ua)) return "chrome";
+    if (/FxiOS|Firefox/.test(ua)) return "firefox";
+    if (/EdgiOS|Edg\//.test(ua)) return "edge";
+    return "safari";
+  }
+
+  function installPad(info) {
+    info = info || {};
+    const ua = String(info.ua || "");
+    const w = Number(info.width || 0);
+    const h = Number(info.height || 0);
+    const points = Number(info.maxTouchPoints || 0);
+    if (/iPhone|iPod/.test(ua)) return false;
+    if (/iPad/.test(ua)) return true;
+    if (/Macintosh|MacIntel/.test(ua + " " + String(info.platform || "")) && points > 1) return true;
+    const min = Math.min(w, h);
+    const max = Math.max(w, h);
+    return points > 1 && min >= 600 && max >= 900;
+  }
+
+  function installShareAt(info) {
+    info = info || {};
+    const browser = installBrowser(info.ua);
+    if (!installPad(info) && browser === "safari") return "bottom-center";
+    return "top-right";
+  }
+
+  function installCopy(lang) {
+    const l = String(lang || "en").toLowerCase().slice(0, 2);
+    const table = {
+      nl: { share: "Deel", add: "Zet op beginscherm", menu: "Menu" },
+      fr: { share: "Partager", add: "Sur l'écran d'accueil", menu: "Menu" },
+      de: { share: "Teilen", add: "Zum Home-Bildschirm", menu: "Menü" },
+      en: { share: "Share", add: "Add to Home Screen", menu: "Menu" },
+    };
+    return table[l] || table.en;
+  }
+
   function homeSurface(standalone, langOnCount, opts) {
     const iosBrowser = opts && Object.prototype.hasOwnProperty.call(opts, "iosBrowser")
       ? !!opts.iosBrowser
@@ -199,7 +239,8 @@
 
   const api = {
     KEY, LANGS, SECTIONS, STAGES,
-    homeSurface, isIosBrowser, defaultState, hashPin, ageMonths, stageFor, itemKey,
+    homeSurface, isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
+    defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
     setLang, setSection, setItem, setBirth, setPin, checkPin,
     exportPayload, importPayload, load, save,

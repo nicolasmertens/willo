@@ -338,6 +338,29 @@
     return S.homeSurface(isStandalone(), n, iosProbe());
   }
 
+  const SVG_SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.2 8.5H7A2.5 2.5 0 0 0 4.5 11v8A2.5 2.5 0 0 0 7 21.5h10a2.5 2.5 0 0 0 2.5-2.5v-8A2.5 2.5 0 0 0 17 8.5h-1.2"/><path d="M12 15.5V3.5"/><path d="M8 7l4-4 4 4"/></svg>';
+  const SVG_DOTS = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="6" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18" cy="12" r="1.8"/></svg>';
+  const SVG_ADD = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg>';
+
+  function paintInstall() {
+    const el = document.getElementById("install-card");
+    if (!el) return;
+    const probe = Object.assign(iosProbe(), { width: window.innerWidth, height: window.innerHeight });
+    const at = S.installShareAt(probe);
+    const browser = S.installBrowser(probe.ua);
+    const copy = S.installCopy(navigator.language || document.documentElement.lang || "en");
+    const step1icon = browser === "safari" ? SVG_SHARE : SVG_DOTS;
+    const step1text = browser === "safari" ? copy.share : copy.menu;
+    el.dataset.at = at;
+    el.dataset.browser = browser;
+    el.innerHTML = `
+      <div class="install-aim">${step1icon}</div>
+      <div class="install-row"><span class="install-n">1</span>${step1icon}<span>${step1text}</span></div>
+      <div class="install-row"><span class="install-n">2</span>${SVG_ADD}<span>${copy.add}</span></div>
+    `;
+    document.documentElement.lang = (navigator.language || "en").slice(0, 2);
+  }
+
   function openAddLang() {
     if (surfaceNow() === "install") return;
     const st = S.load();
@@ -361,6 +384,7 @@
     grid.hidden = mode === "install";
     if (mode === "install") {
       grid.innerHTML = "";
+      paintInstall();
       return;
     }
     const st = S.load();
@@ -442,6 +466,9 @@
     applyLangs();
     applyCatalog();
     applyFaceImages();
+    const relayout = () => { if (document.getElementById("install-card") && surfaceNow() === "install") paintInstall(); };
+    window.addEventListener("resize", relayout);
+    window.addEventListener("orientationchange", () => setTimeout(relayout, 250));
   }
 
   root.WilloUI = { openUnlock, openAddLang, boot, applyFaceImages, applyLangs, applyCatalog, renderHome };

@@ -25,6 +25,18 @@ ok("pwa empty is plus", S.homeSurface(true, 0, { ua: ipadDesktop, maxTouchPoints
 ok("pwa with lang is home", S.homeSurface(true, 1, { ua: ipadDesktop, maxTouchPoints: 5 }) === "home");
 ok("desktop tab empty is plus", S.homeSurface(false, 0, { ua: macSafari, maxTouchPoints: 0 }) === "plus");
 
+const iphoneUa = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
+const crios = "Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/129.0.0.0 Mobile/15E148 Safari/604.1";
+ok("iphone safari share bottom", S.installShareAt({ ua: iphoneUa, width: 390, height: 844, maxTouchPoints: 5 }) === "bottom-center");
+ok("ipad safari share top", S.installShareAt({ ua: ipadDesktop, width: 1180, height: 820, maxTouchPoints: 5 }) === "top-right");
+ok("ipad portrait still top", S.installShareAt({ ua: ipadDesktop, width: 820, height: 1180, maxTouchPoints: 5 }) === "top-right");
+ok("chrome ipad share top", S.installShareAt({ ua: crios, width: 1180, height: 820, maxTouchPoints: 5 }) === "top-right");
+ok("browser safari", S.installBrowser(iphoneUa) === "safari");
+ok("browser chrome", S.installBrowser(crios) === "chrome");
+ok("copy nl add", S.installCopy("nl-BE").add === "Zet op beginscherm");
+ok("copy en add", S.installCopy("en-US").add === "Add to Home Screen");
+ok("copy fr add", S.installCopy("fr-FR").add === "Sur l'écran d'accueil");
+
 const now = Date.parse("2026-08-17T12:00:00");
 ok("age william 22", S.ageMonths("2024-09-24", now) === 22);
 ok("age 0-2 stage", S.stageFor(1).id === "0-2");
@@ -77,7 +89,7 @@ ok("import empty langs stay empty", (() => {
   return r.ok && S.LANGS.every((l) => !r.state.langs[l]);
 })());
 
-console.log("checks: 33  fails: " + fails.length);
+console.log("checks: 42  fails: " + fails.length);
 fails.forEach((f) => console.log("FAIL", f));
 if (fails.length) process.exit(1);
 console.log("PASS willo settings");
