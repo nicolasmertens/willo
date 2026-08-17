@@ -6,7 +6,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="__TITLE_FALLBACK__">
+<meta name="apple-mobile-web-app-title" content="Willo">
 <meta name="theme-color" content="#fff7e6">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -202,7 +202,7 @@ if ("serviceWorker" in navigator) {
     location.reload();
   });
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js")
+    navigator.serviceWorker.register("/liedjes/sw.js", { scope: "/liedjes/" })
       .then(reg => {
         schedulePrefetch();
         // Nudge the SW to check for an updated script when the user
@@ -533,12 +533,18 @@ function attachBarButton(btn, opts) {
       const el = document.elementFromPoint(t.clientX, t.clientY);
       const onBtn = el === btn || btn.contains(el);
       let decision;
-      if (c.drifted)              decision = "drifted";
+      if (opts.kind === "stop" && onBtn && !c.drifted && dur >= 1800) decision = "settings";
+      else if (c.drifted)              decision = "drifted";
       else if (!onBtn)            decision = "off_tile";
       else if (dur < MIN_TAP_MS)  decision = "too_short";
       else if (dur > MAX_TAP_MS)  decision = "too_long";
       else                        decision = "fire";
       tel("bar_touchend", { kind: opts.kind, label: opts.label, dur_ms: dur, r_start: Math.round(c.r0), r_end: Math.round(r), on_btn: onBtn, decision });
+      if (decision === "settings") {
+        e.preventDefault();
+        if (window.WilloUI) WilloUI.openUnlock();
+        return;
+      }
       if (decision === "fire") {
         e.preventDefault();
         if (opts.kind === "stop") {
@@ -574,6 +580,8 @@ function attachBarButton(btn, opts) {
 
 // --- Overflow sides (injected from scripts/overflow-assign.js) ---
 /*__OVERFLOW_ASSIGN__*/
+/*__WILLO_SETTINGS__*/
+/*__WILLO_SETTINGS_UI__*/
 
 function liedjesColCount(grid) {
   const tile = 154, gap = 20;
@@ -603,9 +611,17 @@ function refreshLiedjesOverflow() {
 }
 
 // --- Build sections ---
+function visibleTracks() {
+  const all = (typeof ALL_TRACKS !== "undefined") ? ALL_TRACKS : [];
+  if (!window.WilloSettings) return all;
+  const st = WilloSettings.load();
+  const page = document.body.dataset.page;
+  return all.filter(t => WilloSettings.isItemOn(st, t, page));
+}
+
 function build() {
   const bySection = { boeken: [], games: [], liedjes: [], verhalen: [] };
-  ALL_TRACKS.forEach(t => { if (bySection[t._section]) bySection[t._section].push(t); });
+  visibleTracks().forEach(t => { if (bySection[t._section]) bySection[t._section].push(t); });
 
   for (const [section, tracks] of Object.entries(bySection)) {
     const grid = document.querySelector(`[data-grid="${section}"]`);
@@ -643,8 +659,18 @@ const PAGE = document.body.dataset.page;  // "mama" | "papa" | "klas"
   attachBarButton(btn, { kind: "nav", href: btn.dataset.href, label: name, lockable: true });
 });
 attachBarButton(document.getElementById("stopbtn"), { kind: "stop", label: "stop", lockable: false });
+(function () {
+  const stop = document.getElementById("stopbtn");
+  if (!stop) return;
+  let hold = 0;
+  stop.addEventListener("mousedown", () => {
+    hold = setTimeout(() => { if (window.WilloUI) WilloUI.openUnlock(); }, 1800);
+  });
+  ["mouseup", "mouseleave"].forEach((ev) => stop.addEventListener(ev, () => clearTimeout(hold)));
+})();
 
 build();
+if (window.WilloUI) WilloUI.boot();
 refreshLiedjesOverflow();
 requestAnimationFrame(refreshLiedjesOverflow);
 let overResizeT = 0;

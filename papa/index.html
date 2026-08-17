@@ -6,7 +6,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Papa">
+<meta name="apple-mobile-web-app-title" content="Willo">
 <meta name="theme-color" content="#fff7e6">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -202,7 +202,7 @@ if ("serviceWorker" in navigator) {
     location.reload();
   });
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js")
+    navigator.serviceWorker.register("/liedjes/sw.js", { scope: "/liedjes/" })
       .then(reg => {
         schedulePrefetch();
         // Nudge the SW to check for an updated script when the user
@@ -226,11 +226,11 @@ document.addEventListener("touchmove", e => { if (e.touches.length > 1) e.preven
 document.addEventListener("contextmenu", e => e.preventDefault());
 document.addEventListener("dblclick", e => e.preventDefault());
 
-const ALL_TRACKS = [{"n": 1, "title": "Alle Eendjes", "href": "/liedjes/eendjes/", "icon": "/liedjes/eendjes/cover-tile.jpg", "_section": "boeken"}, {"n": 2, "title": "Kleine Huppel", "href": "/liedjes/huppel/", "icon": "/liedjes/huppel/cover-tile.jpg", "_section": "boeken"}, {"n": 1, "title": "Memory", "icon": "/liedjes/klas/games/hero-memory.jpg", "href": "/liedjes/papa/games/memory/", "_section": "games"}, {"n": 2, "title": "Geluiden", "icon": "/liedjes/klas/games/hero-sounds.jpg", "href": "/liedjes/papa/games/soundboard/", "_section": "games"}, {"n": 3, "title": "Welke?", "icon": "/liedjes/klas/games/hero-pick.jpg", "href": "/liedjes/papa/games/pick/", "_section": "games"}, {"n": 1, "title": "En de krokodil", "audio": "liedjes/audio/01.mp3", "icon": "liedjes/icons/01.jpg", "irev": 2, "face": "#7cbf2a", "_section": "liedjes"}, {"n": 2, "title": "De wielen van de bus", "audio": "liedjes/audio/02.mp3", "icon": "liedjes/icons/02.png", "irev": 6, "face": "#f0c01a", "over": ["bottom"], "_section": "liedjes"}, {"n": 3, "title": "Hansje Pansje Kevertje", "audio": "liedjes/audio/03.mp3", "icon": "liedjes/icons/03.png", "irev": 3, "face": "#7cbf2a", "over": ["right", "bottom"], "_section": "liedjes"}, {"n": 4, "title": "Ze kunnen zeggen wat ze willen", "audio": "liedjes/audio/04.mp3", "icon": "liedjes/icons/04.png", "irev": 3, "face": "#f0d48a", "over": ["right", "bottom"], "_section": "liedjes"}, {"n": 5, "title": "Het ABC", "audio": "liedjes/audio/05.mp3", "icon": "liedjes/icons/05.png", "irev": 3, "face": "#2aa8a8", "over": ["left"], "_section": "liedjes"}, {"n": 6, "title": "Babyhaai", "audio": "liedjes/audio/06.mp3", "icon": "liedjes/icons/06.png", "irev": 5, "face": "#1a6db5", "over": ["top", "left"], "_section": "liedjes"}, {"n": 7, "title": "Eén kleine vinger", "audio": "liedjes/audio/07.mp3", "icon": "liedjes/icons/07.png", "rev": 2, "irev": 4, "face": "#efc44a", "over": ["top"], "_section": "liedjes"}];
+const ALL_TRACKS = [{"n": 1, "title": "Alle Eendjes", "href": "/liedjes/eendjes/", "icon": "/liedjes/eendjes/cover-tile.jpg", "fromMonth": 10, "_section": "boeken"}, {"n": 2, "title": "Kleine Huppel", "href": "/liedjes/huppel/", "icon": "/liedjes/huppel/cover-tile.jpg", "fromMonth": 10, "_section": "boeken"}, {"n": 1, "title": "Memory", "icon": "/liedjes/klas/games/hero-memory.jpg", "href": "/liedjes/papa/games/memory/", "fromMonth": 16, "_section": "games"}, {"n": 2, "title": "Geluiden", "icon": "/liedjes/klas/games/hero-sounds.jpg", "href": "/liedjes/papa/games/soundboard/", "fromMonth": 16, "_section": "games"}, {"n": 3, "title": "Welke?", "icon": "/liedjes/klas/games/hero-pick.jpg", "href": "/liedjes/papa/games/pick/", "fromMonth": 16, "_section": "games"}, {"n": 4, "title": "Groot of klein", "icon": "/liedjes/klas/games/_archive/hero-sort.jpg", "href": "/liedjes/klas/games/_archive/sort/", "fromMonth": 30, "_section": "games"}, {"n": 1, "title": "En de krokodil", "audio": "liedjes/audio/01.mp3", "icon": "liedjes/icons/01.jpg", "irev": 2, "face": "#7cbf2a", "fromMonth": 12, "_section": "liedjes"}, {"n": 2, "title": "De wielen van de bus", "audio": "liedjes/audio/02.mp3", "icon": "liedjes/icons/02.png", "irev": 6, "face": "#f0c01a", "over": ["bottom"], "fromMonth": 12, "_section": "liedjes"}, {"n": 3, "title": "Hansje Pansje Kevertje", "audio": "liedjes/audio/03.mp3", "icon": "liedjes/icons/03.png", "irev": 3, "face": "#7cbf2a", "over": ["right", "bottom"], "fromMonth": 12, "_section": "liedjes"}, {"n": 4, "title": "Ze kunnen zeggen wat ze willen", "audio": "liedjes/audio/04.mp3", "icon": "liedjes/icons/04.png", "irev": 3, "face": "#f0d48a", "over": ["right", "bottom"], "fromMonth": 12, "_section": "liedjes"}, {"n": 5, "title": "Het ABC", "audio": "liedjes/audio/05.mp3", "icon": "liedjes/icons/05.png", "irev": 3, "face": "#2aa8a8", "over": ["left"], "fromMonth": 18, "_section": "liedjes"}, {"n": 6, "title": "Babyhaai", "audio": "liedjes/audio/06.mp3", "icon": "liedjes/icons/06.png", "irev": 5, "face": "#1a6db5", "over": ["top", "left"], "fromMonth": 12, "_section": "liedjes"}, {"n": 7, "title": "Eén kleine vinger", "audio": "liedjes/audio/07.mp3", "icon": "liedjes/icons/07.png", "rev": 2, "irev": 4, "face": "#efc44a", "over": ["top"], "fromMonth": 12, "_section": "liedjes"}];
 const SEED_ORDER = ["liedjes:1", "liedjes:2", "liedjes:3", "liedjes:4", "liedjes:5"];
 const PARENT_HREF = "/liedjes/";
 const STORAGE_PREFIX = "papa";
-const APP_VERSION = "papa-0900dc15";
+const APP_VERSION = "papa-89d61ff5";
 
 const audio = new Audio();
 audio.preload = "none";
@@ -533,12 +533,18 @@ function attachBarButton(btn, opts) {
       const el = document.elementFromPoint(t.clientX, t.clientY);
       const onBtn = el === btn || btn.contains(el);
       let decision;
-      if (c.drifted)              decision = "drifted";
+      if (opts.kind === "stop" && onBtn && !c.drifted && dur >= 1800) decision = "settings";
+      else if (c.drifted)              decision = "drifted";
       else if (!onBtn)            decision = "off_tile";
       else if (dur < MIN_TAP_MS)  decision = "too_short";
       else if (dur > MAX_TAP_MS)  decision = "too_long";
       else                        decision = "fire";
       tel("bar_touchend", { kind: opts.kind, label: opts.label, dur_ms: dur, r_start: Math.round(c.r0), r_end: Math.round(r), on_btn: onBtn, decision });
+      if (decision === "settings") {
+        e.preventDefault();
+        if (window.WilloUI) WilloUI.openUnlock();
+        return;
+      }
       if (decision === "fire") {
         e.preventDefault();
         if (opts.kind === "stop") {
@@ -647,6 +653,509 @@ function attachBarButton(btn, opts) {
   }
 })(typeof globalThis !== "undefined" ? globalThis : this);
 
+/** Willo parent settings. Browser + Node (evals). */
+(function (root) {
+  const KEY = "willo_settings_v1";
+  const LANGS = ["mama", "papa", "klas"];
+  const SECTIONS = ["boeken", "games", "liedjes", "verhalen"];
+  const STAGES = [
+    { id: "0-2", from: 0, to: 2 },
+    { id: "3-4", from: 3, to: 4 },
+    { id: "5-6", from: 5, to: 6 },
+    { id: "7-8", from: 7, to: 8 },
+    { id: "9-10", from: 9, to: 10 },
+    { id: "11-12", from: 11, to: 12 },
+    { id: "13-15", from: 13, to: 15 },
+    { id: "16-18", from: 16, to: 18 },
+    { id: "19-21", from: 19, to: 21 },
+    { id: "22-24", from: 22, to: 24 },
+    { id: "25-27", from: 25, to: 27 },
+    { id: "28-30", from: 28, to: 30 },
+    { id: "31+", from: 31, to: 120 },
+  ];
+
+  function defaultState() {
+    return {
+      pinHash: "",
+      birth: "",
+      langs: { mama: true, papa: true, klas: true },
+      sections: { boeken: true, games: true, liedjes: true, verhalen: true },
+      items: {},
+    };
+  }
+
+  function clone(s) {
+    return JSON.parse(JSON.stringify(s));
+  }
+
+  function hashPin(pin) {
+    const s = "willo:" + String(pin);
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) h = ((h << 5) + h) + s.charCodeAt(i);
+    return (h >>> 0).toString(16);
+  }
+
+  function ageMonths(birth, nowMs) {
+    if (!birth || !/^\d{4}-\d{2}-\d{2}$/.test(birth)) return null;
+    const now = nowMs == null ? Date.now() : nowMs;
+    const b = new Date(birth + "T00:00:00");
+    if (isNaN(b.getTime())) return null;
+    const n = new Date(now);
+    let m = (n.getFullYear() - b.getFullYear()) * 12 + (n.getMonth() - b.getMonth());
+    if (n.getDate() < b.getDate()) m -= 1;
+    if (m < 0) return 0;
+    return m;
+  }
+
+  function stageFor(months) {
+    if (months == null) return null;
+    for (let i = 0; i < STAGES.length; i++) {
+      if (months >= STAGES[i].from && months <= STAGES[i].to) return STAGES[i];
+    }
+    return STAGES[STAGES.length - 1];
+  }
+
+  function itemKey(taal, section, n) {
+    return taal + ":" + section + ":" + n;
+  }
+
+  function isLangOn(state, lang) {
+    return !!(state && state.langs && state.langs[lang]);
+  }
+
+  function isSectionOn(state, section) {
+    return !!(state && state.sections && state.sections[section]);
+  }
+
+  function isItemOn(state, track, taal) {
+    if (!track) return false;
+    const section = track._section;
+    if (section && !isSectionOn(state, section)) return false;
+    const k = itemKey(taal, section, track.n);
+    if (state.items && Object.prototype.hasOwnProperty.call(state.items, k)) {
+      return !!state.items[k];
+    }
+    const months = ageMonths(state.birth);
+    const from = track.fromMonth == null ? 0 : Number(track.fromMonth);
+    if (months == null) return from < 30;
+    return from <= months;
+  }
+
+  function setLang(state, lang, on) {
+    if (LANGS.indexOf(lang) === -1) return { ok: false, reason: "bad-lang" };
+    const next = clone(state);
+    next.langs[lang] = !!on;
+    const live = LANGS.filter((l) => next.langs[l]);
+    if (!live.length) return { ok: false, reason: "need-one-lang", state: state };
+    return { ok: true, state: next };
+  }
+
+  function setSection(state, section, on) {
+    if (SECTIONS.indexOf(section) === -1) return { ok: false, reason: "bad-section" };
+    const next = clone(state);
+    next.sections[section] = !!on;
+    return { ok: true, state: next };
+  }
+
+  function setItem(state, taal, section, n, on) {
+    const next = clone(state);
+    next.items[itemKey(taal, section, n)] = !!on;
+    return { ok: true, state: next };
+  }
+
+  function setBirth(state, birth) {
+    if (birth && !/^\d{4}-\d{2}-\d{2}$/.test(birth)) return { ok: false, reason: "bad-birth" };
+    const next = clone(state);
+    next.birth = birth || "";
+    return { ok: true, state: next };
+  }
+
+  function setPin(state, pin) {
+    if (!/^\d{4}$/.test(String(pin))) return { ok: false, reason: "bad-pin" };
+    const next = clone(state);
+    next.pinHash = hashPin(pin);
+    return { ok: true, state: next };
+  }
+
+  function checkPin(state, pin) {
+    if (!state.pinHash) return { ok: false, reason: "no-pin" };
+    if (state.pinHash !== hashPin(pin)) return { ok: false, reason: "wrong-pin" };
+    return { ok: true };
+  }
+
+  function exportPayload(state, photos) {
+    return {
+      v: 1,
+      app: "willo",
+      state: clone(state),
+      photos: photos || {},
+    };
+  }
+
+  function importPayload(raw) {
+    let data = raw;
+    if (typeof raw === "string") {
+      try { data = JSON.parse(raw); } catch (e) { return { ok: false, reason: "bad-json" }; }
+    }
+    if (!data || data.app !== "willo" || !data.state) return { ok: false, reason: "bad-file" };
+    const base = defaultState();
+    const s = data.state;
+    if (s.pinHash) base.pinHash = String(s.pinHash);
+    if (s.birth) base.birth = String(s.birth);
+    LANGS.forEach((l) => { if (s.langs && typeof s.langs[l] === "boolean") base.langs[l] = s.langs[l]; });
+    SECTIONS.forEach((sec) => { if (s.sections && typeof s.sections[sec] === "boolean") base.sections[sec] = s.sections[sec]; });
+    if (s.items && typeof s.items === "object") base.items = s.items;
+    const live = LANGS.filter((l) => base.langs[l]);
+    if (!live.length) base.langs.papa = true;
+    return { ok: true, state: base, photos: data.photos || {} };
+  }
+
+  function load() {
+    try {
+      const raw = root.localStorage && root.localStorage.getItem(KEY);
+      if (!raw) return defaultState();
+      const parsed = JSON.parse(raw);
+      const merged = defaultState();
+      return Object.assign(merged, parsed, {
+        langs: Object.assign(defaultState().langs, parsed.langs || {}),
+        sections: Object.assign(defaultState().sections, parsed.sections || {}),
+        items: parsed.items || {},
+      });
+    } catch (e) {
+      return defaultState();
+    }
+  }
+
+  function save(state) {
+    try {
+      if (root.localStorage) root.localStorage.setItem(KEY, JSON.stringify(state));
+    } catch (e) {}
+    return state;
+  }
+
+  const api = {
+    KEY, LANGS, SECTIONS, STAGES,
+    defaultState, hashPin, ageMonths, stageFor, itemKey,
+    isLangOn, isSectionOn, isItemOn,
+    setLang, setSection, setItem, setBirth, setPin, checkPin,
+    exportPayload, importPayload, load, save,
+  };
+
+  root.WilloSettings = api;
+  if (typeof module !== "undefined" && module.exports) module.exports = api;
+})(typeof globalThis !== "undefined" ? globalThis : this);
+
+/** Parent sheet for Willo. Requires WilloSettings. */
+(function (root) {
+  const S = root.WilloSettings;
+  if (!S) return;
+  const DB = "willo-photos";
+  const STORE = "faces";
+
+  function idb() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open(DB, 1);
+      r.onupgradeneeded = () => r.result.createObjectStore(STORE);
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  }
+  async function photoGet(lang) {
+    try {
+      const db = await idb();
+      return await new Promise((res, rej) => {
+        const q = db.transaction(STORE).objectStore(STORE).get(lang);
+        q.onsuccess = () => res(q.result || "");
+        q.onerror = () => rej(q.error);
+      });
+    } catch (e) { return ""; }
+  }
+  async function photoSet(lang, dataUrl) {
+    const db = await idb();
+    return new Promise((res, rej) => {
+      const q = db.transaction(STORE, "readwrite").objectStore(STORE).put(dataUrl, lang);
+      q.onsuccess = () => res();
+      q.onerror = () => rej(q.error);
+    });
+  }
+  async function allPhotos() {
+    const out = {};
+    for (const l of S.LANGS) out[l] = await photoGet(l);
+    return out;
+  }
+
+  async function applyFaceImages() {
+    for (const l of S.LANGS) {
+      const data = await photoGet(l);
+      if (!data) continue;
+      document.querySelectorAll(`img[src*="home/${l}.jpg"], img[data-face="${l}"]`).forEach((img) => {
+        img.src = data;
+      });
+    }
+  }
+
+  function css() {
+    return `
+    .willo-mask{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;}
+    .willo-sheet{background:#fff7e6;width:100%;max-width:560px;max-height:92dvh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 16px 28px;font-family:inherit;color:#2b2b2b;}
+    .willo-sheet h3{margin:16px 0 8px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,0,0,.45);}
+    .willo-sheet h2{margin:0 0 8px;font-size:22px;}
+    .willo-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.06);}
+    .willo-row label{font-weight:700;}
+    .willo-row small{display:block;font-weight:500;color:rgba(0,0,0,.45);}
+    .willo-sheet input[type=date]{font:inherit;padding:8px;border-radius:10px;border:1px solid #ddd;}
+    .willo-pins{display:flex;gap:8px;justify-content:center;margin:12px 0;}
+    .willo-pins button{width:64px;height:48px;border-radius:12px;border:0;background:#fff;font-weight:800;font-size:18px;box-shadow:0 3px 0 rgba(0,0,0,.1);}
+    .willo-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+    .willo-actions button,.willo-sheet .willo-go{border:0;border-radius:14px;padding:12px 14px;font-weight:800;background:#fff;box-shadow:0 3px 0 rgba(0,0,0,.1);}
+    .willo-err{color:#c0392b;font-weight:700;min-height:1.2em;text-align:center;}
+    .willo-hint{font-size:14px;color:rgba(0,0,0,.5);margin:8px 0;}
+    `;
+  }
+
+  function toggle(on) {
+    return `<input type="checkbox" ${on ? "checked" : ""}>`;
+  }
+
+  let pinBuf = "";
+  let mode = "gate";
+
+  function close() {
+    const el = document.getElementById("willo-mask");
+    if (el) el.remove();
+    pinBuf = "";
+    mode = "gate";
+  }
+
+  function renderGate() {
+    const st = S.load();
+    const first = !st.pinHash;
+    return `
+      <h2>${first ? "Kies een PIN" : "PIN"}</h2>
+      <p class="willo-hint">${first ? "Vier cijfers. Alleen voor ouders." : "Lang drukken op stop opent dit."}</p>
+      <div class="willo-err" id="willo-err"></div>
+      <div class="willo-pins" id="willo-dots"><b>${"• ".repeat(pinBuf.length)}${"○ ".repeat(4 - pinBuf.length)}</b></div>
+      <div class="willo-pins" style="flex-wrap:wrap;max-width:240px;margin:0 auto;">
+        ${[1,2,3,4,5,6,7,8,9,"",0,"⌫"].map((n) =>
+          n === "" ? "<span style='width:64px'></span>" :
+          `<button type="button" data-k="${n}">${n}</button>`
+        ).join("")}
+      </div>
+      <div class="willo-actions"><button type="button" data-close>Sluiten</button></div>
+    `;
+  }
+
+  function renderSheet() {
+    const st = S.load();
+    const months = S.ageMonths(st.birth);
+    const stage = S.stageFor(months);
+    const standalone = !!(navigator.standalone || matchMedia("(display-mode: standalone)").matches);
+    const PAGE = (document.body.dataset && document.body.dataset.page) || "";
+    const tracks = (root.ALL_TRACKS || []).filter((t) => t._section);
+    const groups = { boeken: [], games: [], liedjes: [], verhalen: [] };
+    tracks.forEach((t) => { if (groups[t._section]) groups[t._section].push(t); });
+    Object.keys(groups).forEach((g) => {
+      groups[g].sort((a, b) => (a.fromMonth || 0) - (b.fromMonth || 0) || a.n - b.n);
+    });
+    const labels = { boeken: "Boeken", games: "Spelen", liedjes: "Liedjes", verhalen: "Verhalen" };
+    return `
+      <h2>Willo</h2>
+      <p class="willo-hint">${standalone ? "Op het beginscherm." : "Zet op beginscherm via Delen in Safari."}</p>
+      <h3>Kind</h3>
+      <div class="willo-row"><label>Geboorte</label><input type="date" id="willo-birth" value="${st.birth || ""}"></div>
+      <div class="willo-hint">${months == null ? "Nog geen leeftijd." : months + " maanden · emmer " + (stage ? stage.id : "?")}</div>
+      <h3>Talen</h3>
+      ${S.LANGS.map((l) => `<div class="willo-row"><label>${l}</label>${toggle(S.isLangOn(st, l)).replace(">", ` data-lang="${l}">`)}</div>`).join("")}
+      <h3>Secties</h3>
+      ${S.SECTIONS.map((sec) => `<div class="willo-row"><label>${labels[sec] || sec}</label>${toggle(S.isSectionOn(st, sec)).replace(">", ` data-sec="${sec}">`)}</div>`).join("")}
+      ${PAGE && tracks.length ? `<h3>Tegels (${PAGE})</h3>` + S.SECTIONS.map((sec) => {
+        if (!groups[sec].length) return "";
+        return `<h3 style="margin-top:8px">${labels[sec]}</h3>` + groups[sec].map((t) => {
+          const on = S.isItemOn(st, t, PAGE);
+          return `<div class="willo-row"><label>${t.title}<small>vanaf ${t.fromMonth || 0} m</small></label>${toggle(on).replace(">", ` data-item="${PAGE}:${sec}:${t.n}">`)}</div>`;
+        }).join("");
+      }).join("") : ""}
+      <h3>Foto’s</h3>
+      ${S.LANGS.map((l) => `<div class="willo-row"><label>${l}</label><input type="file" accept="image/*" data-photo="${l}"></div>`).join("")}
+      <div class="willo-actions">
+        <button type="button" data-export>Exporteer</button>
+        <button type="button" data-import>Importeer</button>
+        <input type="file" accept="application/json,.json" id="willo-import" hidden>
+        <button type="button" data-close>Klaar</button>
+      </div>
+    `;
+  }
+
+  function mount(html) {
+    let mask = document.getElementById("willo-mask");
+    if (!mask) {
+      if (!document.getElementById("willo-css")) {
+        const s = document.createElement("style");
+        s.id = "willo-css";
+        s.textContent = css();
+        document.head.appendChild(s);
+      }
+      mask = document.createElement("div");
+      mask.id = "willo-mask";
+      mask.className = "willo-mask";
+      document.body.appendChild(mask);
+    }
+    mask.innerHTML = `<div class="willo-sheet">${html}</div>`;
+    bind(mask);
+  }
+
+  function bind(mask) {
+    mask.addEventListener("click", (e) => { if (e.target === mask) close(); });
+    mask.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", close));
+    mask.querySelectorAll("[data-k]").forEach((b) => b.addEventListener("click", () => digit(b.getAttribute("data-k"))));
+    mask.querySelectorAll("[data-lang]").forEach((el) => el.addEventListener("change", () => {
+      const r = S.setLang(S.load(), el.getAttribute("data-lang"), el.checked);
+      if (!r.ok) { el.checked = true; return; }
+      S.save(r.state); applyLangs();
+    }));
+    mask.querySelectorAll("[data-sec]").forEach((el) => el.addEventListener("change", () => {
+      const r = S.setSection(S.load(), el.getAttribute("data-sec"), el.checked);
+      S.save(r.state); applyCatalog();
+    }));
+    mask.querySelectorAll("[data-item]").forEach((el) => el.addEventListener("change", () => {
+      const [taal, sec, n] = el.getAttribute("data-item").split(":");
+      const r = S.setItem(S.load(), taal, sec, Number(n), el.checked);
+      S.save(r.state); applyCatalog();
+    }));
+    const birth = mask.querySelector("#willo-birth");
+    if (birth) birth.addEventListener("change", () => {
+      const r = S.setBirth(S.load(), birth.value);
+      if (r.ok) { S.save(r.state); mount(renderSheet()); applyCatalog(); }
+    });
+    mask.querySelectorAll("[data-photo]").forEach((el) => el.addEventListener("change", async () => {
+      const f = el.files && el.files[0];
+      if (!f) return;
+      const url = await fileToData(f);
+      await photoSet(el.getAttribute("data-photo"), url);
+      await applyFaceImages();
+    }));
+    const exp = mask.querySelector("[data-export]");
+    if (exp) exp.addEventListener("click", doExport);
+    const imp = mask.querySelector("[data-import]");
+    const file = mask.querySelector("#willo-import");
+    if (imp && file) {
+      imp.addEventListener("click", () => file.click());
+      file.addEventListener("change", () => { if (file.files[0]) doImport(file.files[0]); });
+    }
+  }
+
+  function fileToData(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  }
+
+  async function doExport() {
+    const photos = await allPhotos();
+    const payload = S.exportPayload(S.load(), photos);
+    const blob = new Blob([JSON.stringify(payload)], { type: "application/json" });
+    const file = new File([blob], "willo-settings.json", { type: "application/json" });
+    try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: "Willo" });
+        return;
+      }
+    } catch (e) {}
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "willo-settings.json";
+    a.click();
+  }
+
+  async function doImport(file) {
+    const text = await file.text();
+    const r = S.importPayload(text);
+    if (!r.ok) return;
+    S.save(r.state);
+    for (const l of S.LANGS) {
+      if (r.photos && r.photos[l]) await photoSet(l, r.photos[l]);
+    }
+    applyLangs();
+    applyCatalog();
+    await applyFaceImages();
+    mount(renderSheet());
+  }
+
+  function digit(k) {
+    if (k === "⌫") { pinBuf = pinBuf.slice(0, -1); mount(renderGate()); return; }
+    if (!/^\d$/.test(k) || pinBuf.length >= 4) return;
+    pinBuf += k;
+    mount(renderGate());
+    if (pinBuf.length < 4) return;
+    const st = S.load();
+    if (!st.pinHash) {
+      const r = S.setPin(st, pinBuf);
+      if (r.ok) S.save(r.state);
+      pinBuf = "";
+      mode = "sheet";
+      mount(renderSheet());
+      return;
+    }
+    const chk = S.checkPin(st, pinBuf);
+    pinBuf = "";
+    if (!chk.ok) {
+      mount(renderGate());
+      const err = document.getElementById("willo-err");
+      if (err) err.textContent = "Fout";
+      return;
+    }
+    mode = "sheet";
+    mount(renderSheet());
+  }
+
+  function applyLangs() {
+    const st = S.load();
+    S.LANGS.forEach((l) => {
+      const on = S.isLangOn(st, l);
+      document.querySelectorAll(`button.tile[data-label="${l}"]`).forEach((b) => {
+        b.style.display = on ? "" : "none";
+      });
+      const nav = document.getElementById("nav-" + l);
+      if (nav) nav.style.display = on ? "" : "none";
+    });
+    const PAGE = document.body.dataset && document.body.dataset.page;
+    if (PAGE && S.LANGS.indexOf(PAGE) !== -1 && !S.isLangOn(st, PAGE)) {
+      window.location = "/liedjes/";
+    }
+  }
+
+  function applyCatalog() {
+    if (typeof build !== "function") return;
+    document.querySelectorAll("[data-grid]").forEach((g) => { g.innerHTML = ""; });
+    document.querySelectorAll("section.taal-section").forEach((s) => s.classList.remove("empty"));
+    document.body.classList.remove("has-games");
+    build();
+    if (typeof refreshLiedjesOverflow === "function") refreshLiedjesOverflow();
+    const st = S.load();
+    S.SECTIONS.forEach((sec) => {
+      const el = document.querySelector(`section[data-section="${sec}"]`);
+      if (el && !S.isSectionOn(st, sec)) el.classList.add("empty");
+    });
+  }
+
+  function openUnlock() {
+    pinBuf = "";
+    mode = "gate";
+    mount(renderGate());
+  }
+
+  function boot() {
+    applyLangs();
+    applyCatalog();
+    applyFaceImages();
+  }
+
+  root.WilloUI = { openUnlock, boot, applyFaceImages, applyLangs, applyCatalog };
+})(typeof globalThis !== "undefined" ? globalThis : this);
+
 
 function liedjesColCount(grid) {
   const tile = 154, gap = 20;
@@ -676,9 +1185,17 @@ function refreshLiedjesOverflow() {
 }
 
 // --- Build sections ---
+function visibleTracks() {
+  const all = (typeof ALL_TRACKS !== "undefined") ? ALL_TRACKS : [];
+  if (!window.WilloSettings) return all;
+  const st = WilloSettings.load();
+  const page = document.body.dataset.page;
+  return all.filter(t => WilloSettings.isItemOn(st, t, page));
+}
+
 function build() {
   const bySection = { boeken: [], games: [], liedjes: [], verhalen: [] };
-  ALL_TRACKS.forEach(t => { if (bySection[t._section]) bySection[t._section].push(t); });
+  visibleTracks().forEach(t => { if (bySection[t._section]) bySection[t._section].push(t); });
 
   for (const [section, tracks] of Object.entries(bySection)) {
     const grid = document.querySelector(`[data-grid="${section}"]`);
@@ -716,8 +1233,18 @@ const PAGE = document.body.dataset.page;  // "mama" | "papa" | "klas"
   attachBarButton(btn, { kind: "nav", href: btn.dataset.href, label: name, lockable: true });
 });
 attachBarButton(document.getElementById("stopbtn"), { kind: "stop", label: "stop", lockable: false });
+(function () {
+  const stop = document.getElementById("stopbtn");
+  if (!stop) return;
+  let hold = 0;
+  stop.addEventListener("mousedown", () => {
+    hold = setTimeout(() => { if (window.WilloUI) WilloUI.openUnlock(); }, 1800);
+  });
+  ["mouseup", "mouseleave"].forEach((ev) => stop.addEventListener(ev, () => clearTimeout(hold)));
+})();
 
 build();
+if (window.WilloUI) WilloUI.boot();
 refreshLiedjesOverflow();
 requestAnimationFrame(refreshLiedjesOverflow);
 let overResizeT = 0;

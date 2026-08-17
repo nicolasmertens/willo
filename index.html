@@ -6,12 +6,12 @@
 <meta name="theme-color" content="#fff7e6">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="William">
+<meta name="apple-mobile-web-app-title" content="Willo">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<title>William</title>
+<title>Willo</title>
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
   html, body { margin: 0; padding: 0; background: #fff7e6; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Avenir Next", system-ui, sans-serif; min-height: 100vh; min-height: 100dvh; overscroll-behavior: none; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
@@ -50,15 +50,10 @@
     </button>
   </main>
 <script>
-// Unregister any service worker still registered at the root scope.
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.getRegistrations().then(regs => {
-    regs.forEach(r => {
-      if (r.scope.endsWith("/liedjes/") || r.scope.endsWith("nicolasmertens.github.io/")) {
-        r.unregister().catch(() => {});
-      }
-    });
-  }).catch(() => {});
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(() => {});
+  });
 }
 
 // --- Toddler-proofing: kill all browser gestures (mirrors templates/taal.html) ---
@@ -198,6 +193,18 @@ function attachTileHandlers(btn) {
 }
 
 document.querySelectorAll("button.tile").forEach(attachTileHandlers);
+
+let homeHold = null;
+document.addEventListener("touchstart", e => {
+  if (e.target.closest("button.tile")) return;
+  if (e.touches.length !== 1) return;
+  homeHold = setTimeout(() => { homeHold = null; if (window.WilloUI) WilloUI.openUnlock(); }, 1800);
+}, { passive: true });
+document.addEventListener("touchend", () => { if (homeHold) { clearTimeout(homeHold); homeHold = null; } }, { passive: true });
+document.addEventListener("touchmove", () => { if (homeHold) { clearTimeout(homeHold); homeHold = null; } }, { passive: true });
+window.addEventListener("load", () => { if (window.WilloUI) WilloUI.boot(); });
 </script>
+<script src="scripts/willo-settings.js"></script>
+<script src="scripts/willo-settings-ui.js"></script>
 </body>
 </html>

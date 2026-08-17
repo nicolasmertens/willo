@@ -49,7 +49,7 @@ TALEN = {
         "parent_href": "/liedjes/",
         "title_fallback": "Mama",
         "storage_prefix": "mama",
-        "manifest_name": "Mama",
+        "manifest_name": "Willo",
         "sections": ["boeken", "games", "liedjes", "verhalen"],
     },
     "papa": {
@@ -59,7 +59,7 @@ TALEN = {
         "parent_href": "/liedjes/",
         "title_fallback": "Papa",
         "storage_prefix": "papa",
-        "manifest_name": "Papa",
+        "manifest_name": "Willo",
         "sections": ["boeken", "games", "liedjes", "verhalen"],
     },
     "klas": {
@@ -69,7 +69,7 @@ TALEN = {
         "parent_href": "/liedjes/",
         "title_fallback": "Klas",
         "storage_prefix": "klas",
-        "manifest_name": "Klas",
+        "manifest_name": "Willo",
         "sections": ["boeken", "games", "liedjes", "verhalen"],
     },
 }
@@ -159,7 +159,9 @@ def render_taal(name, config):
     # change automatically invalidates PWA caches on next page load.
     sw_template = (ROOT / "templates/service-worker.js").read_text()
     overflow_js = (ROOT / "scripts/overflow-assign.js").read_text()
-    ver = content_hash(all_tracks, template, sw_template, overflow_js, config["lang"], labels)
+    willo_js = (ROOT / "scripts/willo-settings.js").read_text()
+    willo_ui = (ROOT / "scripts/willo-settings-ui.js").read_text()
+    ver = content_hash(all_tracks, template, sw_template, overflow_js, willo_js, willo_ui, config["lang"], labels)
     app_version = f"{name}-{ver}"
     cache_name = f"{name}-{ver}"
     mp3_cache_name = f"{name}-mp3-{ver}"
@@ -178,6 +180,8 @@ def render_taal(name, config):
         .replace("__ALL_TRACKS_JSON__", json.dumps(all_tracks, ensure_ascii=False))
         .replace("__SEED_ORDER__",      json.dumps(audio_keys))
         .replace("/*__OVERFLOW_ASSIGN__*/", overflow_js)
+        .replace("/*__WILLO_SETTINGS__*/", willo_js)
+        .replace("/*__WILLO_SETTINGS_UI__*/", willo_ui)
     )
     (out_dir / "index.html").write_text(html, encoding="utf-8")
 
@@ -196,15 +200,16 @@ def render_taal(name, config):
 
     # manifest.json
     manifest = {
-        "name": config["manifest_name"],
-        "short_name": config["manifest_name"],
-        "start_url": "./",
+        "name": "Willo",
+        "short_name": "Willo",
+        "start_url": "/liedjes/",
+        "scope": "/liedjes/",
         "display": "standalone",
         "background_color": "#fff7e6",
         "theme_color": "#fff7e6",
         "icons": [
-            {"src": "icon-192.png", "sizes": "192x192", "type": "image/png"},
-            {"src": "icon-512.png", "sizes": "512x512", "type": "image/png"},
+            {"src": "/liedjes/icon-192.png", "sizes": "192x192", "type": "image/png"},
+            {"src": "/liedjes/icon-512.png", "sizes": "512x512", "type": "image/png"},
         ],
     }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")

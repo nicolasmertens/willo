@@ -6,19 +6,29 @@
       "n": 1,
       "title": "Memory",
       "icon": "/liedjes/klas/games/hero-memory.jpg",
-      "href": "/liedjes/papa/games/memory/"
+      "href": "/liedjes/papa/games/memory/",
+      "fromMonth": 16
     },
     {
       "n": 2,
       "title": "Geluiden",
       "icon": "/liedjes/klas/games/hero-sounds.jpg",
-      "href": "/liedjes/papa/games/soundboard/"
+      "href": "/liedjes/papa/games/soundboard/",
+      "fromMonth": 16
     },
     {
       "n": 3,
       "title": "Welke?",
       "icon": "/liedjes/klas/games/hero-pick.jpg",
-      "href": "/liedjes/papa/games/pick/"
+      "href": "/liedjes/papa/games/pick/",
+      "fromMonth": 16
+    },
+    {
+      "n": 4,
+      "title": "Groot of klein",
+      "icon": "/liedjes/klas/games/_archive/hero-sort.jpg",
+      "href": "/liedjes/klas/games/_archive/sort/",
+      "fromMonth": 30
     }
   ]
 }

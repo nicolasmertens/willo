@@ -1,7 +1,8 @@
 {
-  "name": "William",
-  "short_name": "William",
+  "name": "Willo",
+  "short_name": "Willo",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#fff7e6",
   "theme_color": "#fff7e6",

@@ -21,71 +21,82 @@
       "title": "Vroom Vroom",
       "audio": "liedjes/audio/01.mp3",
       "icon": "liedjes/icons/01.jpg",
-      "rev": 3
+      "rev": 3,
+      "fromMonth": 12
     },
     {
       "n": 2,
       "title": "I Love My Garbage Truck",
       "audio": "liedjes/audio/02.mp3",
-      "icon": "liedjes/icons/02.jpg"
+      "icon": "liedjes/icons/02.jpg",
+      "fromMonth": 12
     },
     {
       "n": 3,
       "title": "Driving In My Car",
       "audio": "liedjes/audio/03.mp3",
-      "icon": "liedjes/icons/03.jpg"
+      "icon": "liedjes/icons/03.jpg",
+      "fromMonth": 12
     },
     {
       "n": 4,
       "title": "Here Comes The Firetruck",
       "audio": "liedjes/audio/04.mp3",
-      "icon": "liedjes/icons/04.jpg"
+      "icon": "liedjes/icons/04.jpg",
+      "fromMonth": 12
     },
     {
       "n": 5,
       "title": "Baby Shark",
       "audio": "liedjes/audio/05.mp3",
-      "icon": "liedjes/icons/05.jpg"
+      "icon": "liedjes/icons/05.jpg",
+      "fromMonth": 12
     },
     {
       "n": 6,
       "title": "One Little Finger",
       "audio": "liedjes/audio/06.mp3",
-      "icon": "liedjes/icons/06.jpg"
+      "icon": "liedjes/icons/06.jpg",
+      "fromMonth": 12
     },
     {
       "n": 7,
       "title": "The Wheels On The Bus",
       "audio": "liedjes/audio/07.mp3",
       "icon": "liedjes/icons/07.jpg",
-      "rev": 2
+      "rev": 2,
+      "fromMonth": 12
     },
     {
       "n": 8,
       "title": "The Alphabet Song",
       "audio": "liedjes/audio/08.mp3",
-      "icon": "liedjes/icons/08.jpg"
+      "icon": "liedjes/icons/08.jpg",
+      "fromMonth": 18
     },
     {
       "n": 9,
       "title": "Old MacDonald Had a Farm",
       "audio": "liedjes/audio/09.mp3",
       "icon": "liedjes/icons/09.jpg",
-      "rev": 3
+      "rev": 3,
+      "fromMonth": 12
     },
     {
       "n": 10,
       "title": "Slippery Fish",
       "audio": "liedjes/audio/10.mp3",
       "icon": "liedjes/icons/10.jpg",
-      "rev": 2
+      "rev": 2,
+      "fromMonth": 12
     },
     {
       "n": 11,
       "title": "Old MacDonald",
       "audio": "liedjes/audio/11.mp3",
       "icon": "liedjes/icons/11.jpg",
-      "rev": 2
+      "rev": 2,
+      "fromMonth": 12
     }
   ]
 }

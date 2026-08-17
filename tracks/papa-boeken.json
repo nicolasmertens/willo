@@ -4,13 +4,15 @@
       "n": 1,
       "title": "Alle Eendjes",
       "href": "/liedjes/eendjes/",
-      "icon": "/liedjes/eendjes/cover-tile.jpg"
+      "icon": "/liedjes/eendjes/cover-tile.jpg",
+      "fromMonth": 10
     },
     {
       "n": 2,
       "title": "Kleine Huppel",
       "href": "/liedjes/huppel/",
-      "icon": "/liedjes/huppel/cover-tile.jpg"
+      "icon": "/liedjes/huppel/cover-tile.jpg",
+      "fromMonth": 10
     }
   ]
 }

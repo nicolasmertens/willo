@@ -22,9 +22,14 @@ self.addEventListener("install", e => {
 
 self.addEventListener("activate", e => {
   e.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CORE_CACHE && k !== MP3_CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+    caches.keys().then(keys => {
+      const prefix = CORE_CACHE.replace(/-[0-9a-f]{8}$/i, "");
+      return Promise.all(
+        keys
+          .filter(k => k.startsWith(prefix) && k !== CORE_CACHE && k !== MP3_CACHE)
+          .map(k => caches.delete(k))
+      );
+    }).then(() => self.clients.claim())
   );
 });
 

@@ -7,7 +7,10 @@
       "icon": "liedjes/icons/01.png",
       "irev": 4,
       "face": "#f0c01a",
-      "over": ["bottom"]
+      "over": [
+        "bottom"
+      ],
+      "fromMonth": 12
     },
     {
       "n": 2,
@@ -16,7 +19,11 @@
       "icon": "liedjes/icons/02.png",
       "irev": 2,
       "face": "#e07a2f",
-      "over": ["left", "right"]
+      "over": [
+        "left",
+        "right"
+      ],
+      "fromMonth": 12
     },
     {
       "n": 3,
@@ -24,7 +31,8 @@
       "audio": "liedjes/audio/03.mp3",
       "icon": "liedjes/icons/03.jpg",
       "irev": 2,
-      "face": "#e6c31a"
+      "face": "#e6c31a",
+      "fromMonth": 12
     },
     {
       "n": 4,
@@ -33,7 +41,10 @@
       "icon": "liedjes/icons/04.png",
       "irev": 2,
       "face": "#1d4ed8",
-      "over": ["left"]
+      "over": [
+        "left"
+      ],
+      "fromMonth": 12
     },
     {
       "n": 5,
@@ -42,7 +53,10 @@
       "icon": "liedjes/icons/05.png",
       "irev": 2,
       "face": "#c46a3a",
-      "over": ["bottom"]
+      "over": [
+        "bottom"
+      ],
+      "fromMonth": 12
     },
     {
       "n": 6,
@@ -50,7 +64,8 @@
       "audio": "liedjes/audio/06.mp3",
       "icon": "liedjes/icons/06.jpg",
       "irev": 2,
-      "face": "#1aa3e6"
+      "face": "#1aa3e6",
+      "fromMonth": 12
     },
     {
       "n": 7,
@@ -59,7 +74,11 @@
       "icon": "liedjes/icons/07.png",
       "irev": 3,
       "face": "#c0392b",
-      "over": ["left", "top"]
+      "over": [
+        "left",
+        "top"
+      ],
+      "fromMonth": 12
     },
     {
       "n": 8,
@@ -68,7 +87,10 @@
       "icon": "liedjes/icons/08.png",
       "irev": 2,
       "face": "#2aa8a8",
-      "over": ["left"]
+      "over": [
+        "left"
+      ],
+      "fromMonth": 18
     },
     {
       "n": 9,
@@ -77,7 +99,11 @@
       "icon": "liedjes/icons/09.png",
       "irev": 2,
       "face": "#1a6db5",
-      "over": ["top", "left"]
+      "over": [
+        "top",
+        "left"
+      ],
+      "fromMonth": 12
     },
     {
       "n": 10,
@@ -87,7 +113,10 @@
       "rev": 2,
       "irev": 2,
       "face": "#efc44a",
-      "over": ["top"]
+      "over": [
+        "top"
+      ],
+      "fromMonth": 12
     },
     {
       "n": 11,
@@ -96,7 +125,10 @@
       "icon": "liedjes/icons/11.png",
       "irev": 2,
       "face": "#5eb3e6",
-      "over": ["left"]
+      "over": [
+        "left"
+      ],
+      "fromMonth": 12
     }
   ]
 }
