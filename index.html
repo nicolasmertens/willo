@@ -33,17 +33,17 @@
 </head>
 <body>
   <main class="grid">
-    <button class="tile" data-href="/liedjes/mama/" data-label="mama" aria-label="Mama">
+    <button class="tile" data-href="/willo/mama/" data-label="mama" aria-label="Mama">
       <img src="home/mama.jpg" alt="" onerror="this.classList.add('missing')">
       <div class="text-fallback">Mama</div>
       <div class="label">Mama</div>
     </button>
-    <button class="tile" data-href="/liedjes/papa/" data-label="papa" aria-label="Papa">
+    <button class="tile" data-href="/willo/papa/" data-label="papa" aria-label="Papa">
       <img src="home/papa.jpg" alt="" onerror="this.classList.add('missing')">
       <div class="text-fallback">Papa</div>
       <div class="label">Papa</div>
     </button>
-    <button class="tile" data-href="/liedjes/klas/" data-label="klas" aria-label="Klas">
+    <button class="tile" data-href="/willo/klas/" data-label="klas" aria-label="Klas">
       <img src="home/klas.jpg" alt="" onerror="this.classList.add('missing')">
       <div class="text-fallback">Klas</div>
       <div class="label">Klas</div>
@@ -194,16 +194,21 @@ function attachTileHandlers(btn) {
 
 document.querySelectorAll("button.tile").forEach(attachTileHandlers);
 
-let homeHold = null;
-document.addEventListener("touchstart", e => {
-  if (e.target.closest("button.tile")) return;
-  if (e.touches.length !== 1) return;
-  homeHold = setTimeout(() => { homeHold = null; if (window.WilloUI) WilloUI.openUnlock(); }, 1800);
-}, { passive: true });
-document.addEventListener("touchend", () => { if (homeHold) { clearTimeout(homeHold); homeHold = null; } }, { passive: true });
-document.addEventListener("touchmove", () => { if (homeHold) { clearTimeout(homeHold); homeHold = null; } }, { passive: true });
-window.addEventListener("load", () => { if (window.WilloUI) WilloUI.boot(); });
+window.addEventListener("load", () => {
+  if (window.WilloHold) {
+    WilloHold.attach(document, {
+      shouldStart(e) {
+        if (e.target.closest("button.tile")) return false;
+        if (e.target.closest("#willo-sheet, .willo-sheet, .willo-gate")) return false;
+        return true;
+      },
+      onHold() { if (window.WilloUI) WilloUI.openUnlock(); },
+    });
+  }
+  if (window.WilloUI) WilloUI.boot();
+});
 </script>
+<script src="scripts/willo-hold.js"></script>
 <script src="scripts/willo-settings.js"></script>
 <script src="scripts/willo-settings-ui.js"></script>
 </body>

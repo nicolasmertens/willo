@@ -45,8 +45,8 @@ TALEN = {
     "mama": {
         "out_dir": "mama",
         "lang": "fr",
-        "parent_photo": "/liedjes/home/mama.jpg",
-        "parent_href": "/liedjes/",
+        "parent_photo": "/willo/home/mama.jpg",
+        "parent_href": "/willo/",
         "title_fallback": "Mama",
         "storage_prefix": "mama",
         "manifest_name": "Willo",
@@ -55,8 +55,8 @@ TALEN = {
     "papa": {
         "out_dir": "papa",
         "lang": "nl",
-        "parent_photo": "/liedjes/home/papa.jpg",
-        "parent_href": "/liedjes/",
+        "parent_photo": "/willo/home/papa.jpg",
+        "parent_href": "/willo/",
         "title_fallback": "Papa",
         "storage_prefix": "papa",
         "manifest_name": "Willo",
@@ -65,8 +65,8 @@ TALEN = {
     "klas": {
         "out_dir": "klas",
         "lang": "en",
-        "parent_photo": "/liedjes/home/klas.jpg",
-        "parent_href": "/liedjes/",
+        "parent_photo": "/willo/home/klas.jpg",
+        "parent_href": "/willo/",
         "title_fallback": "Klas",
         "storage_prefix": "klas",
         "manifest_name": "Willo",
@@ -90,7 +90,7 @@ def render_grid(name, config):
         .replace("__GRID_TITLE__",     spec["title"])
         .replace("__HTML_LANG__",      spec["lang"])
         .replace("__PARENT_PHOTO__",   spec["parent_photo"])
-        .replace("__PARENT_HREF__",    spec.get("parent_href", "/liedjes/"))
+        .replace("__PARENT_HREF__",    spec.get("parent_href", "/willo/"))
         .replace("__ACTIVE_TAAL__",    spec.get("active_taal", ""))
         .replace("__APP_VERSION__",    spec["app_version"])
         .replace("__STORAGE_PREFIX__", spec["storage_prefix"])
@@ -159,9 +159,10 @@ def render_taal(name, config):
     # change automatically invalidates PWA caches on next page load.
     sw_template = (ROOT / "templates/service-worker.js").read_text()
     overflow_js = (ROOT / "scripts/overflow-assign.js").read_text()
+    willo_hold = (ROOT / "scripts/willo-hold.js").read_text()
     willo_js = (ROOT / "scripts/willo-settings.js").read_text()
     willo_ui = (ROOT / "scripts/willo-settings-ui.js").read_text()
-    ver = content_hash(all_tracks, template, sw_template, overflow_js, willo_js, willo_ui, config["lang"], labels)
+    ver = content_hash(all_tracks, template, sw_template, overflow_js, willo_hold, willo_js, willo_ui, config["lang"], labels)
     app_version = f"{name}-{ver}"
     cache_name = f"{name}-{ver}"
     mp3_cache_name = f"{name}-mp3-{ver}"
@@ -180,6 +181,7 @@ def render_taal(name, config):
         .replace("__ALL_TRACKS_JSON__", json.dumps(all_tracks, ensure_ascii=False))
         .replace("__SEED_ORDER__",      json.dumps(audio_keys))
         .replace("/*__OVERFLOW_ASSIGN__*/", overflow_js)
+        .replace("/*__WILLO_HOLD__*/", willo_hold)
         .replace("/*__WILLO_SETTINGS__*/", willo_js)
         .replace("/*__WILLO_SETTINGS_UI__*/", willo_ui)
     )
@@ -202,14 +204,14 @@ def render_taal(name, config):
     manifest = {
         "name": "Willo",
         "short_name": "Willo",
-        "start_url": "/liedjes/",
-        "scope": "/liedjes/",
+        "start_url": "/willo/",
+        "scope": "/willo/",
         "display": "standalone",
         "background_color": "#fff7e6",
         "theme_color": "#fff7e6",
         "icons": [
-            {"src": "/liedjes/icon-192.png", "sizes": "192x192", "type": "image/png"},
-            {"src": "/liedjes/icon-512.png", "sizes": "512x512", "type": "image/png"},
+            {"src": "/willo/icon-192.png", "sizes": "192x192", "type": "image/png"},
+            {"src": "/willo/icon-512.png", "sizes": "512x512", "type": "image/png"},
         ],
     }
     (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")

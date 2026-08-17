@@ -276,7 +276,7 @@
     });
     const PAGE = document.body.dataset && document.body.dataset.page;
     if (PAGE && S.LANGS.indexOf(PAGE) !== -1 && !S.isLangOn(st, PAGE)) {
-      window.location = "/liedjes/";
+      window.location = "/willo/";
     }
   }
 

@@ -211,9 +211,9 @@
 </div>
 
 <nav class="bottombar" id="bottombar" aria-label="nav">
-  <button class="navtile active" data-href="/liedjes/mama/" aria-label="mama"><img src="/liedjes/home/mama.jpg" alt=""></button>
-  <button class="navtile" data-href="/liedjes/papa/" aria-label="papa"><img src="/liedjes/home/papa.jpg" alt=""></button>
-  <button class="navtile" data-href="/liedjes/klas/" aria-label="klas"><img src="/liedjes/home/klas.jpg" alt=""></button>
+  <button class="navtile active" data-href="/willo/mama/" aria-label="mama"><img src="/willo/home/mama.jpg" alt=""></button>
+  <button class="navtile" data-href="/willo/papa/" aria-label="papa"><img src="/willo/home/papa.jpg" alt=""></button>
+  <button class="navtile" data-href="/willo/klas/" aria-label="klas"><img src="/willo/home/klas.jpg" alt=""></button>
   <button class="stopbtn" id="exitbtn" aria-label="exit"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
 </nav>
 
@@ -277,7 +277,7 @@
   }
 
   // Shared voice FX (same Jaaaa / Neee on mama, papa, klas)
-  var FX_BASE = "/liedjes/klas/games/fx/";
+  var FX_BASE = "/willo/klas/games/fx/";
   var fxAudio = null;
   function playFx(file){
     try{
@@ -648,7 +648,7 @@
 
   attachButtonTap(document.getElementById('exitbtn'), function(){
     stopSound();
-    window.location = "/liedjes/mama/";
+    window.location = "/willo/mama/";
   });
 
   attachButtonTap(document.getElementById('againBtn'), function(){

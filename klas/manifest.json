@@ -1,19 +1,19 @@
 {
   "name": "Willo",
   "short_name": "Willo",
-  "start_url": "/liedjes/",
-  "scope": "/liedjes/",
+  "start_url": "/willo/",
+  "scope": "/willo/",
   "display": "standalone",
   "background_color": "#fff7e6",
   "theme_color": "#fff7e6",
   "icons": [
     {
-      "src": "/liedjes/icon-192.png",
+      "src": "/willo/icon-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/liedjes/icon-512.png",
+      "src": "/willo/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

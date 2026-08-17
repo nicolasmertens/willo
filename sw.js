@@ -1,5 +1,5 @@
-// One Willo worker for /liedjes/. Does not wipe per-taal caches.
-const CORE_CACHE = "willo-core-v1";
+// One Willo worker for /willo/. Does not wipe per-taal caches.
+const CORE_CACHE = "willo-core-v2";
 const MP3_CACHE = "willo-mp3-v1";
 
 const CORE = [
@@ -13,6 +13,7 @@ const CORE = [
   "./home/mama.jpg",
   "./home/papa.jpg",
   "./home/klas.jpg",
+  "./scripts/willo-hold.js",
   "./scripts/willo-settings.js",
   "./scripts/willo-settings-ui.js",
   "./mama/",

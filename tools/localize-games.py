@@ -17,7 +17,7 @@ LOCALES = {
         "lang": "fr",
         "html_lang": "fr",
         "nav_active": "mama",
-        "exit_href": "/liedjes/mama/",
+        "exit_href": "/willo/mama/",
         "memory": {
             "title": "Mémoire",
             "easy": "Facile",
@@ -47,7 +47,7 @@ LOCALES = {
         "lang": "nl",
         "html_lang": "nl",
         "nav_active": "papa",
-        "exit_href": "/liedjes/papa/",
+        "exit_href": "/willo/papa/",
         "memory": {
             "title": "Memory",
             "easy": "Makkelijk",
@@ -80,12 +80,12 @@ def set_nav_active(html: str, active: str) -> str:
     # Reset any active, then mark the right navtile.
     for name in ("mama", "papa", "klas"):
         html = html.replace(
-            f'class="navtile active" data-href="/liedjes/{name}/"',
-            f'class="navtile" data-href="/liedjes/{name}/"',
+            f'class="navtile active" data-href="/willo/{name}/"',
+            f'class="navtile" data-href="/willo/{name}/"',
         )
     html = html.replace(
-        f'class="navtile" data-href="/liedjes/{active}/"',
-        f'class="navtile active" data-href="/liedjes/{active}/"',
+        f'class="navtile" data-href="/willo/{active}/"',
+        f'class="navtile active" data-href="/willo/{active}/"',
         1,
     )
     return html
@@ -103,7 +103,7 @@ def localize_memory(src: str, loc: dict, exit_href: str) -> str:
     html = html.replace('<span class="word">Hard</span>', f'<span class="word">{m["hard"]}</span>')
     html = html.replace("<h2>Yay!</h2>", f"<h2>{m['yay']}</h2>")
     html = html.replace(">Play again</button>", f">{m['again']}</button>")
-    html = html.replace('window.location = "/liedjes/klas/";', f'window.location = "{exit_href}";')
+    html = html.replace('window.location = "/willo/klas/";', f'window.location = "{exit_href}";')
     html = set_nav_active(html, loc["nav_active"])
     return html
 
@@ -125,7 +125,7 @@ def localize_pick(src: str, loc: dict, exit_href: str) -> str:
         'aria-label="Play the word again"',
         f'aria-label="{p["replay_aria"]}"',
     )
-    html = html.replace('window.location = "/liedjes/klas/";', f'window.location = "{exit_href}";')
+    html = html.replace('window.location = "/willo/klas/";', f'window.location = "{exit_href}";')
     html = set_nav_active(html, loc["nav_active"])
     return html
 
@@ -140,20 +140,20 @@ def write_games_json(path: Path, title: str, lang: str, memory_title: str, pick_
             {
                 "n": 1,
                 "title": memory_title,
-                "icon": "/liedjes/klas/games/hero-memory.jpg",
-                "href": f"/liedjes/{taal}/games/memory/",
+                "icon": "/willo/klas/games/hero-memory.jpg",
+                "href": f"/willo/{taal}/games/memory/",
             },
             {
                 "n": 2,
                 "title": sound_title,
-                "icon": "/liedjes/klas/games/hero-sounds.jpg",
+                "icon": "/willo/klas/games/hero-sounds.jpg",
                 "href": sound_href,
             },
             {
                 "n": 3,
                 "title": pick_title,
-                "icon": "/liedjes/klas/games/hero-pick.jpg",
-                "href": f"/liedjes/{taal}/games/pick/",
+                "icon": "/willo/klas/games/hero-pick.jpg",
+                "href": f"/willo/{taal}/games/pick/",
             },
         ],
     }
@@ -188,7 +188,7 @@ def main() -> None:
             print(f"[ok] {taal}/games/{game}/index.html")
 
         sound_title = "Sons" if taal == "mama" else "Geluiden"
-        sound_href = f"/liedjes/{taal}/games/soundboard/"
+        sound_href = f"/willo/{taal}/games/soundboard/"
         write_games_json(
             ROOT / loc["games_json"],
             loc["games_title"],

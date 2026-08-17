@@ -137,7 +137,7 @@
   }
   .bottombar .navtile img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
   .bottombar .navtile.active { border-color: #ff7043; box-shadow: 0 0 0 3px rgba(255,112,67,0.25); }
-  .bottombar .stopbtn { background: #e53935; border-color: #fff; display: flex; align-items: center; justify-content: center; }
+  .bottombar .stopbtn { background: #e53935; border-color: #fff; display: flex; align-items: center; justify-content: center; touch-action: none; -webkit-touch-callout: none; }
   .bottombar .stopbtn svg { width: 56%; height: 56%; fill: #fff; pointer-events: none; }
   .bottombar > button.pressing { transform: scale(0.94); filter: brightness(1.12); }
 
@@ -184,9 +184,9 @@
   <div class="player" id="player"><img id="player-img" alt=""></div>
 
   <nav class="bottombar" id="bottombar" aria-label="navigatie">
-    <button class="navtile" id="nav-mama" data-href="/liedjes/mama/" data-nav="mama" aria-label="mama"><img src="/liedjes/home/mama.jpg" alt=""></button>
-    <button class="navtile" id="nav-papa" data-href="/liedjes/papa/" data-nav="papa" aria-label="papa"><img src="/liedjes/home/papa.jpg" alt=""></button>
-    <button class="navtile" id="nav-klas" data-href="/liedjes/klas/" data-nav="klas" aria-label="klas"><img src="/liedjes/home/klas.jpg" alt=""></button>
+    <button class="navtile" id="nav-mama" data-href="/willo/mama/" data-nav="mama" aria-label="mama"><img src="/willo/home/mama.jpg" alt=""></button>
+    <button class="navtile" id="nav-papa" data-href="/willo/papa/" data-nav="papa" aria-label="papa"><img src="/willo/home/papa.jpg" alt=""></button>
+    <button class="navtile" id="nav-klas" data-href="/willo/klas/" data-nav="klas" aria-label="klas"><img src="/willo/home/klas.jpg" alt=""></button>
     <button class="stopbtn" id="stopbtn" aria-label="stop"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
   </nav>
 
@@ -202,7 +202,7 @@ if ("serviceWorker" in navigator) {
     location.reload();
   });
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/liedjes/sw.js", { scope: "/liedjes/" })
+    navigator.serviceWorker.register("/willo/sw.js", { scope: "/willo/" })
       .then(reg => {
         schedulePrefetch();
         // Nudge the SW to check for an updated script when the user
@@ -500,9 +500,19 @@ function attachTileHandlers(btn, track) {
 // --- Bottom-bar handlers (nav + stop) ---
 function attachBarButton(btn, opts) {
   // opts: { kind: "nav" | "stop", href, label, lockable }
+  // Safari: iOS cancels a 2s press before touchend (callout). Settings
+  // must fire on the timer while the finger is still down.
+  const HOLD_MS = (window.WilloHold && WilloHold.HOLD_MS) || 1800;
+  const HOLD_DRIFT = (window.WilloHold && WilloHold.DRIFT_PX) || 28;
   const candidates = new Map();
+  let holdTimer = null;
+  let holdFired = false;
+  function clearHold() {
+    if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+  }
   btn.addEventListener("touchstart", e => {
     if (opts.lockable && isPlaying) return;  // nav locked during play
+    if (opts.kind === "stop") e.preventDefault();
     for (const t of e.changedTouches) {
       const r0 = Math.max(t.radiusX || 0, t.radiusY || 0);
       if (r0 > PALM_RADIUS_PX) {
@@ -512,13 +522,24 @@ function attachBarButton(btn, opts) {
       candidates.set(t.identifier, { t0: Date.now(), x0: t.clientX, y0: t.clientY, drifted: false, r0 });
       btn.classList.add("pressing");
       tel("bar_touchstart", { kind: opts.kind, label: opts.label, r: Math.round(r0) });
+      if (opts.kind === "stop") {
+        holdFired = false;
+        clearHold();
+        holdTimer = setTimeout(() => {
+          holdTimer = null;
+          holdFired = true;
+          tel("bar_hold", { kind: "stop", label: opts.label });
+          if (window.WilloUI) WilloUI.openUnlock();
+        }, HOLD_MS);
+      }
     }
-  }, { passive: true });
+  }, { passive: false });
   btn.addEventListener("touchmove", e => {
     for (const t of e.changedTouches) {
       const c = candidates.get(t.identifier);
       if (!c) continue;
       const d = Math.hypot(t.clientX - c.x0, t.clientY - c.y0);
+      if (d > HOLD_DRIFT) clearHold();
       if (d > MAX_TAP_DRIFT_PX) c.drifted = true;
     }
   }, { passive: true });
@@ -528,21 +549,21 @@ function attachBarButton(btn, opts) {
       candidates.delete(t.identifier);
       if (candidates.size === 0) btn.classList.remove("pressing");
       if (!c) continue;
+      clearHold();
       const dur = Date.now() - c.t0;
       const r = Math.max(t.radiusX || 0, t.radiusY || 0);
       const el = document.elementFromPoint(t.clientX, t.clientY);
       const onBtn = el === btn || btn.contains(el);
       let decision;
-      if (opts.kind === "stop" && onBtn && !c.drifted && dur >= 1800) decision = "settings";
-      else if (c.drifted)              decision = "drifted";
-      else if (!onBtn)            decision = "off_tile";
-      else if (dur < MIN_TAP_MS)  decision = "too_short";
-      else if (dur > MAX_TAP_MS)  decision = "too_long";
-      else                        decision = "fire";
+      if (holdFired)                  decision = "settings";
+      else if (c.drifted)             decision = "drifted";
+      else if (!onBtn)                decision = "off_tile";
+      else if (dur < MIN_TAP_MS)      decision = "too_short";
+      else if (dur > MAX_TAP_MS)      decision = "too_long";
+      else                            decision = "fire";
       tel("bar_touchend", { kind: opts.kind, label: opts.label, dur_ms: dur, r_start: Math.round(c.r0), r_end: Math.round(r), on_btn: onBtn, decision });
       if (decision === "settings") {
         e.preventDefault();
-        if (window.WilloUI) WilloUI.openUnlock();
         return;
       }
       if (decision === "fire") {
@@ -559,6 +580,7 @@ function attachBarButton(btn, opts) {
     }
   }, { passive: false });
   btn.addEventListener("touchcancel", e => {
+    if (!holdFired) clearHold();
     for (const t of e.changedTouches) {
       candidates.delete(t.identifier);
     }
@@ -580,6 +602,7 @@ function attachBarButton(btn, opts) {
 
 // --- Overflow sides (injected from scripts/overflow-assign.js) ---
 /*__OVERFLOW_ASSIGN__*/
+/*__WILLO_HOLD__*/
 /*__WILLO_SETTINGS__*/
 /*__WILLO_SETTINGS_UI__*/
 

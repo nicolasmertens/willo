@@ -1,8 +1,8 @@
 {
   "title": "Liedjes",
   "lang": "en",
-  "parent_photo": "/liedjes/home/klas.jpg",
-  "parent_href": "/liedjes/klas/",
+  "parent_photo": "/willo/home/klas.jpg",
+  "parent_href": "/willo/klas/",
   "app_version": "klas-liedjes-v1",
   "storage_prefix": "klas_liedjes",
   "cache_name": "klas-liedjes-v1",

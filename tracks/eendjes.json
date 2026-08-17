@@ -1,8 +1,8 @@
 {
   "title": "Alle Eendjes",
   "lang": "nl",
-  "parent_photo": "/liedjes/home/papa.jpg",
-  "parent_href": "/liedjes/papa/",
+  "parent_photo": "/willo/home/papa.jpg",
+  "parent_href": "/willo/papa/",
   "active_taal": "papa",
   "app_version": "eendjes-v3",
   "storage_prefix": "eendjes",
