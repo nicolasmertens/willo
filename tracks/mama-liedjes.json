@@ -84,6 +84,7 @@
       "title": "Un tout petit doigt",
       "audio": "liedjes/audio/10.mp3",
       "icon": "liedjes/icons/10.png",
+      "rev": 2,
       "irev": 2,
       "face": "#efc44a",
       "over": ["top"]

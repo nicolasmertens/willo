@@ -58,6 +58,7 @@
       "title": "Eén kleine vinger",
       "audio": "liedjes/audio/07.mp3",
       "icon": "liedjes/icons/07.png",
+      "rev": 2,
       "irev": 4,
       "face": "#efc44a",
       "over": ["top"]
