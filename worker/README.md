@@ -4,7 +4,12 @@ Cloudflare Worker that receives behavioural-log batches from the Liedjes PWA
 and commits them as JSONL files into `logs/<date>/<time>-<rand>.jsonl` in
 this repo.
 
-## Endpoint
+## Endpoints
+
+- `POST /log` telemetry JSONL
+- `POST /kid` PNG, origin `https://nicolasmertens.github.io` → `{ id, url }` (KV, 24h)
+- `GET /kid/:id.png` public, for iOS Add to Home Screen
+- `DELETE /kid/:id` origin-gated, after first standalone open
 
 `POST https://liedjes-logger.super-mud-e2ef.workers.dev/log`
 

@@ -110,16 +110,17 @@
       : false;
     if (!child) return "child";
     if (iosBrowser && !standalone) return "install";
-    if (!langOnCount) return "plus";
+    if (!langOnCount) return "hold";
     return "home";
   }
 
   function homeChrome(langOnCount) {
     const n = Number(langOnCount) || 0;
     return {
-      firstPick: n === 0,
+      firstPick: false,
       showPlus: false,
       holdHint: n > 0,
+      holdCoach: n === 0,
     };
   }
 
@@ -136,6 +137,17 @@
       fr: { title: "Choisis", hint: "Ensuite, reste appuyé 2 secondes pour les réglages." },
       de: { title: "Wählen", hint: "Danach 2 Sekunden halten für Einstellungen." },
       en: { title: "Choose", hint: "Then hold 2 seconds for settings." },
+    };
+    return table[l] || table.en;
+  }
+
+  function holdCopy(lang) {
+    const l = String(lang || "en").toLowerCase().slice(0, 2);
+    const table = {
+      nl: { kicker: "Op het beginscherm", title: "Houd 2 seconden in", hint: "Zo open je instellingen. Mama, papa, klas." },
+      fr: { kicker: "Sur l'écran d'accueil", title: "Reste appuyé 2 secondes", hint: "Ça ouvre les réglages. Maman, papa, classe." },
+      de: { kicker: "Auf dem Home-Bildschirm", title: "2 Sekunden halten", hint: "So öffnest du Einstellungen. Mama, Papa, Klasse." },
+      en: { kicker: "On the Home Screen", title: "Hold for 2 seconds", hint: "That opens settings. Mama, papa, class." },
     };
     return table[l] || table.en;
   }
@@ -370,7 +382,7 @@
   const api = {
     KEY, LANGS, SECTIONS, STAGES,
     homeSurface, homeChrome, navVisibility, hasChild, setChild, springboardName, springboardTags, childCopy,
-    firstPickCopy, holdHintCopy, slimBridge, mergeBridge,
+    firstPickCopy, holdCopy, holdHintCopy, slimBridge, mergeBridge,
     isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
     defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,

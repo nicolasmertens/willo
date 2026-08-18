@@ -232,7 +232,7 @@ const ALL_TRACKS = [{"n": 1, "title": "Nursery Rhymes", "href": "/willo/rhymes/"
 const SEED_ORDER = ["liedjes:1", "liedjes:2", "liedjes:3", "liedjes:4", "liedjes:5"];
 const PARENT_HREF = "/willo/";
 const STORAGE_PREFIX = "klas";
-const APP_VERSION = "klas-91c70b7a";
+const APP_VERSION = "klas-0da061a1";
 
 const audio = new Audio();
 audio.preload = "none";
@@ -908,16 +908,17 @@ function attachBarButton(btn, opts) {
       : false;
     if (!child) return "child";
     if (iosBrowser && !standalone) return "install";
-    if (!langOnCount) return "plus";
+    if (!langOnCount) return "hold";
     return "home";
   }
 
   function homeChrome(langOnCount) {
     const n = Number(langOnCount) || 0;
     return {
-      firstPick: n === 0,
+      firstPick: false,
       showPlus: false,
       holdHint: n > 0,
+      holdCoach: n === 0,
     };
   }
 
@@ -934,6 +935,17 @@ function attachBarButton(btn, opts) {
       fr: { title: "Choisis", hint: "Ensuite, reste appuyé 2 secondes pour les réglages." },
       de: { title: "Wählen", hint: "Danach 2 Sekunden halten für Einstellungen." },
       en: { title: "Choose", hint: "Then hold 2 seconds for settings." },
+    };
+    return table[l] || table.en;
+  }
+
+  function holdCopy(lang) {
+    const l = String(lang || "en").toLowerCase().slice(0, 2);
+    const table = {
+      nl: { kicker: "Op het beginscherm", title: "Houd 2 seconden in", hint: "Zo open je instellingen. Mama, papa, klas." },
+      fr: { kicker: "Sur l'écran d'accueil", title: "Reste appuyé 2 secondes", hint: "Ça ouvre les réglages. Maman, papa, classe." },
+      de: { kicker: "Auf dem Home-Bildschirm", title: "2 Sekunden halten", hint: "So öffnest du Einstellungen. Mama, Papa, Klasse." },
+      en: { kicker: "On the Home Screen", title: "Hold for 2 seconds", hint: "That opens settings. Mama, papa, class." },
     };
     return table[l] || table.en;
   }
@@ -1168,7 +1180,7 @@ function attachBarButton(btn, opts) {
   const api = {
     KEY, LANGS, SECTIONS, STAGES,
     homeSurface, homeChrome, navVisibility, hasChild, setChild, springboardName, springboardTags, childCopy,
-    firstPickCopy, holdHintCopy, slimBridge, mergeBridge,
+    firstPickCopy, holdCopy, holdHintCopy, slimBridge, mergeBridge,
     isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
     defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
@@ -1220,6 +1232,8 @@ function attachBarButton(btn, opts) {
   }
 
   const LANG_LABEL = { mama: "Mama", papa: "Papa", klas: "Klas" };
+  const KID_API = "https://liedjes-logger.super-mud-e2ef.workers.dev";
+  const KID_ID_KEY = "willo_kid_icon_id";
   let sessionOk = false;
   let pendingAfterPin = "";
 
@@ -1519,17 +1533,19 @@ function attachBarButton(btn, opts) {
     const copy = S.childCopy(navigator.language || document.documentElement.lang || "nl");
     const st = S.load();
     el.innerHTML = `
+      <p class="stage-kicker">Willo</p>
       <h1>${copy.title}</h1>
-      <label for="child-name">${copy.name}</label>
-      <input id="child-name" type="text" enterkeyhint="done" autocomplete="nickname" maxlength="24" value="${st.childName || ""}">
-      <label for="child-birth">${copy.birth}</label>
-      <input id="child-birth" type="date">
-      <label>${copy.photo}</label>
-      <div class="photo-well">
+      <label class="stage-field" for="child-name"><span>${copy.name}</span>
+        <input id="child-name" type="text" enterkeyhint="done" autocomplete="nickname" maxlength="24" value="${st.childName || ""}" placeholder=" ">
+      </label>
+      <label class="stage-field" for="child-birth"><span>${copy.birth}</span>
+        <input id="child-birth" type="date">
+      </label>
+      <label class="stage-sleeve">
         <input id="child-photo" type="file" accept="image/*">
         <img id="child-photo-preview" alt="" hidden>
-        <span>${copy.pick}</span>
-      </div>
+        <span class="stage-sleeve-hint">${copy.pick}</span>
+      </label>
       <p class="willo-err" id="child-err"></p>
       <button type="button" id="child-go">${copy.go}</button>
     `;
@@ -1545,6 +1561,7 @@ function attachBarButton(btn, opts) {
     });
     const go = el.querySelector("#child-go");
     if (go) go.addEventListener("click", submitChild);
+    document.body.classList.add("onboard");
   }
 
   function squareBlob(src, size) {
@@ -1614,6 +1631,36 @@ function attachBarButton(btn, opts) {
     return el;
   }
 
+  function saveKidId(id) {
+    try { localStorage.setItem(KID_ID_KEY, id || ""); } catch (e) {}
+  }
+
+  function loadKidId() {
+    try { return localStorage.getItem(KID_ID_KEY) || ""; } catch (e) { return ""; }
+  }
+
+  async function uploadKidIcon(blob) {
+    const resp = await fetch(KID_API + "/kid", {
+      method: "POST",
+      headers: { "Content-Type": "image/png" },
+      body: blob,
+    });
+    if (!resp.ok) throw new Error("kid-up");
+    const data = await resp.json();
+    if (!data || !data.url || !data.id) throw new Error("kid-up");
+    saveKidId(data.id);
+    return data;
+  }
+
+  async function forgetKidIcon() {
+    const id = loadKidId();
+    if (!id) return;
+    try {
+      await fetch(KID_API + "/kid/" + id, { method: "DELETE" });
+    } catch (e) {}
+    saveKidId("");
+  }
+
   async function applySpringboard(name, dataUrl) {
     const tags = S.springboardTags(name);
     let title = document.querySelector("meta[name='apple-mobile-web-app-title']");
@@ -1628,15 +1675,25 @@ function attachBarButton(btn, opts) {
     tellWorkerKid(tags.title);
     if (!dataUrl) return;
     try {
+      const existing = loadKidId();
+      if (existing) {
+        const icon = ensureTouchIcon("willo-touch-icon");
+        icon.href = KID_API + "/kid/" + existing + ".png";
+        return;
+      }
       const b180 = await squareBlob(dataUrl, 180);
-      const b512 = await squareBlob(dataUrl, 512);
       await cacheKidIcon(b180, "kid-icon-180.png");
-      await cacheKidIcon(b512, "kid-icon-512.png");
-      const data180 = await blobToData(b180);
+      let href = "";
+      try {
+        const up = await uploadKidIcon(b180);
+        href = up.url;
+      } catch (e) {
+        href = await blobToData(b180);
+      }
       const extra = document.getElementById("willo-touch-icon-file");
       if (extra) extra.remove();
       const icon = ensureTouchIcon("willo-touch-icon");
-      icon.href = data180;
+      icon.href = href;
       let fav = document.querySelector("link[rel='icon']");
       if (!fav) {
         fav = document.createElement("link");
@@ -1644,7 +1701,7 @@ function attachBarButton(btn, opts) {
         fav.type = "image/png";
         document.head.appendChild(fav);
       }
-      fav.href = data180;
+      fav.href = href;
       tellWorkerKid(tags.title);
     } catch (e) {}
   }
@@ -1660,13 +1717,20 @@ function attachBarButton(btn, opts) {
       if (err) err.textContent = "!";
       return;
     }
-    const dataUrl = await fileToData(file);
-    await photoSet("child", dataUrl);
-    r.state.childFace = true;
-    S.save(r.state);
-    if (navigator.serviceWorker) await navigator.serviceWorker.ready;
-    await applySpringboard(r.state.childName, dataUrl);
-    renderHome();
+    const go = document.getElementById("child-go");
+    if (go) go.disabled = true;
+    try {
+      const dataUrl = await fileToData(file);
+      await photoSet("child", dataUrl);
+      r.state.childFace = true;
+      S.save(r.state);
+      if (navigator.serviceWorker) await navigator.serviceWorker.ready;
+      await applySpringboard(r.state.childName, dataUrl);
+      renderHome();
+    } catch (e) {
+      if (err) err.textContent = "!";
+      if (go) go.disabled = false;
+    }
   }
 
   function paintInstall() {
@@ -1680,15 +1744,52 @@ function attachBarButton(btn, opts) {
     const step1text = browser === "safari" ? copy.share : copy.menu;
     el.dataset.at = at;
     el.dataset.browser = browser;
+    const who = S.springboardName((S.load() || {}).childName) || "";
     el.innerHTML = `
-      <img class="install-face" id="install-face" alt="" hidden>
+      <img class="install-hero" id="install-face" alt="" hidden>
+      <p class="install-who">${who}</p>
       <div class="install-aim">${step1icon}</div>
-      <div class="install-row"><span class="install-n">1</span>${step1icon}<span>${step1text}</span></div>
-      <div class="install-row"><span class="install-n">2</span>${SVG_ADD}<span>${copy.add}</span></div>
+      <div class="install-row">${step1icon}<span>${step1text}</span></div>
+      <div class="install-row">${SVG_ADD}<span>${copy.add}</span></div>
     `;
     document.documentElement.lang = (navigator.language || "en").slice(0, 2);
     photoGet("child").then((data) => {
       const img = document.getElementById("install-face");
+      if (img && data) {
+        img.src = data;
+        img.hidden = false;
+      }
+    });
+  }
+
+  function paintHold() {
+    const el = document.getElementById("hold-card");
+    if (!el) return;
+    const loc = navigator.language || document.documentElement.lang || "nl";
+    const copy = S.holdCopy(loc);
+    el.innerHTML = `
+      <p class="stage-kicker">${copy.kicker}</p>
+      <h1>${copy.title}</h1>
+      <button type="button" class="hold-pad" id="hold-pad" aria-label="${copy.title}">
+        <span class="hold-ring" aria-hidden="true"></span>
+        <img class="hold-face" id="hold-face" alt="" hidden>
+      </button>
+      <p class="hold-hint">${copy.hint}</p>
+    `;
+    const pad = el.querySelector("#hold-pad");
+    if (pad && window.WilloHold) {
+      WilloHold.attach(pad, {
+        onHold() { openUnlock(); },
+        onTap() {},
+      });
+    }
+    if (pad) pad.addEventListener("click", (e) => {
+      if ("ontouchstart" in window) return;
+      if (e.detail === 0) return;
+      openUnlock();
+    });
+    photoGet("child").then((data) => {
+      const img = document.getElementById("hold-face");
       if (img && data) {
         img.src = data;
         img.hidden = false;
@@ -1734,9 +1835,14 @@ function attachBarButton(btn, opts) {
     if (!grid) return;
     const surface = surfaceNow();
     const child = document.getElementById("child-card");
+    const hold = document.getElementById("hold-card");
     if (child) child.hidden = surface !== "child";
     if (install) install.hidden = surface !== "install";
-    grid.hidden = surface === "install" || surface === "child";
+    if (hold) hold.hidden = surface !== "hold";
+    const staged = surface === "install" || surface === "child" || surface === "hold";
+    grid.hidden = staged;
+    document.body.classList.toggle("onboard", staged);
+    document.body.dataset.stage = surface;
     const loc = navigator.language || document.documentElement.lang || "nl";
     if (surface === "child") {
       grid.innerHTML = "";
@@ -1750,10 +1856,16 @@ function attachBarButton(btn, opts) {
       paintInstall();
       return;
     }
+    if (surface === "hold") {
+      grid.innerHTML = "";
+      paintHint("");
+      paintHold();
+      return;
+    }
     const st = S.load();
     const on = S.LANGS.filter((l) => S.isLangOn(st, l));
     const chrome = S.homeChrome(on.length);
-    const pickLangs = chrome.firstPick ? S.LANGS.slice() : on;
+    const pickLangs = on;
     grid.classList.toggle("home-empty", pickLangs.length === 1);
     grid.classList.toggle("home-pick", !!chrome.firstPick);
     const tiles = pickLangs.map((l) => `
@@ -1825,17 +1937,20 @@ function attachBarButton(btn, opts) {
   }
 
   function boot() {
+    if (isStandalone()) forgetKidIcon();
     applyLangs();
     applyCatalog();
     applyFaceImages();
     const st = S.load();
-    if (S.hasChild(st)) photoGet("child").then((data) => applySpringboard(st.childName, data));
+    if (!isStandalone() && S.hasChild(st)) {
+      photoGet("child").then((data) => applySpringboard(st.childName, data));
+    }
     const relayout = () => { if (document.getElementById("install-card") && surfaceNow() === "install") paintInstall(); };
     window.addEventListener("resize", relayout);
     window.addEventListener("orientationchange", () => setTimeout(relayout, 250));
   }
 
-  root.WilloUI = { openUnlock, openAddLang, boot, applyFaceImages, applyLangs, applyCatalog, renderHome, applySpringboard };
+  root.WilloUI = { openUnlock, openAddLang, boot, applyFaceImages, applyLangs, applyCatalog, renderHome, applySpringboard, forgetKidIcon };
 })(typeof globalThis !== "undefined" ? globalThis : this);
 
 

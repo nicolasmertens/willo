@@ -23,9 +23,9 @@ ok("ipad desktop ua + coarse, 0 points", S.isIosBrowser({ ua: ipadDesktop, platf
 ok("mac safari not ios", S.isIosBrowser({ ua: macSafari, platform: "MacIntel", maxTouchPoints: 0, coarse: false }) === false);
 ok("no child is child form", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5 }) === "child");
 ok("ios tab after child is install", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "install");
-ok("pwa empty after child is plus", S.homeSurface(true, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "plus");
+ok("pwa empty after child is hold", S.homeSurface(true, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "hold");
 ok("pwa with lang is home", S.homeSurface(true, 1, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "home");
-ok("desktop after child is plus", S.homeSurface(false, 0, { ua: macSafari, maxTouchPoints: 0, hasChild: true }) === "plus");
+ok("desktop after child is hold", S.homeSurface(false, 0, { ua: macSafari, maxTouchPoints: 0, hasChild: true }) === "hold");
 ok("springboard first name", S.springboardName("William Mertens") === "William");
 ok("hasChild needs face", S.hasChild({ childName: "Ada", birth: "2024-09-24", childFace: false }) === false);
 ok("hasChild ok", S.hasChild({ childName: "Ada", birth: "2024-09-24", childFace: true }));
@@ -98,7 +98,9 @@ ok("import empty langs stay empty", (() => {
 })());
 
 ok("no plus tile", S.homeChrome(0).showPlus === false);
-ok("first pick when empty", S.homeChrome(0).firstPick === true);
+ok("no first pick when empty", S.homeChrome(0).firstPick === false);
+ok("hold coach when empty", S.homeChrome(0).holdCoach === true);
+ok("hold copy nl", S.holdCopy("nl").title.indexOf("2") !== -1);
 ok("no first pick after one", S.homeChrome(1).firstPick === false);
 ok("hold hint after one", S.homeChrome(1).holdHint === true);
 ok("nav hides off langs", S.navVisibility({ langs: { mama: true, papa: false, klas: false } }).papa === false);

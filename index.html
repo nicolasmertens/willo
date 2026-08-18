@@ -7,31 +7,36 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Willo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@450;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
-  html, body { margin: 0; padding: 0; background: #fff7e6; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Avenir Next", system-ui, sans-serif; min-height: 100vh; min-height: 100dvh; overscroll-behavior: none; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+  html, body { margin: 0; padding: 0; background: #fff7e6; font-family: Figtree, "SF Pro Rounded", "Avenir Next", system-ui, sans-serif; min-height: 100vh; min-height: 100dvh; overscroll-behavior: none; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
   body { padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: max(16px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; }
+  body.onboard { background: #16132e; color: #fff6e8; }
+  body.onboard #home-grid, body.onboard #home-hint { display: none !important; }
 
   .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; max-width: 900px; }
   .grid.home-empty { grid-template-columns: 1fr; max-width: 280px; }
   @media (max-width: 640px) { .grid { grid-template-columns: 1fr; max-width: 480px; } .grid.home-empty { max-width: 280px; } }
 
-  #install-card { position: fixed; z-index: 40; width: min(340px, calc(100vw - 24px)); background: #fff; border-radius: 22px; padding: 16px 16px 14px; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); }
+  #install-card { position: fixed; z-index: 40; width: min(360px, calc(100vw - 24px)); background: #211c45; color: #fff6e8; border-radius: 28px; padding: 22px 20px 18px; box-shadow: 0 18px 50px rgba(0,0,0,0.35); border: 1px solid rgba(244,193,78,0.28); }
   #install-card[data-at="top-right"] { top: calc(env(safe-area-inset-top) + 58px); right: 10px; }
   #install-card[data-at="bottom-center"] { left: 50%; bottom: calc(env(safe-area-inset-bottom) + 62px); transform: translateX(-50%); }
-  #install-card .install-aim { position: absolute; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #111; }
-  #install-card[data-at="top-right"] .install-aim { top: -50px; }
+  #install-card .install-aim { position: absolute; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: #f4c14e; }
+  #install-card[data-at="top-right"] .install-aim { top: -52px; }
   #install-card[data-browser="safari"][data-at="top-right"] .install-aim { right: 108px; }
   #install-card[data-browser="chrome"][data-at="top-right"] .install-aim { right: 8px; }
   #install-card[data-browser="edge"][data-at="top-right"] .install-aim { right: 8px; }
   #install-card[data-at="bottom-center"] .install-aim { left: 50%; bottom: -54px; transform: translateX(-50%); }
-  #install-card .install-aim svg { width: 28px; height: 28px; }
-  #install-card .install-row { display: flex; align-items: center; gap: 12px; padding: 8px 2px; font-weight: 800; font-size: 17px; }
-  #install-card .install-row + .install-row { border-top: 1px solid rgba(0,0,0,.06); }
-  #install-card .install-row svg { width: 28px; height: 28px; flex: 0 0 28px; color: #111; }
-  #install-card .install-n { width: 22px; height: 22px; border-radius: 50%; background: #111; color: #fff; font-size: 13px; display: flex; align-items: center; justify-content: center; flex: 0 0 22px; }
-  #install-card .install-face { width: 88px; height: 88px; border-radius: 22px; object-fit: cover; display: block; margin: 0 auto 10px; background: #ffe0b2; }
-  #install-card .install-face[hidden] { display: none; }
+  #install-card .install-aim svg { width: 30px; height: 30px; }
+  #install-card .install-hero { width: 112px; height: 112px; border-radius: 28px; object-fit: cover; display: block; margin: 0 auto 12px; background: #2d2758; box-shadow: 0 0 0 4px #f4c14e; }
+  #install-card .install-hero[hidden] { display: none; }
+  #install-card .install-who { margin: 0 0 14px; text-align: center; font-family: Syne, sans-serif; font-weight: 800; font-size: 28px; letter-spacing: -0.03em; }
+  #install-card .install-row { display: flex; align-items: center; gap: 12px; padding: 10px 2px; font-weight: 700; font-size: 17px; }
+  #install-card .install-row + .install-row { border-top: 1px solid rgba(255,246,232,0.1); }
+  #install-card .install-row svg { width: 28px; height: 28px; flex: 0 0 28px; color: #f4c14e; }
 
   button.tile { display: block; aspect-ratio: 1 / 1; border: 0; border-radius: 26px; overflow: hidden; position: relative; background: #fff; padding: 0; cursor: pointer; font-family: inherit; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
   button.tile:active, button.tile.pressing { transform: translateY(2px) scale(0.98); filter: brightness(1.08); box-shadow: 0 2px 0 rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08); }
@@ -50,21 +55,35 @@
   #home-hint { margin: 0; max-width: 520px; text-align: center; font-weight: 700; font-size: 15px; color: rgba(0,0,0,.45); }
 
   #child-card, #child-card * { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; touch-action: manipulation; pointer-events: auto; }
-  #child-card { width: min(380px, calc(100vw - 32px)); background: #fff; border-radius: 26px; padding: 22px 20px 18px; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); position: relative; z-index: 50; }
-  #child-card h1 { margin: 0 0 14px; font-size: 24px; }
-  #child-card label { display: block; font-weight: 800; margin: 10px 0; }
-  #child-card input[type=text], #child-card input[type=date] { display: block; width: 100%; margin-top: 6px; font: inherit; font-size: 16px; padding: 12px; border-radius: 12px; border: 1px solid #ddd; background: #fff; min-height: 48px; }
-  #child-card .photo-well { position: relative; margin-top: 8px; min-height: 96px; border: 3px dashed #111; border-radius: 16px; display: flex; align-items: center; justify-content: center; overflow: hidden; background: #fffaf0; }
-  #child-card .photo-well input[type=file] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; font-size: 32px; cursor: pointer; }
-  #child-card .photo-well span { font-weight: 800; pointer-events: none; }
-  #child-card .photo-well img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-  #child-card button { margin-top: 12px; width: 100%; border: 0; border-radius: 14px; padding: 14px; font-weight: 800; font-size: 16px; background: #111; color: #fff; }
-  #child-card .willo-err { color: #c0392b; min-height: 1.2em; font-weight: 800; }
+  #child-card, #hold-card { width: min(400px, calc(100vw - 32px)); position: relative; z-index: 50; }
+  #child-card .stage-kicker, #hold-card .stage-kicker { margin: 0 0 8px; font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: #f4c14e; font-weight: 700; }
+  #child-card h1, #hold-card h1 { margin: 0 0 22px; font-family: Syne, sans-serif; font-weight: 800; font-size: clamp(34px, 8vw, 48px); letter-spacing: -0.04em; line-height: 0.95; color: #fff6e8; }
+  #child-card .stage-field { display: block; margin: 0 0 16px; }
+  #child-card .stage-field span { display: block; font-size: 13px; font-weight: 700; color: rgba(255,246,232,0.55); margin-bottom: 6px; }
+  #child-card input[type=text], #child-card input[type=date] { display: block; width: 100%; font: inherit; font-size: 22px; font-weight: 700; padding: 4px 0 10px; border: 0; border-bottom: 2px solid rgba(244,193,78,0.45); border-radius: 0; background: transparent; color: #fff6e8; min-height: 48px; }
+  #child-card input[type=date]::-webkit-date-and-time-value { text-align: left; }
+  #child-card .stage-sleeve { position: relative; display: block; margin: 22px 0 16px; aspect-ratio: 1 / 1; width: min(220px, 56vw); border-radius: 32px; overflow: hidden; background: #2d2758; box-shadow: 0 0 0 3px #f4c14e, 0 18px 40px rgba(0,0,0,0.35); }
+  #child-card .stage-sleeve input[type=file] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; font-size: 32px; cursor: pointer; }
+  #child-card .stage-sleeve-hint { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center; padding: 20px; font-weight: 700; color: #fff6e8; pointer-events: none; }
+  #child-card .stage-sleeve img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+  #child-card .stage-sleeve img:not([hidden]) + .stage-sleeve-hint { display: none; }
+  #child-card #child-go { margin-top: 8px; width: 100%; border: 0; border-radius: 999px; padding: 16px; font-family: Syne, sans-serif; font-weight: 800; font-size: 18px; background: #f4c14e; color: #16132e; }
+  #child-card #child-go:disabled { opacity: 0.45; }
+  #child-card .willo-err { color: #ff8b7b; min-height: 1.2em; font-weight: 700; }
+  #hold-card { text-align: center; }
+  #hold-card .hold-pad { position: relative; width: min(220px, 56vw); aspect-ratio: 1 / 1; margin: 8px auto 18px; border: 0; padding: 0; background: #2d2758; border-radius: 32px; box-shadow: 0 18px 40px rgba(0,0,0,0.35); }
+  #hold-card .hold-ring { position: absolute; inset: -10px; border-radius: 40px; border: 3px solid #f4c14e; opacity: 0.35; animation: holdpulse 1.8s ease-in-out infinite; pointer-events: none; }
+  #hold-card .hold-face { width: 100%; height: 100%; object-fit: cover; border-radius: 32px; display: block; }
+  #hold-card .hold-face[hidden] { display: none; }
+  #hold-card .hold-hint { margin: 0; font-size: 16px; font-weight: 600; color: rgba(255,246,232,0.62); }
+  @keyframes holdpulse { 0%, 100% { transform: scale(0.96); opacity: 0.25; } 50% { transform: scale(1.04); opacity: 0.7; } }
+  @media (prefers-reduced-motion: reduce) { #hold-card .hold-ring { animation: none; } }
 </style>
 </head>
 <body>
   <section id="child-card" hidden></section>
   <section id="install-card" hidden></section>
+  <section id="hold-card" hidden></section>
   <main class="grid home-empty" id="home-grid"></main>
   <p id="home-hint" hidden></p>
 <script>
@@ -81,7 +100,7 @@ document.addEventListener("gestureend", e => e.preventDefault(), { passive: fals
 
 let lastTouchEnd = 0;
 document.addEventListener("touchend", e => {
-  if (e.target.closest("#child-card, #install-card, input, textarea, select, label, button")) return;
+  if (e.target.closest("#child-card, #install-card, #hold-card, input, textarea, select, label, button")) return;
   const now = Date.now();
   if (now - lastTouchEnd <= 350) e.preventDefault();
   lastTouchEnd = now;
@@ -216,7 +235,7 @@ window.addEventListener("load", () => {
     WilloHold.attach(document, {
       shouldStart(e) {
         if (e.target.closest("input, textarea, select, label, button, a")) return false;
-        if (e.target.closest("#child-card, #install-card, #willo-mask, #willo-sheet, .willo-sheet, button.tile")) return false;
+        if (e.target.closest("#child-card, #install-card, #hold-card, #willo-mask, #willo-sheet, .willo-sheet, button.tile")) return false;
         return true;
       },
       onHold() { if (window.WilloUI) WilloUI.openUnlock(); },

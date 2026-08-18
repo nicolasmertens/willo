@@ -5,3 +5,7 @@ account_id = "07c300613d24d4ab7d1072c439e4325a"
 
 [observability]
 enabled = true
+
+[[kv_namespaces]]
+binding = "KID"
+id = "370cfc6ca33149cdada6fe52a861affe"

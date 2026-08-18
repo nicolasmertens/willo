@@ -53,11 +53,17 @@ function pathForBatch(rand) {
   return `logs/${date}/${time}-${rand}.jsonl`;
 }
 
+import { handleKid } from "./kid.js";
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     const origin = req.headers.get("Origin") || "";
     const originAllowed = origin === ALLOWED_ORIGIN;
+
+    if (url.pathname === "/kid" || url.pathname.startsWith("/kid/")) {
+      return handleKid(req, env, originAllowed);
+    }
 
     if (req.method === "OPTIONS") {
       return new Response(null, { status: 204, headers: corsHeaders(originAllowed) });
