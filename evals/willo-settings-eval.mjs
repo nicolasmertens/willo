@@ -130,6 +130,13 @@ ok("first pick copy not taal", S.firstPickCopy("nl").title.indexOf("Taal") === -
 ok("slim bridge has langs", !!S.slimBridge(S.defaultState()).langs);
 
 const { readFileSync } = require("fs");
+const { execFileSync } = require("child_process");
+try {
+  execFileSync("node", ["--check", join(root, "scripts/willo-settings-ui.js")], { stdio: "pipe" });
+  ok("ui parses", true);
+} catch (e) {
+  ok("ui parses", false, String(e.stderr || e));
+}
 const ui = readFileSync(join(root, "scripts/willo-settings-ui.js"), "utf8");
 ok("openUnlock no const mode shadow", !/function openUnlock\(\) \{\s*const mode = surfaceNow/.test(ui));
 ok("openUnlock uses surface", /function openUnlock\(\) \{\s*const surface = surfaceNow/.test(ui));

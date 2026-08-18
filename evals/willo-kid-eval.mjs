@@ -37,7 +37,7 @@ const index = readFileSync(join(root, "index.html"), "utf8");
 ok("index inline reset", index.indexOf("willo_settings_v2") !== -1 && index.indexOf("get(\"reset\") !== \"1\"") !== -1);
 ok("index sw no http cache", index.indexOf("updateViaCache: \"none\"") !== -1);
 const sw = readFileSync(join(root, "sw.js"), "utf8");
-ok("sw scripts network first", sw.indexOf("isScript") !== -1 && sw.indexOf("cache: \"no-store\"") !== -1);
+ok("sw does not intercept scripts", sw.indexOf("isScript") === -1);
 
 if (fails.length) {
   console.log("FAIL", fails.length, fails.join(" | "));

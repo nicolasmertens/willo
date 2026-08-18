@@ -763,7 +763,6 @@
         <div class="text-fallback" aria-hidden="true"></div>
       </button>`).join("");
     grid.innerHTML = tiles;
-    const blank = document.getElementById("home-blank");
     if (blank) {
       blank.hidden = false;
       blank.textContent = S.holdHintCopy(loc);
