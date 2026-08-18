@@ -144,10 +144,10 @@
   function holdCopy(lang) {
     const l = String(lang || "en").toLowerCase().slice(0, 2);
     const table = {
-      nl: { kicker: "Op het beginscherm", title: "Houd 2 seconden in", hint: "Zo open je instellingen." },
-      fr: { kicker: "Sur l'écran d'accueil", title: "Reste appuyé 2 secondes", hint: "Ça ouvre les réglages." },
-      de: { kicker: "Auf dem Home-Bildschirm", title: "2 Sekunden halten", hint: "So öffnest du die Einstellungen." },
-      en: { kicker: "On the Home Screen", title: "Hold for 2 seconds", hint: "That opens settings." },
+      nl: { kicker: "Instellingen", title: "Houd hier 2 seconden in", hint: "In de lege ruimte. Niet op een tegel." },
+      fr: { kicker: "Réglages", title: "Reste appuyé ici 2 secondes", hint: "Dans le vide. Pas sur une tuile." },
+      de: { kicker: "Einstellungen", title: "Hier 2 Sekunden halten", hint: "Im leeren Bereich. Nicht auf einer Kachel." },
+      en: { kicker: "Settings", title: "Hold here for 2 seconds", hint: "On the empty space. Not on a tile." },
     };
     return table[l] || table.en;
   }
@@ -155,7 +155,7 @@
   function holdHintCopy(lang) {
     const l = String(lang || "en").toLowerCase().slice(0, 2);
     const table = {
-      nl: "Houd een tegel 2 seconden in voor instellingen.",
+      nl: "Houd 2 seconden in de lege ruimte.",
       fr: "Reste appuyé 2 secondes sur une tuile pour les réglages.",
       de: "Kachel 2 Sekunden halten für Einstellungen.",
       en: "Hold a tile 2 seconds for settings.",
@@ -286,6 +286,38 @@
     return from <= months;
   }
 
+  function gameLeaf(href) {
+    const m = String(href || "").match(/\/games\/([^/]+)\//);
+    return m ? m[1] : "";
+  }
+
+  function groupItems(section, catalog) {
+    const rows = (catalog || []).filter((t) => t && t.section === section);
+    if (section === "games") {
+      const map = {};
+      const order = [];
+      rows.forEach((t) => {
+        const leaf = gameLeaf(t.href) || (t.pack + "-" + t.n);
+        if (!map[leaf]) {
+          map[leaf] = { id: leaf, title: t.title, items: [] };
+          order.push(leaf);
+        }
+        map[leaf].items.push(t);
+      });
+      return order.map((k) => {
+        const g = map[k];
+        const papa = g.items.filter((i) => i.pack === "papa")[0];
+        if (papa) g.title = papa.title;
+        return g;
+      });
+    }
+    return rows.map((t) => ({
+      id: t.pack + ":" + t.n,
+      title: t.title,
+      items: [t],
+    }));
+  }
+
   function setLang(state, lang, on) {
     if (LANGS.indexOf(lang) === -1) return { ok: false, reason: "bad-lang" };
     const next = clone(state);
@@ -387,6 +419,7 @@
     defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
     setLang, setSection, setItem, setBirth, setPin, checkPin,
+    gameLeaf, groupItems,
     exportPayload, importPayload, load, save,
   };
 

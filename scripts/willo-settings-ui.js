@@ -75,6 +75,11 @@
     .willo-actions button,.willo-sheet .willo-go{border:0;border-radius:14px;padding:12px 14px;font-weight:800;background:#fff;box-shadow:0 3px 0 rgba(0,0,0,.1);}
     .willo-err{color:#c0392b;font-weight:700;min-height:1.2em;text-align:center;}
     .willo-hint{font-size:14px;color:rgba(0,0,0,.5);margin:8px 0;}
+    .willo-face-lab{display:flex;align-items:center;min-height:44px;}
+    .willo-face-dot{width:44px;height:44px;border-radius:14px;object-fit:cover;background:#ffe0b2;}
+    .willo-face-dot.missing{opacity:.7;}
+    .willo-drill{width:100%;text-align:left;border:0;background:#fff;border-radius:14px;padding:14px;font-weight:800;box-shadow:0 3px 0 rgba(0,0,0,.1);margin:6px 0;display:flex;justify-content:space-between;align-items:center;}
+    .willo-back{border:0;background:transparent;font-weight:800;padding:8px 0;color:#5a4632;}
     `;
   }
 
@@ -84,6 +89,9 @@
 
   let pinBuf = "";
   let mode = "gate";
+  let sheetView = "root";
+  let sheetSec = "";
+  const SEC_LABEL = { boeken: "Boeken", games: "Spelen", liedjes: "Liedjes", verhalen: "Verhalen" };
 
   function close() {
     const el = document.getElementById("willo-mask");
@@ -112,44 +120,68 @@
     `;
   }
 
+  function catalog() {
+    return root.WILLO_CATALOG || [];
+  }
+
   function renderSheet() {
+    if (sheetView === "section") return renderSection(sheetSec);
+    if (sheetView === "faces") return renderFaces();
+    return renderRoot();
+  }
+
+  function renderRoot() {
     const st = S.load();
     const months = S.ageMonths(st.birth);
     const stage = S.stageFor(months);
     const standalone = !!(navigator.standalone || matchMedia("(display-mode: standalone)").matches);
-    const PAGE = (document.body.dataset && document.body.dataset.page) || "";
-    const tracks = (root.ALL_TRACKS || []).filter((t) => t._section);
-    const groups = { boeken: [], games: [], liedjes: [], verhalen: [] };
-    tracks.forEach((t) => { if (groups[t._section]) groups[t._section].push(t); });
-    Object.keys(groups).forEach((g) => {
-      groups[g].sort((a, b) => (a.fromMonth || 0) - (b.fromMonth || 0) || a.n - b.n);
-    });
-    const labels = { boeken: "Boeken", games: "Spelen", liedjes: "Liedjes", verhalen: "Verhalen" };
     return `
       <h2>Willo</h2>
       <p class="willo-hint">${standalone ? "Op het beginscherm." : "Zet op beginscherm via Delen in Safari."}</p>
       <h3>Kind</h3>
       <div class="willo-row"><label>Geboorte</label><input type="date" id="willo-birth" value="${st.birth || ""}"></div>
       <div class="willo-hint">${months == null ? "Nog geen leeftijd." : months + " maanden · emmer " + (stage ? stage.id : "?")}</div>
-      <h3>Inhoud</h3>
-      ${S.LANGS.map((l) => `<div class="willo-row"><label>${LANG_LABEL[l] || l}</label>${toggle(S.isLangOn(st, l)).replace(">", ` data-lang="${l}">`)}</div>`).join("")}
-      <h3>Secties</h3>
-      ${S.SECTIONS.map((sec) => `<div class="willo-row"><label>${labels[sec] || sec}</label>${toggle(S.isSectionOn(st, sec)).replace(">", ` data-sec="${sec}">`)}</div>`).join("")}
-      ${PAGE && tracks.length ? `<h3>Tegels (${PAGE})</h3>` + S.SECTIONS.map((sec) => {
-        if (!groups[sec].length) return "";
-        return `<h3 style="margin-top:8px">${labels[sec]}</h3>` + groups[sec].map((t) => {
-          const on = S.isItemOn(st, t, PAGE);
-          return `<div class="willo-row"><label>${t.title}<small>vanaf ${t.fromMonth || 0} m</small></label>${toggle(on).replace(">", ` data-item="${PAGE}:${sec}:${t.n}">`)}</div>`;
-        }).join("");
-      }).join("") : ""}
-      <h3>Foto’s</h3>
-      ${S.LANGS.map((l) => `<div class="willo-row"><label>${l}</label><input type="file" accept="image/*" data-photo="${l}"></div>`).join("")}
+      <h3>Wat speelt hij?</h3>
+      ${S.SECTIONS.map((sec) => `<button type="button" class="willo-drill" data-drill="${sec}"><span>${SEC_LABEL[sec] || sec}</span><span>›</span></button>`).join("")}
+      <button type="button" class="willo-drill" data-drill-faces><span>Wie is erbij?</span><span>›</span></button>
       <div class="willo-actions">
         <button type="button" data-export>Exporteer</button>
         <button type="button" data-import>Importeer</button>
         <input type="file" accept="application/json,.json" id="willo-import" hidden>
         <button type="button" data-close>Klaar</button>
       </div>
+    `;
+  }
+
+  function renderFaces() {
+    const st = S.load();
+    return `
+      <button type="button" class="willo-back" data-back>‹ Terug</button>
+      <h2>Wie is erbij?</h2>
+      <p class="willo-hint">Foto erbij, dan aan.</p>
+      ${S.LANGS.map((l) => `<div class="willo-row"><label class="willo-face-lab"><img data-face="${l}" alt="" class="willo-face-dot missing"><input type="file" accept="image/*" data-photo="${l}"></label>${toggle(S.isLangOn(st, l)).replace(">", ` data-lang="${l}">`)}</div>`).join("")}
+    `;
+  }
+
+  function renderSection(sec) {
+    const st = S.load();
+    const groups = S.groupItems(sec, catalog());
+    const anyPack = S.LANGS.some((l) => S.isLangOn(st, l));
+    const rows = groups.map((g) => {
+      const inner = g.items.map((t) => {
+        const track = { n: t.n, _section: t.section, fromMonth: t.fromMonth };
+        const on = S.isItemOn(st, track, t.pack);
+        const age = t.fromMonth ? "vanaf " + t.fromMonth + " m" : "";
+        return `<div class="willo-row"><label class="willo-face-lab"><img data-face="${t.pack}" alt="" class="willo-face-dot missing"><span>${t.title}${age ? "<small>" + age + "</small>" : ""}</span></label>${toggle(on).replace(">", ` data-item="${t.pack}:${t.section}:${t.n}">`)}</div>`;
+      }).join("");
+      if (g.items.length === 1) return inner;
+      return `<h3>${g.title}</h3>` + inner;
+    }).join("");
+    return `
+      <button type="button" class="willo-back" data-back>‹ Terug</button>
+      <h2>${SEC_LABEL[sec] || sec}</h2>
+      <div class="willo-row"><label>Alles in ${SEC_LABEL[sec] || sec}</label>${toggle(S.isSectionOn(st, sec)).replace(">", ` data-sec="${sec}">`)}</div>
+      ${anyPack ? rows : `<p class="willo-hint">Zet eerst iemand aan.</p><button type="button" class="willo-drill" data-drill-faces>Wie is erbij? ›</button>`}
     `;
   }
 
@@ -169,6 +201,7 @@
     }
     mask.innerHTML = `<div class="willo-sheet">${html}</div>`;
     bind(mask);
+    applyFaceImages();
   }
 
   function bindTap(el, fn) {
@@ -206,10 +239,23 @@
     }
     mask.querySelectorAll("[data-close]").forEach((b) => bindTap(b, close));
     mask.querySelectorAll("[data-k]").forEach((b) => bindTap(b, () => digit(b.getAttribute("data-k"))));
+    mask.querySelectorAll("[data-drill]").forEach((b) => bindTap(b, () => {
+      sheetView = "section";
+      sheetSec = b.getAttribute("data-drill");
+      mount(renderSheet());
+    }));
+    mask.querySelectorAll("[data-drill-faces]").forEach((b) => bindTap(b, () => {
+      sheetView = "faces";
+      mount(renderSheet());
+    }));
+    mask.querySelectorAll("[data-back]").forEach((b) => bindTap(b, () => {
+      sheetView = "root";
+      mount(renderSheet());
+    }));
     mask.querySelectorAll("[data-lang]").forEach((el) => el.addEventListener("change", () => {
       const r = S.setLang(S.load(), el.getAttribute("data-lang"), el.checked);
       if (!r.ok) { el.checked = !el.checked; return; }
-      S.save(r.state); applyLangs();
+      S.save(r.state); applyLangs(); mount(renderSheet());
     }));
     mask.querySelectorAll("[data-add-lang]").forEach((b) => bindTap(b, () => {
       const lang = b.getAttribute("data-add-lang");
@@ -220,12 +266,12 @@
     }));
     mask.querySelectorAll("[data-sec]").forEach((el) => el.addEventListener("change", () => {
       const r = S.setSection(S.load(), el.getAttribute("data-sec"), el.checked);
-      S.save(r.state); applyCatalog();
+      S.save(r.state); applyCatalog(); mount(renderSheet());
     }));
     mask.querySelectorAll("[data-item]").forEach((el) => el.addEventListener("change", () => {
       const [taal, sec, n] = el.getAttribute("data-item").split(":");
       const r = S.setItem(S.load(), taal, sec, Number(n), el.checked);
-      S.save(r.state); applyCatalog();
+      S.save(r.state); applyCatalog(); mount(renderSheet());
     }));
     const birth = mask.querySelector("#willo-birth");
     if (birth) birth.addEventListener("change", () => {
@@ -609,30 +655,20 @@
     el.innerHTML = `
       <p class="stage-kicker">${copy.kicker}</p>
       <h1>${copy.title}</h1>
-      <button type="button" class="hold-pad" id="hold-pad" aria-label="${copy.title}">
-        <span class="hold-ring" aria-hidden="true"></span>
-        <img class="hold-face" id="hold-face" alt="" hidden>
-      </button>
+      <div class="hold-blank" id="hold-pad" aria-label="${copy.title}"></div>
       <p class="hold-hint">${copy.hint}</p>
     `;
-    const pad = el.querySelector("#hold-pad");
-    if (pad && window.WilloHold) {
-      WilloHold.attach(pad, {
+    if (window.WilloHold) {
+      WilloHold.attach(el, {
         onHold() { openUnlock(); },
         onTap() {},
       });
     }
-    if (pad) pad.addEventListener("click", (e) => {
+    el.addEventListener("click", (e) => {
       if ("ontouchstart" in window) return;
       if (e.detail === 0) return;
+      if (e.target.closest("button")) return;
       openUnlock();
-    });
-    photoGet("child").then((data) => {
-      const img = document.getElementById("hold-face");
-      if (img && data) {
-        img.src = data;
-        img.hidden = false;
-      }
     });
   }
 
@@ -680,6 +716,8 @@
     if (hold) hold.hidden = surface !== "hold";
     const staged = surface === "install" || surface === "child" || surface === "hold";
     grid.hidden = staged;
+    const blank = document.getElementById("home-blank");
+    if (blank && staged) blank.hidden = true;
     document.body.classList.toggle("onboard", staged);
     document.body.dataset.stage = surface;
     const loc = navigator.language || document.documentElement.lang || "nl";
@@ -708,13 +746,17 @@
     grid.classList.toggle("home-empty", pickLangs.length === 1);
     grid.classList.toggle("home-pick", !!chrome.firstPick);
     const tiles = pickLangs.map((l) => `
-      <button class="tile" data-href="/willo/${l}/" data-label="${l}" data-pick="${chrome.firstPick ? "1" : ""}" aria-label="${LANG_LABEL[l] || l}">
+      <button class="tile" data-href="/willo/${l}/" data-label="${l}" aria-label="${l}">
         <img data-face="${l}" alt="" class="missing">
-        <div class="text-fallback">${LANG_LABEL[l] || l}</div>
-        <div class="label">${LANG_LABEL[l] || l}</div>
+        <div class="text-fallback" aria-hidden="true"></div>
       </button>`).join("");
     grid.innerHTML = tiles;
-    paintHint(chrome.firstPick ? S.firstPickCopy(loc).hint : (chrome.holdHint ? S.holdHintCopy(loc) : ""));
+    const blank = document.getElementById("home-blank");
+    if (blank) {
+      blank.hidden = false;
+      blank.textContent = S.holdHintCopy(loc);
+    }
+    paintHint("");
     grid.querySelectorAll("button.tile").forEach((btn) => {
       const pick = btn.dataset.pick === "1";
       if (window.WilloHold) {
@@ -772,6 +814,8 @@
     if (surface === "install" || surface === "child") return;
     pinBuf = "";
     mode = "gate";
+    sheetView = "root";
+    sheetSec = "";
     if (typeof tel === "function") tel("pin_gate", { surface: surface });
     mount(renderGate());
   }

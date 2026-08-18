@@ -161,8 +161,9 @@ def render_taal(name, config):
     overflow_js = (ROOT / "scripts/overflow-assign.js").read_text()
     willo_hold = (ROOT / "scripts/willo-hold.js").read_text()
     willo_js = (ROOT / "scripts/willo-settings.js").read_text()
+    willo_cat = (ROOT / "scripts/willo-catalog.js").read_text()
     willo_ui = (ROOT / "scripts/willo-settings-ui.js").read_text()
-    ver = content_hash(all_tracks, template, sw_template, overflow_js, willo_hold, willo_js, willo_ui, config["lang"], labels)
+    ver = content_hash(all_tracks, template, sw_template, overflow_js, willo_hold, willo_js, willo_cat, willo_ui, config["lang"], labels)
     app_version = f"{name}-{ver}"
     cache_name = f"{name}-{ver}"
     mp3_cache_name = f"{name}-mp3-{ver}"
@@ -183,6 +184,7 @@ def render_taal(name, config):
         .replace("/*__OVERFLOW_ASSIGN__*/", overflow_js)
         .replace("/*__WILLO_HOLD__*/", willo_hold)
         .replace("/*__WILLO_SETTINGS__*/", willo_js)
+        .replace("/*__WILLO_CATALOG__*/", willo_cat)
         .replace("/*__WILLO_SETTINGS_UI__*/", willo_ui)
     )
     (out_dir / "index.html").write_text(html, encoding="utf-8")

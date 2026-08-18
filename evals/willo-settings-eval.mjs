@@ -106,6 +106,18 @@ ok("no first pick after one", S.homeChrome(1).firstPick === false);
 ok("hold hint after one", S.homeChrome(1).holdHint === true);
 ok("nav hides off langs", S.navVisibility({ langs: { mama: true, papa: false, klas: false } }).papa === false);
 ok("nav shows on lang", S.navVisibility({ langs: { mama: true, papa: false, klas: false } }).mama === true);
+ok("krokodil one group", S.groupItems("liedjes", [
+  { pack: "papa", section: "liedjes", n: 1, title: "En de krokodil" },
+]).length === 1);
+ok("memory three packs one group", (() => {
+  const g = S.groupItems("games", [
+    { pack: "mama", section: "games", n: 1, title: "Mémoire", href: "/willo/mama/games/memory/" },
+    { pack: "papa", section: "games", n: 1, title: "Memory", href: "/willo/papa/games/memory/" },
+    { pack: "klas", section: "games", n: 1, title: "Memory", href: "/willo/klas/games/memory/" },
+  ]);
+  return g.length === 1 && g[0].items.length === 3 && g[0].title === "Memory";
+})());
+ok("hold hint lege", S.holdHintCopy("nl").indexOf("lege") !== -1);
 ok("merge bridge fills child", S.hasChild(S.mergeBridge(S.defaultState(), { childName: "Ada", birth: "2024-09-24", childFace: true })));
 ok("merge will not wipe existing", (() => {
   const have = S.mergeBridge(
