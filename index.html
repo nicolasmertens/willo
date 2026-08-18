@@ -138,7 +138,7 @@ document.addEventListener("gestureend", e => e.preventDefault(), { passive: fals
 
 let lastTouchEnd = 0;
 document.addEventListener("touchend", e => {
-  if (e.target.closest("#child-card, #install-card, #hold-card, input, textarea, select, label, button")) return;
+  if (e.target.closest("#child-card, #install-card, #hold-card, #willo-mask, input, textarea, select, label, button")) return;
   const now = Date.now();
   if (now - lastTouchEnd <= 350) e.preventDefault();
   lastTouchEnd = now;
@@ -282,8 +282,8 @@ window.addEventListener("load", () => {
   if (window.WilloUI) WilloUI.boot();
 });
 </script>
-<script src="scripts/willo-hold.js?v=14"></script>
-<script src="scripts/willo-settings.js?v=14"></script>
-<script src="scripts/willo-settings-ui.js?v=14"></script>
+<script src="scripts/willo-hold.js?v=15"></script>
+<script src="scripts/willo-settings.js?v=15"></script>
+<script src="scripts/willo-settings-ui.js?v=15"></script>
 </body>
 </html>

@@ -124,6 +124,8 @@ ok("openUnlock uses surface", /function openUnlock\(\) \{\s*const surface = surf
 ok("no blob manifest", ui.indexOf("man.href = URL.createObjectURL") === -1);
 ok("no plus taal tile", ui.indexOf("Taal toevoegen") === -1);
 ok("settings heading not mama papa klas", ui.indexOf("<h3>Mama, papa, klas</h3>") === -1);
+ok("pin uses pointerup", ui.indexOf("function bindTap") !== -1 && ui.indexOf("pointerup") !== -1);
+ok("pin telemetry", ui.indexOf("pin_tap") !== -1);
 ok("a2hs detaches manifest", S.springboardTags("William").detachManifest === true);
 ok("a2hs title first name", S.springboardTags("William Mertens").title === "William");
 ok("a2hs lists stock W path", S.springboardTags("Ada").stockIconPaths.indexOf("apple-touch-icon.png") !== -1);

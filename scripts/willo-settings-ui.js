@@ -69,7 +69,8 @@
     .willo-row small{display:block;font-weight:500;color:rgba(0,0,0,.45);}
     .willo-sheet input[type=date]{font:inherit;padding:8px;border-radius:10px;border:1px solid #ddd;}
     .willo-pins{display:flex;gap:8px;justify-content:center;margin:12px 0;}
-    .willo-pins button{width:64px;height:48px;border-radius:12px;border:0;background:#fff;font-weight:800;font-size:18px;box-shadow:0 3px 0 rgba(0,0,0,.1);}
+    .willo-mask,.willo-sheet,.willo-sheet button{touch-action:manipulation;}
+    .willo-pins button{width:64px;height:52px;border-radius:12px;border:0;background:#fff;font-weight:800;font-size:18px;box-shadow:0 3px 0 rgba(0,0,0,.1);touch-action:manipulation;}
     .willo-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
     .willo-actions button,.willo-sheet .willo-go{border:0;border-radius:14px;padding:12px 14px;font-weight:800;background:#fff;box-shadow:0 3px 0 rgba(0,0,0,.1);}
     .willo-err{color:#c0392b;font-weight:700;min-height:1.2em;text-align:center;}
@@ -170,16 +171,47 @@
     bind(mask);
   }
 
+  function bindTap(el, fn) {
+    let armed = null;
+    let usedPointer = false;
+    el.addEventListener("pointerdown", (e) => {
+      if (e.isPrimary === false) return;
+      armed = { id: e.pointerId, x: e.clientX, y: e.clientY, t: Date.now() };
+    });
+    el.addEventListener("pointerup", (e) => {
+      if (!armed || armed.id !== e.pointerId) return;
+      const dx = e.clientX - armed.x;
+      const dy = e.clientY - armed.y;
+      const dt = Date.now() - armed.t;
+      armed = null;
+      if (Math.hypot(dx, dy) > 28 || dt > 1500) return;
+      usedPointer = true;
+      e.preventDefault();
+      fn();
+    });
+    el.addEventListener("pointercancel", () => { armed = null; });
+    el.addEventListener("click", (e) => {
+      if (usedPointer) {
+        e.preventDefault();
+        return;
+      }
+      fn();
+    });
+  }
+
   function bind(mask) {
-    mask.addEventListener("click", (e) => { if (e.target === mask) close(); });
-    mask.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", close));
-    mask.querySelectorAll("[data-k]").forEach((b) => b.addEventListener("click", () => digit(b.getAttribute("data-k"))));
+    if (!mask.dataset.bound) {
+      mask.dataset.bound = "1";
+      mask.addEventListener("click", (e) => { if (e.target === mask) close(); });
+    }
+    mask.querySelectorAll("[data-close]").forEach((b) => bindTap(b, close));
+    mask.querySelectorAll("[data-k]").forEach((b) => bindTap(b, () => digit(b.getAttribute("data-k"))));
     mask.querySelectorAll("[data-lang]").forEach((el) => el.addEventListener("change", () => {
       const r = S.setLang(S.load(), el.getAttribute("data-lang"), el.checked);
       if (!r.ok) { el.checked = !el.checked; return; }
       S.save(r.state); applyLangs();
     }));
-    mask.querySelectorAll("[data-add-lang]").forEach((b) => b.addEventListener("click", () => {
+    mask.querySelectorAll("[data-add-lang]").forEach((b) => bindTap(b, () => {
       const lang = b.getAttribute("data-add-lang");
       const r = S.setLang(S.load(), lang, true);
       if (r.ok) S.save(r.state);
@@ -259,6 +291,7 @@
   }
 
   function digit(k) {
+    if (typeof tel === "function") tel("pin_tap", { k: String(k), n: pinBuf.length });
     if (k === "⌫") { pinBuf = pinBuf.slice(0, -1); mount(renderGate()); return; }
     if (!/^\d$/.test(k) || pinBuf.length >= 4) return;
     pinBuf += k;
@@ -739,6 +772,7 @@
     if (surface === "install" || surface === "child") return;
     pinBuf = "";
     mode = "gate";
+    if (typeof tel === "function") tel("pin_gate", { surface: surface });
     mount(renderGate());
   }
 
