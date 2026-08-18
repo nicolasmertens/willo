@@ -95,7 +95,31 @@ ok("import empty langs stay empty", (() => {
   return r.ok && S.LANGS.every((l) => !r.state.langs[l]);
 })());
 
-console.log("checks: 48  fails: " + fails.length);
+ok("no plus tile", S.homeChrome(0).showPlus === false);
+ok("first pick when empty", S.homeChrome(0).firstPick === true);
+ok("no first pick after one", S.homeChrome(1).firstPick === false);
+ok("hold hint after one", S.homeChrome(1).holdHint === true);
+ok("nav hides off langs", S.navVisibility({ langs: { mama: true, papa: false, klas: false } }).papa === false);
+ok("nav shows on lang", S.navVisibility({ langs: { mama: true, papa: false, klas: false } }).mama === true);
+ok("merge bridge fills child", S.hasChild(S.mergeBridge(S.defaultState(), { childName: "Ada", birth: "2024-09-24", childFace: true })));
+ok("merge will not wipe existing", (() => {
+  const have = S.mergeBridge(
+    { ...S.defaultState(), childName: "Ada", birth: "2024-09-24", childFace: true },
+    { childName: "Other", birth: "2020-01-01", childFace: true }
+  );
+  return have.childName === "Ada";
+})());
+ok("first pick copy not taal", S.firstPickCopy("nl").title.indexOf("Taal") === -1);
+ok("slim bridge has langs", !!S.slimBridge(S.defaultState()).langs);
+
+const { readFileSync } = require("fs");
+const ui = readFileSync(join(root, "scripts/willo-settings-ui.js"), "utf8");
+ok("openUnlock no const mode shadow", !/function openUnlock\(\) \{\s*const mode = surfaceNow/.test(ui));
+ok("openUnlock uses surface", /function openUnlock\(\) \{\s*const surface = surfaceNow/.test(ui));
+ok("no blob manifest", ui.indexOf("man.href = URL.createObjectURL") === -1);
+ok("no plus taal tile", ui.indexOf("Taal toevoegen") === -1);
+
+console.log("checks: " + (48 + 14) + "  fails: " + fails.length);
 fails.forEach((f) => console.log("FAIL", f));
 if (fails.length) process.exit(1);
 console.log("PASS willo settings");

@@ -106,6 +106,87 @@
     return "home";
   }
 
+  function homeChrome(langOnCount) {
+    const n = Number(langOnCount) || 0;
+    return {
+      firstPick: n === 0,
+      showPlus: false,
+      holdHint: n > 0,
+    };
+  }
+
+  function navVisibility(state) {
+    const out = {};
+    LANGS.forEach((l) => { out[l] = isLangOn(state, l); });
+    return out;
+  }
+
+  function firstPickCopy(lang) {
+    const l = String(lang || "en").toLowerCase().slice(0, 2);
+    const table = {
+      nl: { title: "Kies", hint: "Houd daarna 2 seconden in voor instellingen." },
+      fr: { title: "Choisis", hint: "Ensuite, reste appuyé 2 secondes pour les réglages." },
+      de: { title: "Wählen", hint: "Danach 2 Sekunden halten für Einstellungen." },
+      en: { title: "Choose", hint: "Then hold 2 seconds for settings." },
+    };
+    return table[l] || table.en;
+  }
+
+  function holdHintCopy(lang) {
+    const l = String(lang || "en").toLowerCase().slice(0, 2);
+    const table = {
+      nl: "Houd een tegel 2 seconden in voor instellingen.",
+      fr: "Reste appuyé 2 secondes sur une tuile pour les réglages.",
+      de: "Kachel 2 Sekunden halten für Einstellungen.",
+      en: "Hold a tile 2 seconds for settings.",
+    };
+    return table[l] || table.en;
+  }
+
+  function slimBridge(state) {
+    const s = state || defaultState();
+    return {
+      childName: s.childName || "",
+      birth: s.birth || "",
+      childFace: !!s.childFace,
+      langs: Object.assign(defaultState().langs, s.langs || {}),
+    };
+  }
+
+  function mergeBridge(state, bridge) {
+    const next = clone(state || defaultState());
+    if (!bridge || typeof bridge !== "object") return next;
+    if (hasChild(next)) return next;
+    if (bridge.childName) next.childName = springboardName(bridge.childName);
+    if (bridge.birth) next.birth = String(bridge.birth);
+    if (bridge.childFace) next.childFace = true;
+    if (bridge.langs && typeof bridge.langs === "object") {
+      LANGS.forEach((l) => {
+        if (typeof bridge.langs[l] === "boolean") next.langs[l] = bridge.langs[l];
+      });
+    }
+    return next;
+  }
+
+  function writeBridgeCookie(state) {
+    try {
+      if (typeof document === "undefined") return;
+      const slim = slimBridge(state);
+      document.cookie = "willo_bridge=" + encodeURIComponent(JSON.stringify(slim)) + ";path=/;max-age=31536000;SameSite=Lax";
+    } catch (e) {}
+  }
+
+  function readBridgeCookie() {
+    try {
+      if (typeof document === "undefined") return null;
+      const m = String(document.cookie || "").match(/(?:^|; )willo_bridge=([^;]*)/);
+      if (!m) return null;
+      return JSON.parse(decodeURIComponent(m[1]));
+    } catch (e) {
+      return null;
+    }
+  }
+
   function defaultState() {
     return {
       pinHash: "",
@@ -255,16 +336,18 @@
   function load() {
     try {
       const raw = root.localStorage && root.localStorage.getItem(KEY);
-      if (!raw) return defaultState();
+      if (!raw) return mergeBridge(defaultState(), readBridgeCookie());
       const parsed = JSON.parse(raw);
       const merged = defaultState();
-      return Object.assign(merged, parsed, {
+      const fromStore = Object.assign(merged, parsed, {
         langs: Object.assign(defaultState().langs, parsed.langs || {}),
         sections: Object.assign(defaultState().sections, parsed.sections || {}),
         items: parsed.items || {},
       });
+      if (hasChild(fromStore)) return fromStore;
+      return mergeBridge(fromStore, readBridgeCookie());
     } catch (e) {
-      return defaultState();
+      return mergeBridge(defaultState(), readBridgeCookie());
     }
   }
 
@@ -272,12 +355,14 @@
     try {
       if (root.localStorage) root.localStorage.setItem(KEY, JSON.stringify(state));
     } catch (e) {}
+    writeBridgeCookie(state);
     return state;
   }
 
   const api = {
     KEY, LANGS, SECTIONS, STAGES,
-    homeSurface, hasChild, setChild, springboardName, childCopy,
+    homeSurface, homeChrome, navVisibility, hasChild, setChild, springboardName, childCopy,
+    firstPickCopy, holdHintCopy, slimBridge, mergeBridge,
     isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
     defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,

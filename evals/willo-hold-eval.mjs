@@ -60,8 +60,30 @@ ok("tick 1799 still holding", H.decide([
   { type: "tick", t: 1799 },
 ]) === "holding");
 
+const S = require(join(root, "scripts/willo-settings.js"));
+globalThis.WilloSettings = S;
+const N = require(join(root, "scripts/willo-nav.js"));
+function fakeBtn(href) {
+  return { getAttribute(name) { return name === "data-href" ? href : ""; } };
+}
+ok("nav lang from href", N.langFromBtn(fakeBtn("/willo/mama/")) === "mama");
+ok("nav bar hides two", (() => {
+  const tiles = [
+    { getAttribute(n) { return n === "data-href" ? "/willo/mama/" : ""; }, style: {} },
+    { getAttribute(n) { return n === "data-href" ? "/willo/papa/" : ""; }, style: {} },
+    { getAttribute(n) { return n === "data-href" ? "/willo/klas/" : ""; }, style: {} },
+  ];
+  const bar = {
+    querySelectorAll() { return tiles; },
+    querySelector(sel) { return sel === ".stopbtn" ? {} : null; },
+    style: {},
+  };
+  const r = N.applyBar(bar, { langs: { mama: true, papa: false, klas: false } });
+  return r.shown === 1 && tiles[1].style.display === "none" && tiles[2].style.display === "none" && tiles[0].style.display === "";
+})());
+
 if (fails.length) {
   console.log("FAIL", fails.length, fails.join(" | "));
   process.exit(1);
 }
-console.log("PASS 9/9");
+console.log("PASS 11/11");

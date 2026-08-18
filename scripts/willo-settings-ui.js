@@ -128,8 +128,8 @@
       <h3>Kind</h3>
       <div class="willo-row"><label>Geboorte</label><input type="date" id="willo-birth" value="${st.birth || ""}"></div>
       <div class="willo-hint">${months == null ? "Nog geen leeftijd." : months + " maanden · emmer " + (stage ? stage.id : "?")}</div>
-      <h3>Talen</h3>
-      ${S.LANGS.map((l) => `<div class="willo-row"><label>${l}</label>${toggle(S.isLangOn(st, l)).replace(">", ` data-lang="${l}">`)}</div>`).join("")}
+      <h3>Mama, papa, klas</h3>
+      ${S.LANGS.map((l) => `<div class="willo-row"><label>${LANG_LABEL[l] || l}</label>${toggle(S.isLangOn(st, l)).replace(">", ` data-lang="${l}">`)}</div>`).join("")}
       <h3>Secties</h3>
       ${S.SECTIONS.map((sec) => `<div class="willo-row"><label>${labels[sec] || sec}</label>${toggle(S.isSectionOn(st, sec)).replace(">", ` data-sec="${sec}">`)}</div>`).join("")}
       ${PAGE && tracks.length ? `<h3>Tegels (${PAGE})</h3>` + S.SECTIONS.map((sec) => {
@@ -179,20 +179,10 @@
     }));
     mask.querySelectorAll("[data-add-lang]").forEach((b) => b.addEventListener("click", () => {
       const lang = b.getAttribute("data-add-lang");
-      const inp = mask.querySelector("#willo-add-photo");
-      if (!inp) return;
-      inp.onchange = async () => {
-        const f = inp.files && inp.files[0];
-        if (!f) return;
-        const url = await fileToData(f);
-        await photoSet(lang, url);
-        const r = S.setLang(S.load(), lang, true);
-        if (r.ok) S.save(r.state);
-        close();
-        applyLangs();
-        await applyFaceImages();
-      };
-      inp.click();
+      const r = S.setLang(S.load(), lang, true);
+      if (r.ok) S.save(r.state);
+      close();
+      applyLangs();
     }));
     mask.querySelectorAll("[data-sec]").forEach((el) => el.addEventListener("change", () => {
       const r = S.setSection(S.load(), el.getAttribute("data-sec"), el.checked);
@@ -308,15 +298,14 @@
     const st = S.load();
     const off = S.LANGS.filter((l) => !S.isLangOn(st, l));
     if (!off.length) {
-      return `<h2>Talen</h2><p class="willo-hint">Mama, papa en klas staan al aan.</p><div class="willo-actions"><button type="button" data-close>Klaar</button></div>`;
+      return `<h2>Mama, papa, klas</h2><p class="willo-hint">Mama, papa en klas staan al aan.</p><div class="willo-actions"><button type="button" data-close>Klaar</button></div>`;
     }
     return `
-      <h2>Taal toevoegen</h2>
-      <p class="willo-hint">Kies er een. Daarna een foto van dat gezicht.</p>
+      <h2>Toevoegen</h2>
+      <p class="willo-hint">Kies mama, papa of klas. Foto kan later in instellingen.</p>
       <div class="willo-actions" style="flex-direction:column">
         ${off.map((l) => `<button type="button" class="willo-go" data-add-lang="${l}">${LANG_LABEL[l] || l}</button>`).join("")}
       </div>
-      <input type="file" accept="image/*" id="willo-add-photo" hidden>
       <div class="willo-actions"><button type="button" data-close>Sluiten</button></div>
     `;
   }
@@ -403,39 +392,39 @@
     return abs.href;
   }
 
+  function tellWorkerKid(name) {
+    try {
+      if (!navigator.serviceWorker) return;
+      const send = (w) => { if (w) w.postMessage({ type: "willo-kid", name: name || "" }); };
+      if (navigator.serviceWorker.controller) send(navigator.serviceWorker.controller);
+      navigator.serviceWorker.ready.then((reg) => send(reg.active)).catch(() => {});
+    } catch (e) {}
+  }
+
   async function applySpringboard(name, dataUrl) {
     const label = S.springboardName(name) || "Willo";
-    const title = document.querySelector("meta[name='apple-mobile-web-app-title']");
-    if (title) title.setAttribute("content", label);
+    let title = document.querySelector("meta[name='apple-mobile-web-app-title']");
+    if (!title) {
+      title = document.createElement("meta");
+      title.setAttribute("name", "apple-mobile-web-app-title");
+      document.head.appendChild(title);
+    }
+    title.setAttribute("content", label);
     document.title = label;
+    const man = document.getElementById("willo-manifest");
+    if (man && String(man.href || "").indexOf("blob:") === 0) man.href = "manifest.json";
+    tellWorkerKid(label);
     if (!dataUrl) return;
     try {
       const b180 = await squareBlob(dataUrl, 180);
       const b512 = await squareBlob(dataUrl, 512);
-      const u180 = await cacheKidIcon(b180, "kid-icon-180.png");
-      const u512 = await cacheKidIcon(b512, "kid-icon-512.png");
+      await cacheKidIcon(b180, "kid-icon-180.png");
+      await cacheKidIcon(b512, "kid-icon-512.png");
       const stamp = Date.now();
       const icon180 = document.getElementById("willo-touch-icon");
-      if (icon180) icon180.href = u180 + "?v=" + stamp;
-      document.querySelectorAll("link[rel='icon']").forEach((l) => { l.href = u180 + "?v=" + stamp; });
-      const man = document.getElementById("willo-manifest");
-      if (man) {
-        const spec = {
-          name: label,
-          short_name: label,
-          start_url: "./",
-          scope: "./",
-          display: "standalone",
-          background_color: "#fff7e6",
-          theme_color: "#fff7e6",
-          icons: [
-            { src: u180 + "?v=" + stamp, sizes: "180x180", type: "image/png" },
-            { src: u512 + "?v=" + stamp, sizes: "512x512", type: "image/png" },
-          ],
-        };
-        const blob = new Blob([JSON.stringify(spec)], { type: "application/json" });
-        man.href = URL.createObjectURL(blob);
-      }
+      if (icon180) icon180.href = "apple-touch-icon.png?v=" + stamp;
+      document.querySelectorAll("link[rel='icon']").forEach((l) => { l.href = "icon-192.png?v=" + stamp; });
+      tellWorkerKid(label);
     } catch (e) {}
   }
 
@@ -492,47 +481,66 @@
     mount(renderAddLang());
   }
 
+  function paintHint(text) {
+    const hint = document.getElementById("home-hint");
+    if (!hint) return;
+    if (!text) {
+      hint.hidden = true;
+      hint.textContent = "";
+      return;
+    }
+    hint.hidden = false;
+    hint.textContent = text;
+  }
+
+  function enableLang(lang) {
+    const r = S.setLang(S.load(), lang, true);
+    if (r.ok) S.save(r.state);
+    renderHome();
+  }
+
   function renderHome() {
     const grid = document.getElementById("home-grid");
     const install = document.getElementById("install-card");
     if (!grid) return;
-    const mode = surfaceNow();
+    const surface = surfaceNow();
     const child = document.getElementById("child-card");
-    if (child) child.hidden = mode !== "child";
-    if (install) install.hidden = mode !== "install";
-    grid.hidden = mode === "install" || mode === "child";
-    if (mode === "child") {
+    if (child) child.hidden = surface !== "child";
+    if (install) install.hidden = surface !== "install";
+    grid.hidden = surface === "install" || surface === "child";
+    const loc = navigator.language || document.documentElement.lang || "nl";
+    if (surface === "child") {
       grid.innerHTML = "";
+      paintHint("");
       paintChild();
       return;
     }
-    if (mode === "install") {
+    if (surface === "install") {
       grid.innerHTML = "";
+      paintHint("");
       paintInstall();
       return;
     }
     const st = S.load();
     const on = S.LANGS.filter((l) => S.isLangOn(st, l));
-    const canAdd = on.length < S.LANGS.length;
-    grid.classList.toggle("home-empty", on.length === 0);
-    const tiles = on.map((l) => `
-      <button class="tile" data-href="/willo/${l}/" data-label="${l}" aria-label="${LANG_LABEL[l] || l}">
+    const chrome = S.homeChrome(on.length);
+    const pickLangs = chrome.firstPick ? S.LANGS.slice() : on;
+    grid.classList.toggle("home-empty", pickLangs.length === 1);
+    grid.classList.toggle("home-pick", !!chrome.firstPick);
+    const tiles = pickLangs.map((l) => `
+      <button class="tile" data-href="/willo/${l}/" data-label="${l}" data-pick="${chrome.firstPick ? "1" : ""}" aria-label="${LANG_LABEL[l] || l}">
         <img data-face="${l}" alt="" class="missing">
         <div class="text-fallback">${LANG_LABEL[l] || l}</div>
         <div class="label">${LANG_LABEL[l] || l}</div>
       </button>`).join("");
-    const plus = canAdd ? `
-      <button class="tile tile-plus" data-label="add" aria-label="Taal toevoegen">
-        <span class="plus" aria-hidden="true">+</span>
-        <div class="label">Taal</div>
-      </button>` : "";
-    grid.innerHTML = tiles + plus;
+    grid.innerHTML = tiles;
+    paintHint(chrome.firstPick ? S.firstPickCopy(loc).hint : (chrome.holdHint ? S.holdHintCopy(loc) : ""));
     grid.querySelectorAll("button.tile").forEach((btn) => {
-      const add = btn.dataset.label === "add";
+      const pick = btn.dataset.pick === "1";
       if (window.WilloHold) {
         WilloHold.attach(btn, {
           onTap() {
-            if (add) openAddLang();
+            if (pick) enableLang(btn.dataset.label);
             else if (btn.dataset.href) window.location = btn.dataset.href;
           },
           onHold() { openUnlock(); },
@@ -541,7 +549,7 @@
       btn.addEventListener("click", (e) => {
         if ("ontouchstart" in window) return;
         if (e.detail === 0) return;
-        if (add) openAddLang();
+        if (pick) enableLang(btn.dataset.label);
         else if (btn.dataset.href) window.location = btn.dataset.href;
       });
     });
@@ -580,8 +588,8 @@
   }
 
   function openUnlock() {
-    const mode = surfaceNow();
-    if (mode === "install" || mode === "child") return;
+    const surface = surfaceNow();
+    if (surface === "install" || surface === "child") return;
     pinBuf = "";
     mode = "gate";
     mount(renderGate());

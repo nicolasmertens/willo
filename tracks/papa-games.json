@@ -6,29 +6,19 @@
       "n": 1,
       "title": "Memory",
       "icon": "/willo/klas/games/hero-memory.jpg",
-      "href": "/willo/papa/games/memory/",
-      "fromMonth": 16
+      "href": "/willo/papa/games/memory/"
     },
     {
       "n": 2,
       "title": "Geluiden",
       "icon": "/willo/klas/games/hero-sounds.jpg",
-      "href": "/willo/papa/games/soundboard/",
-      "fromMonth": 16
+      "href": "/willo/papa/games/soundboard/"
     },
     {
       "n": 3,
       "title": "Welke?",
       "icon": "/willo/klas/games/hero-pick.jpg",
-      "href": "/willo/papa/games/pick/",
-      "fromMonth": 16
-    },
-    {
-      "n": 4,
-      "title": "Groot of klein",
-      "icon": "/willo/klas/games/_archive/hero-sort.jpg",
-      "href": "/willo/klas/games/_archive/sort/",
-      "fromMonth": 30
+      "href": "/willo/papa/games/pick/"
     }
   ]
 }

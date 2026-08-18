@@ -1,5 +1,5 @@
 // One Willo worker for /willo/. Does not wipe per-taal caches.
-const CORE_CACHE = "willo-core-v10";
+const CORE_CACHE = "willo-core-v11";
 const MP3_CACHE = "willo-mp3-v1";
 const KID_CACHE = "willo-kid-icon-v1";
 
@@ -17,6 +17,7 @@ const CORE = [
   "./scripts/willo-hold.js",
   "./scripts/willo-settings.js",
   "./scripts/willo-settings-ui.js",
+  "./scripts/willo-nav.js",
   "./mama/",
   "./papa/",
   "./klas/",
@@ -39,9 +40,64 @@ self.addEventListener("activate", (e) => {
   );
 });
 
+function kidUrl(file) {
+  return new URL("./" + file, self.location.href).href;
+}
+
+async function kidMeta() {
+  try {
+    const c = await caches.open(KID_CACHE);
+    const r = await c.match(kidUrl("kid-meta.json"));
+    if (!r) return { name: "" };
+    return await r.json();
+  } catch (err) {
+    return { name: "" };
+  }
+}
+
+async function kidPng(size) {
+  const c = await caches.open(KID_CACHE);
+  const file = size >= 512 ? "kid-icon-512.png" : "kid-icon-180.png";
+  return (await c.match(kidUrl(file))) || null;
+}
+
+async function personalizedManifest() {
+  const meta = await kidMeta();
+  const name = (meta && meta.name) || "Willo";
+  const spec = {
+    name,
+    short_name: name,
+    id: "/willo/",
+    start_url: "./",
+    scope: "./",
+    display: "standalone",
+    background_color: "#fff7e6",
+    theme_color: "#fff7e6",
+    icons: [
+      { src: "icon-192.png", sizes: "192x192", type: "image/png" },
+      { src: "icon-512.png", sizes: "512x512", type: "image/png" },
+      { src: "apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  };
+  return new Response(JSON.stringify(spec), {
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+  });
+}
+
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (url.origin !== self.location.origin) return;
+  if (url.pathname.endsWith("/manifest.json") || url.pathname.endsWith("manifest.json")) {
+    e.respondWith(personalizedManifest());
+    return;
+  }
+  if (/\/(apple-touch-icon|icon-192|icon-512)\.png$/.test(url.pathname)) {
+    const size = /512/.test(url.pathname) ? 512 : 180;
+    e.respondWith(
+      kidPng(size).then((r) => r || caches.match(e.request).then((c) => c || fetch(e.request)))
+    );
+    return;
+  }
   if (/kid-icon-\d+\.png$/.test(url.pathname)) {
     const bare = url.origin + url.pathname;
     e.respondWith(
@@ -85,6 +141,15 @@ self.addEventListener("fetch", (e) => {
 let prefetching = false;
 self.addEventListener("message", async (e) => {
   const msg = e.data;
+  if (msg && msg.type === "willo-kid") {
+    const name = String(msg.name || "").trim().slice(0, 12);
+    const cache = await caches.open(KID_CACHE);
+    await cache.put(
+      kidUrl("kid-meta.json"),
+      new Response(JSON.stringify({ name }), { headers: { "Content-Type": "application/json" } })
+    );
+    return;
+  }
   if (!msg || msg.type !== "prefetch-mp3s" || !Array.isArray(msg.urls)) return;
   if (prefetching) return;
   prefetching = true;
