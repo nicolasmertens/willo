@@ -118,8 +118,17 @@ ok("openUnlock no const mode shadow", !/function openUnlock\(\) \{\s*const mode 
 ok("openUnlock uses surface", /function openUnlock\(\) \{\s*const surface = surfaceNow/.test(ui));
 ok("no blob manifest", ui.indexOf("man.href = URL.createObjectURL") === -1);
 ok("no plus taal tile", ui.indexOf("Taal toevoegen") === -1);
+ok("a2hs detaches manifest", S.springboardTags("William").detachManifest === true);
+ok("a2hs title first name", S.springboardTags("William Mertens").title === "William");
+ok("a2hs lists stock W path", S.springboardTags("Ada").stockIconPaths.indexOf("apple-touch-icon.png") !== -1);
+ok("applySpringboard drops manifest", ui.indexOf("el.rel === \"manifest\"") !== -1);
+ok("applySpringboard not stock png", ui.indexOf("icon180.href = \"apple-touch-icon.png") === -1);
 
-console.log("checks: " + (48 + 14) + "  fails: " + fails.length);
+const index = readFileSync(join(root, "index.html"), "utf8");
+ok("index first paint no manifest", index.indexOf("href=\"manifest.json\"") === -1);
+ok("index first paint no W touch icon", index.indexOf("href=\"apple-touch-icon.png\"") === -1);
+
+console.log("checks: " + (48 + 21) + "  fails: " + fails.length);
 fails.forEach((f) => console.log("FAIL", f));
 if (fails.length) process.exit(1);
 console.log("PASS willo settings");

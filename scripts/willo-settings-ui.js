@@ -401,30 +401,69 @@
     } catch (e) {}
   }
 
+  function blobToData(blob) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(blob);
+    });
+  }
+
+  function dropStockIcons(paths) {
+    document.querySelectorAll("link[rel='apple-touch-icon'], link[rel='icon'], link[rel='manifest']").forEach((el) => {
+      if (el.rel === "manifest") {
+        el.remove();
+        return;
+      }
+      const href = String(el.getAttribute("href") || "");
+      if (paths.some((p) => href.indexOf(p) !== -1)) el.remove();
+    });
+  }
+
+  function ensureTouchIcon(id) {
+    let el = document.getElementById(id);
+    if (el) return el;
+    el = document.createElement("link");
+    el.id = id;
+    el.rel = "apple-touch-icon";
+    el.setAttribute("sizes", "180x180");
+    document.head.appendChild(el);
+    return el;
+  }
+
   async function applySpringboard(name, dataUrl) {
-    const label = S.springboardName(name) || "Willo";
+    const tags = S.springboardTags(name);
     let title = document.querySelector("meta[name='apple-mobile-web-app-title']");
     if (!title) {
       title = document.createElement("meta");
       title.setAttribute("name", "apple-mobile-web-app-title");
       document.head.appendChild(title);
     }
-    title.setAttribute("content", label);
-    document.title = label;
-    const man = document.getElementById("willo-manifest");
-    if (man && String(man.href || "").indexOf("blob:") === 0) man.href = "manifest.json";
-    tellWorkerKid(label);
+    title.setAttribute("content", tags.title);
+    document.title = tags.title;
+    if (tags.detachManifest) dropStockIcons(tags.stockIconPaths);
+    tellWorkerKid(tags.title);
     if (!dataUrl) return;
     try {
       const b180 = await squareBlob(dataUrl, 180);
       const b512 = await squareBlob(dataUrl, 512);
       await cacheKidIcon(b180, "kid-icon-180.png");
       await cacheKidIcon(b512, "kid-icon-512.png");
-      const stamp = Date.now();
-      const icon180 = document.getElementById("willo-touch-icon");
-      if (icon180) icon180.href = "apple-touch-icon.png?v=" + stamp;
-      document.querySelectorAll("link[rel='icon']").forEach((l) => { l.href = "icon-192.png?v=" + stamp; });
-      tellWorkerKid(label);
+      const data180 = await blobToData(b180);
+      const icon = ensureTouchIcon("willo-touch-icon");
+      icon.href = data180;
+      const fileIcon = ensureTouchIcon("willo-touch-icon-file");
+      fileIcon.href = "kid-icon-180.png?v=" + Date.now();
+      let fav = document.querySelector("link[rel='icon']");
+      if (!fav) {
+        fav = document.createElement("link");
+        fav.rel = "icon";
+        fav.type = "image/png";
+        document.head.appendChild(fav);
+      }
+      fav.href = data180;
+      tellWorkerKid(tags.title);
     } catch (e) {}
   }
 
@@ -460,11 +499,19 @@
     el.dataset.at = at;
     el.dataset.browser = browser;
     el.innerHTML = `
+      <img class="install-face" id="install-face" alt="" hidden>
       <div class="install-aim">${step1icon}</div>
       <div class="install-row"><span class="install-n">1</span>${step1icon}<span>${step1text}</span></div>
       <div class="install-row"><span class="install-n">2</span>${SVG_ADD}<span>${copy.add}</span></div>
     `;
     document.documentElement.lang = (navigator.language || "en").slice(0, 2);
+    photoGet("child").then((data) => {
+      const img = document.getElementById("install-face");
+      if (img && data) {
+        img.src = data;
+        img.hidden = false;
+      }
+    });
   }
 
   function openAddLang() {
@@ -606,5 +653,5 @@
     window.addEventListener("orientationchange", () => setTimeout(relayout, 250));
   }
 
-  root.WilloUI = { openUnlock, openAddLang, boot, applyFaceImages, applyLangs, applyCatalog, renderHome };
+  root.WilloUI = { openUnlock, openAddLang, boot, applyFaceImages, applyLangs, applyCatalog, renderHome, applySpringboard };
 })(typeof globalThis !== "undefined" ? globalThis : this);

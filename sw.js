@@ -1,5 +1,5 @@
 // One Willo worker for /willo/. Does not wipe per-taal caches.
-const CORE_CACHE = "willo-core-v11";
+const CORE_CACHE = "willo-core-v12";
 const MP3_CACHE = "willo-mp3-v1";
 const KID_CACHE = "willo-kid-icon-v1";
 
@@ -7,7 +7,7 @@ const CORE = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./apple-touch-icon.png",
+  "./willo-mark.png",
   "./icon-192.png",
   "./icon-512.png",
   "./favicon-32.png",
@@ -76,7 +76,7 @@ async function personalizedManifest() {
     icons: [
       { src: "icon-192.png", sizes: "192x192", type: "image/png" },
       { src: "icon-512.png", sizes: "512x512", type: "image/png" },
-      { src: "apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      { src: "willo-mark.png", sizes: "180x180", type: "image/png" },
     ],
   };
   return new Response(JSON.stringify(spec), {
@@ -102,7 +102,7 @@ self.addEventListener("fetch", (e) => {
     const bare = url.origin + url.pathname;
     e.respondWith(
       caches.open(KID_CACHE).then((c) =>
-        c.match(bare).then((r) => r || caches.match("./apple-touch-icon.png"))
+        c.match(bare).then((r) => r || caches.match("./willo-mark.png"))
       )
     );
     return;

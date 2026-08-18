@@ -89,6 +89,14 @@
     return n.slice(0, 12);
   }
 
+  function springboardTags(name) {
+    return {
+      title: springboardName(name) || "Willo",
+      detachManifest: true,
+      stockIconPaths: ["apple-touch-icon.png", "icon-192.png", "icon-512.png", "favicon-32.png"],
+    };
+  }
+
   function hasChild(state) {
     return !!(state && springboardName(state.childName) && state.birth && state.childFace);
   }
@@ -361,7 +369,7 @@
 
   const api = {
     KEY, LANGS, SECTIONS, STAGES,
-    homeSurface, homeChrome, navVisibility, hasChild, setChild, springboardName, childCopy,
+    homeSurface, homeChrome, navVisibility, hasChild, setChild, springboardName, springboardTags, childCopy,
     firstPickCopy, holdHintCopy, slimBridge, mergeBridge,
     isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
     defaultState, hashPin, ageMonths, stageFor, itemKey,
