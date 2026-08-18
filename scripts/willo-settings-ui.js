@@ -742,7 +742,37 @@
     mount(renderGate());
   }
 
-  function boot() {
+  function wantsReset() {
+    try {
+      return new URLSearchParams(location.search).get("reset") === "1";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function wipeLocal() {
+    try { localStorage.removeItem(S.KEY); } catch (e) {}
+    try { localStorage.removeItem(KID_ID_KEY); } catch (e) {}
+    try { document.cookie = "willo_bridge=;path=/;max-age=0;SameSite=Lax"; } catch (e) {}
+    try { indexedDB.deleteDatabase("willo-photos"); } catch (e) {}
+  }
+
+  async function resetIfAsked() {
+    if (!wantsReset()) return false;
+    await forgetKidIcon();
+    wipeLocal();
+    try {
+      if (window.caches) {
+        const keys = await caches.keys();
+        await Promise.all(keys.filter((k) => String(k).indexOf("willo") === 0).map((k) => caches.delete(k)));
+      }
+    } catch (e) {}
+    location.replace(location.pathname + location.hash);
+    return true;
+  }
+
+  async function boot() {
+    if (await resetIfAsked()) return;
     if (isStandalone()) forgetKidIcon();
     applyLangs();
     applyCatalog();
