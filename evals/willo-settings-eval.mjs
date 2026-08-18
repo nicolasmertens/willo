@@ -8,7 +8,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const S = require(join(root, "scripts/willo-settings.js"));
 
 const fails = [];
+let checks = 0;
 function ok(name, cond, extra) {
+  checks += 1;
   if (!cond) fails.push(name + (extra ? " " + extra : ""));
 }
 
@@ -123,12 +125,13 @@ ok("a2hs title first name", S.springboardTags("William Mertens").title === "Will
 ok("a2hs lists stock W path", S.springboardTags("Ada").stockIconPaths.indexOf("apple-touch-icon.png") !== -1);
 ok("applySpringboard drops manifest", ui.indexOf("el.rel === \"manifest\"") !== -1);
 ok("applySpringboard not stock png", ui.indexOf("icon180.href = \"apple-touch-icon.png") === -1);
+ok("applySpringboard no kid-icon file link", ui.indexOf("kid-icon-180.png?v=") === -1);
 
 const index = readFileSync(join(root, "index.html"), "utf8");
 ok("index first paint no manifest", index.indexOf("href=\"manifest.json\"") === -1);
 ok("index first paint no W touch icon", index.indexOf("href=\"apple-touch-icon.png\"") === -1);
 
-console.log("checks: " + (48 + 21) + "  fails: " + fails.length);
+console.log("checks: " + checks + "  fails: " + fails.length);
 fails.forEach((f) => console.log("FAIL", f));
 if (fails.length) process.exit(1);
 console.log("PASS willo settings");

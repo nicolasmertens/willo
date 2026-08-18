@@ -451,10 +451,10 @@
       await cacheKidIcon(b180, "kid-icon-180.png");
       await cacheKidIcon(b512, "kid-icon-512.png");
       const data180 = await blobToData(b180);
+      const extra = document.getElementById("willo-touch-icon-file");
+      if (extra) extra.remove();
       const icon = ensureTouchIcon("willo-touch-icon");
       icon.href = data180;
-      const fileIcon = ensureTouchIcon("willo-touch-icon-file");
-      fileIcon.href = "kid-icon-180.png?v=" + Date.now();
       let fav = document.querySelector("link[rel='icon']");
       if (!fav) {
         fav = document.createElement("link");
