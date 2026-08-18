@@ -87,6 +87,44 @@
   <main class="grid home-empty" id="home-grid"></main>
   <p id="home-hint" hidden></p>
 <script>
+(function () {
+  try {
+    if (new URLSearchParams(location.search).get("reset") !== "1") return;
+    try { localStorage.removeItem("willo_settings_v2"); } catch (e) {}
+    try { localStorage.removeItem("willo_kid_icon_id"); } catch (e) {}
+    [ "/", "/willo", "/willo/" ].forEach(function (p) {
+      document.cookie = "willo_bridge=;path=" + p + ";max-age=0;SameSite=Lax";
+    });
+    var left = 2;
+    function done() {
+      left -= 1;
+      if (left > 0) return;
+      location.replace(location.pathname);
+    }
+    try {
+      var req = indexedDB.deleteDatabase("willo-photos");
+      req.onsuccess = req.onerror = req.onblocked = done;
+    } catch (e) { done(); }
+    var extra = 0;
+    function afterExtra() { if (--extra <= 0) done(); }
+    extra = 1;
+    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+      extra += 1;
+      navigator.serviceWorker.getRegistrations().then(function (rs) {
+        return Promise.all(rs.map(function (r) { return r.unregister(); }));
+      }).then(afterExtra, afterExtra);
+    }
+    if (window.caches) {
+      extra += 1;
+      caches.keys().then(function (keys) {
+        return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+      }).then(afterExtra, afterExtra);
+    }
+    afterExtra();
+  } catch (e) {}
+})();
+</script>
+<script>
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(() => {});

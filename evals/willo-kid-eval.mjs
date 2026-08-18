@@ -33,6 +33,8 @@ ok("ui deletes on standalone", ui.indexOf("if (isStandalone()) forgetKidIcon()")
 ok("ui hold card", ui.indexOf("paintHold") !== -1);
 ok("ui reset query", ui.indexOf("get(\"reset\") === \"1\"") !== -1);
 ok("ui wipe settings key", ui.indexOf("localStorage.removeItem(S.KEY)") !== -1);
+const index = readFileSync(join(root, "index.html"), "utf8");
+ok("index inline reset", index.indexOf("willo_settings_v2") !== -1 && index.indexOf("get(\"reset\") !== \"1\"") !== -1);
 
 if (fails.length) {
   console.log("FAIL", fails.length, fails.join(" | "));
