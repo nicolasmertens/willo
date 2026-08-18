@@ -101,6 +101,7 @@ ok("no plus tile", S.homeChrome(0).showPlus === false);
 ok("no first pick when empty", S.homeChrome(0).firstPick === false);
 ok("hold coach when empty", S.homeChrome(0).holdCoach === true);
 ok("hold copy nl", S.holdCopy("nl").title.indexOf("2") !== -1);
+ok("hold copy omits mama papa klas", ["mama", "papa", "klas"].every((w) => S.holdCopy("nl").hint.toLowerCase().indexOf(w) === -1));
 ok("no first pick after one", S.homeChrome(1).firstPick === false);
 ok("hold hint after one", S.homeChrome(1).holdHint === true);
 ok("nav hides off langs", S.navVisibility({ langs: { mama: true, papa: false, klas: false } }).papa === false);
@@ -122,6 +123,7 @@ ok("openUnlock no const mode shadow", !/function openUnlock\(\) \{\s*const mode 
 ok("openUnlock uses surface", /function openUnlock\(\) \{\s*const surface = surfaceNow/.test(ui));
 ok("no blob manifest", ui.indexOf("man.href = URL.createObjectURL") === -1);
 ok("no plus taal tile", ui.indexOf("Taal toevoegen") === -1);
+ok("settings heading not mama papa klas", ui.indexOf("<h3>Mama, papa, klas</h3>") === -1);
 ok("a2hs detaches manifest", S.springboardTags("William").detachManifest === true);
 ok("a2hs title first name", S.springboardTags("William Mertens").title === "William");
 ok("a2hs lists stock W path", S.springboardTags("Ada").stockIconPaths.indexOf("apple-touch-icon.png") !== -1);

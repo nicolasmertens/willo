@@ -130,7 +130,7 @@
       <h3>Kind</h3>
       <div class="willo-row"><label>Geboorte</label><input type="date" id="willo-birth" value="${st.birth || ""}"></div>
       <div class="willo-hint">${months == null ? "Nog geen leeftijd." : months + " maanden · emmer " + (stage ? stage.id : "?")}</div>
-      <h3>Mama, papa, klas</h3>
+      <h3>Inhoud</h3>
       ${S.LANGS.map((l) => `<div class="willo-row"><label>${LANG_LABEL[l] || l}</label>${toggle(S.isLangOn(st, l)).replace(">", ` data-lang="${l}">`)}</div>`).join("")}
       <h3>Secties</h3>
       ${S.SECTIONS.map((sec) => `<div class="willo-row"><label>${labels[sec] || sec}</label>${toggle(S.isSectionOn(st, sec)).replace(">", ` data-sec="${sec}">`)}</div>`).join("")}
@@ -300,11 +300,11 @@
     const st = S.load();
     const off = S.LANGS.filter((l) => !S.isLangOn(st, l));
     if (!off.length) {
-      return `<h2>Mama, papa, klas</h2><p class="willo-hint">Mama, papa en klas staan al aan.</p><div class="willo-actions"><button type="button" data-close>Klaar</button></div>`;
+      return `<h2>Inhoud</h2><p class="willo-hint">Alles staat al aan.</p><div class="willo-actions"><button type="button" data-close>Klaar</button></div>`;
     }
     return `
       <h2>Toevoegen</h2>
-      <p class="willo-hint">Kies mama, papa of klas. Foto kan later in instellingen.</p>
+      <p class="willo-hint">Zet aan. Foto kan later.</p>
       <div class="willo-actions" style="flex-direction:column">
         ${off.map((l) => `<button type="button" class="willo-go" data-add-lang="${l}">${LANG_LABEL[l] || l}</button>`).join("")}
       </div>

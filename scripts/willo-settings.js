@@ -144,10 +144,10 @@
   function holdCopy(lang) {
     const l = String(lang || "en").toLowerCase().slice(0, 2);
     const table = {
-      nl: { kicker: "Op het beginscherm", title: "Houd 2 seconden in", hint: "Zo open je instellingen. Mama, papa, klas." },
-      fr: { kicker: "Sur l'écran d'accueil", title: "Reste appuyé 2 secondes", hint: "Ça ouvre les réglages. Maman, papa, classe." },
-      de: { kicker: "Auf dem Home-Bildschirm", title: "2 Sekunden halten", hint: "So öffnest du Einstellungen. Mama, Papa, Klasse." },
-      en: { kicker: "On the Home Screen", title: "Hold for 2 seconds", hint: "That opens settings. Mama, papa, class." },
+      nl: { kicker: "Op het beginscherm", title: "Houd 2 seconden in", hint: "Zo open je instellingen." },
+      fr: { kicker: "Sur l'écran d'accueil", title: "Reste appuyé 2 secondes", hint: "Ça ouvre les réglages." },
+      de: { kicker: "Auf dem Home-Bildschirm", title: "2 Sekunden halten", hint: "So öffnest du die Einstellungen." },
+      en: { kicker: "On the Home Screen", title: "Hold for 2 seconds", hint: "That opens settings." },
     };
     return table[l] || table.en;
   }
