@@ -16,6 +16,10 @@
   body { padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: max(16px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; }
   body.onboard { background: #16132e; color: #fff6e8; }
   body.onboard #home-grid, body.onboard #home-hint { display: none !important; }
+  #boot-fallback { position: fixed; inset: 0; z-index: 30; background: #16132e; color: #fff6e8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px; text-align: center; }
+  body.booted #boot-fallback { display: none; }
+  #boot-fallback h1 { margin: 0; font-family: Syne, sans-serif; font-size: 36px; }
+  #boot-fallback a { color: #16132e; background: #f4c14e; text-decoration: none; font-weight: 800; padding: 14px 22px; border-radius: 999px; }
 
   .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; max-width: 900px; }
   .grid.home-empty { grid-template-columns: 1fr; max-width: 280px; }
@@ -78,6 +82,11 @@
 </style>
 </head>
 <body>
+  <section id="boot-fallback">
+    <p class="stage-kicker">Willo</p>
+    <h1>Even laden</h1>
+    <a href="./?fresh=1">Opnieuw</a>
+  </section>
   <section id="child-card" hidden></section>
   <section id="install-card" hidden></section>
   <section id="hold-card" hidden></section>
@@ -123,18 +132,19 @@
 })();
 </script>
 <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (sessionStorage.getItem("willo-sw-reloaded")) return;
-    sessionStorage.setItem("willo-sw-reloaded", "1");
-    location.reload();
-  });
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js", { scope: "./", updateViaCache: "none" })
-      .then((reg) => { if (reg && reg.update) reg.update(); })
-      .catch(() => {});
-  });
-}
+(function () {
+  if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+    navigator.serviceWorker.getRegistrations().then(function (rs) {
+      rs.forEach(function (r) { r.unregister(); });
+    }).catch(function () {});
+  }
+  if (window.caches) {
+    caches.keys().then(function (keys) {
+      return Promise.all(keys.map(function (k) { return caches.delete(k); }));
+    }).catch(function () {});
+  }
+})();
+</script>
 
 // --- Toddler-proofing: kill all browser gestures (mirrors templates/taal.html) ---
 document.addEventListener("gesturestart", e => e.preventDefault(), { passive: false });
@@ -287,9 +297,9 @@ window.addEventListener("load", () => {
   if (window.WilloUI) WilloUI.boot();
 });
 </script>
-<script src="scripts/willo-hold.js?v=18"></script>
-<script src="scripts/willo-settings.js?v=18"></script>
-<script src="scripts/willo-catalog.js?v=18"></script>
-<script src="scripts/willo-settings-ui.js?v=18"></script>
+<script src="scripts/willo-hold.js?v=19"></script>
+<script src="scripts/willo-settings.js?v=19"></script>
+<script src="scripts/willo-catalog.js?v=19"></script>
+<script src="scripts/willo-settings-ui.js?v=19"></script>
 </body>
 </html>

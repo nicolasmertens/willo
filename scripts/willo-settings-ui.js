@@ -861,6 +861,9 @@
   }
 
   async function boot() {
+    document.body.classList.add("booted");
+    const fallback = document.getElementById("boot-fallback");
+    if (fallback) fallback.hidden = true;
     if (await resetIfAsked()) return;
     if (isStandalone()) forgetKidIcon();
     applyLangs();

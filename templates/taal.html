@@ -197,23 +197,11 @@
 // Reload exactly once when a NEW worker takes control. No HTML polling,
 // no reload loops — uses the canonical controllerchange event.
 if ("serviceWorker" in navigator) {
-  let reloading = false;
-  navigator.serviceWorker.addEventListener("controllerchange", () => {
-    if (reloading) return;
-    reloading = true;
-    location.reload();
-  });
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/willo/sw.js", { scope: "/willo/", updateViaCache: "none" })
-      .then(reg => {
-        schedulePrefetch();
-        // Nudge the SW to check for an updated script when the user
-        // brings the app to the foreground.
-        const ping = () => { try { reg.update(); } catch {} };
-        document.addEventListener("visibilitychange", () => { if (!document.hidden) ping(); });
-        window.addEventListener("focus", ping);
-      })
-      .catch(() => {});
+    navigator.serviceWorker.getRegistrations().then(function (rs) {
+      rs.forEach(function (r) { r.unregister(); });
+    }).catch(function () {});
+    schedulePrefetch();
   });
 }
 
