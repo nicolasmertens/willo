@@ -204,7 +204,7 @@ if ("serviceWorker" in navigator) {
     location.reload();
   });
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/willo/sw.js", { scope: "/willo/" })
+    navigator.serviceWorker.register("/willo/sw.js", { scope: "/willo/", updateViaCache: "none" })
       .then(reg => {
         schedulePrefetch();
         // Nudge the SW to check for an updated script when the user

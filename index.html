@@ -124,8 +124,15 @@
 </script>
 <script>
 if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (sessionStorage.getItem("willo-sw-reloaded")) return;
+    sessionStorage.setItem("willo-sw-reloaded", "1");
+    location.reload();
+  });
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(() => {});
+    navigator.serviceWorker.register("./sw.js", { scope: "./", updateViaCache: "none" })
+      .then((reg) => { if (reg && reg.update) reg.update(); })
+      .catch(() => {});
   });
 }
 
@@ -280,9 +287,9 @@ window.addEventListener("load", () => {
   if (window.WilloUI) WilloUI.boot();
 });
 </script>
-<script src="scripts/willo-hold.js?v=16"></script>
-<script src="scripts/willo-settings.js?v=16"></script>
-<script src="scripts/willo-catalog.js?v=16"></script>
-<script src="scripts/willo-settings-ui.js?v=16"></script>
+<script src="scripts/willo-hold.js?v=17"></script>
+<script src="scripts/willo-settings.js?v=17"></script>
+<script src="scripts/willo-catalog.js?v=17"></script>
+<script src="scripts/willo-settings-ui.js?v=17"></script>
 </body>
 </html>

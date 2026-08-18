@@ -147,9 +147,11 @@
       <div class="willo-actions">
         <button type="button" data-export>Exporteer</button>
         <button type="button" data-import>Importeer</button>
+        <button type="button" data-refresh>Vernieuw app</button>
         <input type="file" accept="application/json,.json" id="willo-import" hidden>
         <button type="button" data-close>Klaar</button>
       </div>
+      <p class="willo-hint">v17</p>
     `;
   }
 
@@ -287,6 +289,16 @@
     }));
     const exp = mask.querySelector("[data-export]");
     if (exp) exp.addEventListener("click", doExport);
+    const refresh = mask.querySelector("[data-refresh]");
+    if (refresh) bindTap(refresh, () => {
+      Promise.resolve()
+        .then(() => window.caches ? caches.keys().then((ks) => Promise.all(ks.map((k) => caches.delete(k)))) : null)
+        .then(() => navigator.serviceWorker && navigator.serviceWorker.getRegistrations
+          ? navigator.serviceWorker.getRegistrations().then((rs) => Promise.all(rs.map((r) => r.unregister())))
+          : null)
+        .then(() => { location.reload(); })
+        .catch(() => { location.reload(); });
+    });
     const imp = mask.querySelector("[data-import]");
     const file = mask.querySelector("#willo-import");
     if (imp && file) {

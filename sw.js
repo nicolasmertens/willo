@@ -1,11 +1,9 @@
 // One Willo worker for /willo/. Does not wipe per-taal caches.
-const CORE_CACHE = "willo-core-v16";
+const CORE_CACHE = "willo-core-v17";
 const MP3_CACHE = "willo-mp3-v1";
 const KID_CACHE = "willo-kid-icon-v1";
 
 const CORE = [
-  "./",
-  "./index.html",
   "./manifest.json",
   "./willo-mark.png",
   "./icon-192.png",
@@ -116,11 +114,25 @@ self.addEventListener("fetch", (e) => {
 
   if (isHTML) {
     e.respondWith(
-      fetch(e.request).then((resp) => {
+      fetch(e.request, { cache: "no-store" }).then((resp) => {
         const copy = resp.clone();
         caches.open(CORE_CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
         return resp;
       }).catch(() => caches.match(e.request).then((r) => r || caches.match("./")))
+    );
+    return;
+  }
+
+  const isScript = url.pathname.indexOf("/scripts/") !== -1 || url.pathname.endsWith(".js");
+  if (isScript) {
+    e.respondWith(
+      fetch(e.request, { cache: "no-store" }).then((resp) => {
+        if (resp && resp.status === 200) {
+          const copy = resp.clone();
+          caches.open(CORE_CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
+        }
+        return resp;
+      }).catch(() => caches.match(e.request))
     );
     return;
   }
