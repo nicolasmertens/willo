@@ -42,6 +42,7 @@
   const KID_ID_KEY = "willo_kid_icon_id";
   let sessionOk = false;
   let pendingAfterPin = "";
+  let continuedThisLoad = false;
 
   async function applyFaceImages() {
     for (const l of S.LANGS) {
@@ -417,11 +418,9 @@
   function surfaceNow() {
     const st = S.load();
     const n = S.LANGS.filter((l) => S.isLangOn(st, l)).length;
-    let showInstall = false;
-    try { showInstall = sessionStorage.getItem("willo_show_install") === "1"; } catch (e) {}
     return S.homeSurface(isStandalone(), n, Object.assign(iosProbe(), {
       hasChild: S.hasChild(st),
-      showInstall: showInstall,
+      showInstall: continuedThisLoad,
     }));
   }
 
@@ -463,6 +462,12 @@
     });
     const go = el.querySelector("#child-go");
     if (go) go.addEventListener("click", submitChild);
+    photoGet("child").then((data) => {
+      if (!data || !prev) return;
+      if (file && file.files && file.files[0]) return;
+      prev.src = data;
+      prev.hidden = false;
+    });
     document.body.classList.add("onboard");
   }
 
@@ -632,7 +637,12 @@
     const err = document.getElementById("child-err");
     const file = photoEl && photoEl.files && photoEl.files[0];
     const r = S.setChild(S.load(), nameEl ? nameEl.value : "", birthEl ? birthEl.value : "");
-    if (!r.ok || !file) {
+    if (!r.ok) {
+      if (err) err.textContent = "!";
+      return;
+    }
+    const existing = await photoGet("child");
+    if (!file && !existing && !r.state.childFace) {
       if (err) err.textContent = "!";
       return;
     }
@@ -640,13 +650,19 @@
     if (go) go.disabled = true;
     r.state.childFace = true;
     S.save(r.state);
-    try { sessionStorage.setItem("willo_show_install", "1"); } catch (e) {}
+    continuedThisLoad = true;
     stampChildUrl(r.state);
-    let dataUrl = "";
     try {
-      dataUrl = await withTimeout(fileToData(file), 8000);
-      try { await withTimeout(photoSet("child", dataUrl), 2500); } catch (e) {}
-      try { await withTimeout(applySpringboard(r.state.childName, dataUrl), 6000); } catch (e) {}
+      let dataUrl = "";
+      if (file) {
+        dataUrl = await withTimeout(fileToData(file), 8000);
+        try { await withTimeout(photoSet("child", dataUrl), 2500); } catch (e) {}
+      } else {
+        dataUrl = existing;
+      }
+      if (dataUrl) {
+        try { await withTimeout(applySpringboard(r.state.childName, dataUrl), 6000); } catch (e) {}
+      }
     } catch (e) {
       if (err) err.textContent = "!";
     }
@@ -889,6 +905,8 @@
     document.body.classList.add("booted");
     const fallback = document.getElementById("boot-fallback");
     if (fallback) fallback.hidden = true;
+    try { sessionStorage.removeItem("willo_show_install"); } catch (e) {}
+    continuedThisLoad = false;
     if (await resetIfAsked()) return;
     if (isStandalone()) forgetKidIcon();
     applyLangs();

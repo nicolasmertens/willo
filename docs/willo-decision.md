@@ -11,7 +11,7 @@ Brand: **Willo**. Springboard name + icon = this child (not a stock Willo/Willia
 
 Public URL: `https://nicolasmertens.github.io/willo/`. Languages stay `/mama/`, `/papa/`, `/klas/`.
 
-Order: (1) name + birth + child photo (2) then Add to Home Screen (3) open from the icon, then hold 2s for settings. iOS tab after child is the share coach. Standalone with no mama/papa/klas is the hold coach. No + Taal tile. Extra faces only in settings.
+Order: (1) name + birth + child photo (2) then Add to Home Screen (3) open from the icon, then hold 2s for settings. Safari always starts at the child form, even if William is leftover. Share is only after Continue on this page load. Standalone with no mama/papa/klas is the hold coach. No + Taal tile. Extra faces only in settings.
 
 Springboard icon: POST the 180 PNG to the liedjes-logger worker `/kid` (KV, 24h TTL). Point `apple-touch-icon` at that public URL. On first standalone open, DELETE `/kid/:id`. Fallback if the upload fails: data-URL only.
 
