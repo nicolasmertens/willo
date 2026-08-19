@@ -173,6 +173,19 @@
     };
   }
 
+  function fromChildQuery(search) {
+    let q = search;
+    if (typeof search === "string") {
+      if (search.charAt(0) === "?") search = search.slice(1);
+      q = new URLSearchParams(search);
+    }
+    if (!q || typeof q.get !== "function") return null;
+    const n = springboardName(q.get("n") || "");
+    const b = String(q.get("b") || "");
+    if (!n || !/^\d{4}-\d{2}-\d{2}$/.test(b)) return null;
+    return { childName: n, birth: b, childFace: q.get("f") !== "0" };
+  }
+
   function mergeBridge(state, bridge) {
     const next = clone(state || defaultState());
     if (!bridge || typeof bridge !== "object") return next;
@@ -192,7 +205,7 @@
     try {
       if (typeof document === "undefined") return;
       const slim = slimBridge(state);
-      document.cookie = "willo_bridge=" + encodeURIComponent(JSON.stringify(slim)) + ";path=/;max-age=31536000;SameSite=Lax";
+      document.cookie = "willo_bridge=" + encodeURIComponent(JSON.stringify(slim)) + ";path=/;max-age=31536000;SameSite=Lax;Secure";
     } catch (e) {}
   }
 
@@ -388,7 +401,13 @@
   function load() {
     try {
       const raw = root.localStorage && root.localStorage.getItem(KEY);
-      if (!raw) return mergeBridge(defaultState(), readBridgeCookie());
+      if (!raw) {
+        let st = mergeBridge(defaultState(), readBridgeCookie());
+        if (!hasChild(st) && typeof location !== "undefined") {
+          st = mergeBridge(st, fromChildQuery(location.search));
+        }
+        return st;
+      }
       const parsed = JSON.parse(raw);
       const merged = defaultState();
       const fromStore = Object.assign(merged, parsed, {
@@ -397,9 +416,15 @@
         items: parsed.items || {},
       });
       if (hasChild(fromStore)) return fromStore;
-      return mergeBridge(fromStore, readBridgeCookie());
+      let st = mergeBridge(fromStore, readBridgeCookie());
+      if (!hasChild(st) && typeof location !== "undefined") {
+        st = mergeBridge(st, fromChildQuery(location.search));
+      }
+      return st;
     } catch (e) {
-      return mergeBridge(defaultState(), readBridgeCookie());
+      let st = mergeBridge(defaultState(), readBridgeCookie());
+      if (typeof location !== "undefined") st = mergeBridge(st, fromChildQuery(location.search));
+      return st;
     }
   }
 
@@ -414,7 +439,7 @@
   const api = {
     KEY, LANGS, SECTIONS, STAGES,
     homeSurface, homeChrome, navVisibility, hasChild, setChild, springboardName, springboardTags, childCopy,
-    firstPickCopy, holdCopy, holdHintCopy, slimBridge, mergeBridge,
+    firstPickCopy, holdCopy, holdHintCopy, slimBridge, mergeBridge, fromChildQuery,
     isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
     defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,

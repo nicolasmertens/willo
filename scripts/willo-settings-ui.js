@@ -536,17 +536,34 @@
     try { return localStorage.getItem(KID_ID_KEY) || ""; } catch (e) { return ""; }
   }
 
+  function withTimeout(p, ms) {
+    return Promise.race([
+      p,
+      new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms)),
+    ]);
+  }
+
   async function uploadKidIcon(blob) {
-    const resp = await fetch(KID_API + "/kid", {
+    const resp = await withTimeout(fetch(KID_API + "/kid", {
       method: "POST",
       headers: { "Content-Type": "image/png" },
       body: blob,
-    });
+    }), 4000);
     if (!resp.ok) throw new Error("kid-up");
     const data = await resp.json();
     if (!data || !data.url || !data.id) throw new Error("kid-up");
     saveKidId(data.id);
     return data;
+  }
+
+  function stampChildUrl(state) {
+    try {
+      const u = new URL(location.href);
+      u.searchParams.set("n", S.springboardName(state.childName));
+      u.searchParams.set("b", state.birth);
+      u.searchParams.set("f", "1");
+      history.replaceState({}, "", u.pathname + "?" + u.searchParams.toString());
+    } catch (e) {}
   }
 
   async function forgetKidIcon() {
@@ -616,18 +633,19 @@
     }
     const go = document.getElementById("child-go");
     if (go) go.disabled = true;
+    r.state.childFace = true;
+    S.save(r.state);
+    stampChildUrl(r.state);
+    let dataUrl = "";
     try {
-      const dataUrl = await fileToData(file);
-      await photoSet("child", dataUrl);
-      r.state.childFace = true;
-      S.save(r.state);
-      if (navigator.serviceWorker) await navigator.serviceWorker.ready;
-      await applySpringboard(r.state.childName, dataUrl);
-      renderHome();
+      dataUrl = await withTimeout(fileToData(file), 8000);
+      try { await withTimeout(photoSet("child", dataUrl), 2500); } catch (e) {}
+      try { await withTimeout(applySpringboard(r.state.childName, dataUrl), 6000); } catch (e) {}
     } catch (e) {
       if (err) err.textContent = "!";
-      if (go) go.disabled = false;
     }
+    if (go) go.disabled = false;
+    renderHome();
   }
 
   function paintInstall() {

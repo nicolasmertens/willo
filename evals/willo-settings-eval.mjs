@@ -118,6 +118,11 @@ ok("memory three packs one group", (() => {
   return g.length === 1 && g[0].items.length === 3 && g[0].title === "Memory";
 })());
 ok("hold hint lege", S.holdHintCopy("nl").indexOf("lege") !== -1);
+ok("child query parses", (() => {
+  const b = S.fromChildQuery("v=20&n=William&b=2024-09-24&f=1");
+  return b && b.childName === "William" && b.birth === "2024-09-24" && b.childFace === true;
+})());
+ok("child query rejects junk", S.fromChildQuery("v=20") == null);
 ok("merge bridge fills child", S.hasChild(S.mergeBridge(S.defaultState(), { childName: "Ada", birth: "2024-09-24", childFace: true })));
 ok("merge will not wipe existing", (() => {
   const have = S.mergeBridge(
@@ -145,6 +150,7 @@ ok("no plus taal tile", ui.indexOf("Taal toevoegen") === -1);
 ok("settings heading not mama papa klas", ui.indexOf("<h3>Mama, papa, klas</h3>") === -1);
 ok("pin uses pointerup", ui.indexOf("function bindTap") !== -1 && ui.indexOf("pointerup") !== -1);
 ok("pin telemetry", ui.indexOf("pin_tap") !== -1);
+ok("continue never waits on SW ready", ui.indexOf("await navigator.serviceWorker.ready") === -1);
 ok("a2hs detaches manifest", S.springboardTags("William").detachManifest === true);
 ok("a2hs title first name", S.springboardTags("William Mertens").title === "William");
 ok("a2hs lists stock W path", S.springboardTags("Ada").stockIconPaths.indexOf("apple-touch-icon.png") !== -1);
