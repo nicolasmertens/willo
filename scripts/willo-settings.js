@@ -109,7 +109,9 @@
       ? !!opts.hasChild
       : false;
     if (!child) return "child";
-    if (iosBrowser && !standalone) return "install";
+    if (iosBrowser && !standalone) {
+      return opts && opts.showInstall ? "install" : "child";
+    }
     if (!langOnCount) return "hold";
     return "home";
   }

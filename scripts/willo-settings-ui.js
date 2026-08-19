@@ -417,7 +417,12 @@
   function surfaceNow() {
     const st = S.load();
     const n = S.LANGS.filter((l) => S.isLangOn(st, l)).length;
-    return S.homeSurface(isStandalone(), n, Object.assign(iosProbe(), { hasChild: S.hasChild(st) }));
+    let showInstall = false;
+    try { showInstall = sessionStorage.getItem("willo_show_install") === "1"; } catch (e) {}
+    return S.homeSurface(isStandalone(), n, Object.assign(iosProbe(), {
+      hasChild: S.hasChild(st),
+      showInstall: showInstall,
+    }));
   }
 
   const SVG_SHARE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.2 8.5H7A2.5 2.5 0 0 0 4.5 11v8A2.5 2.5 0 0 0 7 21.5h10a2.5 2.5 0 0 0 2.5-2.5v-8A2.5 2.5 0 0 0 17 8.5h-1.2"/><path d="M12 15.5V3.5"/><path d="M8 7l4-4 4 4"/></svg>';
@@ -635,6 +640,7 @@
     if (go) go.disabled = true;
     r.state.childFace = true;
     S.save(r.state);
+    try { sessionStorage.setItem("willo_show_install", "1"); } catch (e) {}
     stampChildUrl(r.state);
     let dataUrl = "";
     try {
@@ -860,6 +866,7 @@
   function wipeLocal() {
     try { localStorage.removeItem(S.KEY); } catch (e) {}
     try { localStorage.removeItem(KID_ID_KEY); } catch (e) {}
+    try { sessionStorage.removeItem("willo_show_install"); } catch (e) {}
     try { document.cookie = "willo_bridge=;path=/;max-age=0;SameSite=Lax"; } catch (e) {}
     try { indexedDB.deleteDatabase("willo-photos"); } catch (e) {}
   }

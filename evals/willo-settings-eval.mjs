@@ -22,7 +22,8 @@ ok("ipad desktop ua + 5 points", S.isIosBrowser({ ua: ipadDesktop, platform: "",
 ok("ipad desktop ua + coarse, 0 points", S.isIosBrowser({ ua: ipadDesktop, platform: "", maxTouchPoints: 0, coarse: true }));
 ok("mac safari not ios", S.isIosBrowser({ ua: macSafari, platform: "MacIntel", maxTouchPoints: 0, coarse: false }) === false);
 ok("no child is child form", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5 }) === "child");
-ok("ios tab after child is install", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "install");
+ok("ios tab with child is form until continue", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "child");
+ok("ios tab after continue is install", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true, showInstall: true }) === "install");
 ok("pwa empty after child is hold", S.homeSurface(true, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "hold");
 ok("pwa with lang is home", S.homeSurface(true, 1, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "home");
 ok("desktop after child is hold", S.homeSurface(false, 0, { ua: macSafari, maxTouchPoints: 0, hasChild: true }) === "hold");
