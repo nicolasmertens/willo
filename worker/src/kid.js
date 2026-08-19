@@ -20,7 +20,7 @@ export function kidRoute(method, pathname) {
   if (m === "POST" && pathname === "/kid") return { op: "put" };
   const id = parseKidId(pathname);
   if (!id) return { op: "" };
-  if (m === "GET") return { op: "get", id };
+  if (m === "GET" || m === "HEAD") return { op: "get", id };
   if (m === "DELETE") return { op: "del", id };
   return { op: "" };
 }
@@ -45,15 +45,23 @@ export async function handleKid(req, env, originAllowed) {
   }
 
   if (route.op === "get") {
-    if (!env.KID) return new Response("no store", { status: 500 });
+    const publicGet = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+      "Content-Type": "image/png",
+      "Cache-Control": "public, max-age=300",
+    };
+    if (!env.KID) return new Response("no store", { status: 500, headers: publicGet });
     const buf = await env.KID.get(route.id, { type: "arrayBuffer" });
-    if (!buf) return new Response("gone", { status: 404 });
-    return new Response(buf, {
+    if (!buf) {
+      return new Response("gone", {
+        status: 404,
+        headers: { ...publicGet, "Content-Type": "text/plain;charset=UTF-8" },
+      });
+    }
+    return new Response(req.method === "HEAD" ? null : buf, {
       status: 200,
-      headers: {
-        "Content-Type": "image/png",
-        "Cache-Control": "public, max-age=300",
-      },
+      headers: publicGet,
     });
   }
 

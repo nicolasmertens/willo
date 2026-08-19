@@ -123,6 +123,14 @@ ok("child query parses", (() => {
   const b = S.fromChildQuery("v=20&n=William&b=2024-09-24&f=1");
   return b && b.childName === "William" && b.birth === "2024-09-24" && b.childFace === true;
 })());
+ok("child query keeps extra a2hs k", (() => {
+  const b = S.fromChildQuery("n=William&b=2024-09-24&f=1&k=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee&a2hs=1");
+  return b && b.childName === "William";
+})());
+ok("kid id from search", S.kidIdFromSearch("n=W&k=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee") === "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+ok("kid id rejects junk", S.kidIdFromSearch("k=nope") === "");
+ok("wants a2hs", S.wantsA2hs("a2hs=1&n=William") === true);
+ok("wants a2hs false", S.wantsA2hs("n=William") === false);
 ok("child query rejects junk", S.fromChildQuery("v=20") == null);
 ok("merge bridge fills child", S.hasChild(S.mergeBridge(S.defaultState(), { childName: "Ada", birth: "2024-09-24", childFace: true })));
 ok("merge will not wipe existing", (() => {
@@ -154,6 +162,10 @@ ok("pin telemetry", ui.indexOf("pin_tap") !== -1);
 ok("continue never waits on SW ready", ui.indexOf("await navigator.serviceWorker.ready") === -1);
 ok("continue does not persist share", ui.indexOf("sessionStorage.setItem(\"willo_show_install\"") === -1);
 ok("continue is this load only", ui.indexOf("continuedThisLoad") !== -1);
+ok("a2hs never data icon", ui.indexOf("href = await blobToData") === -1);
+ok("a2hs probes worker png", ui.indexOf("function probeKid") !== -1);
+ok("a2hs reloads with k", ui.indexOf("u.searchParams.set(\"a2hs\", \"1\")") !== -1);
+ok("a2hs fill opaque", ui.indexOf("ctx.fillStyle = \"#fff7e6\"") !== -1);
 ok("a2hs detaches manifest", S.springboardTags("William").detachManifest === true);
 ok("a2hs title first name", S.springboardTags("William Mertens").title === "William");
 ok("a2hs lists stock W path", S.springboardTags("Ada").stockIconPaths.indexOf("apple-touch-icon.png") !== -1);

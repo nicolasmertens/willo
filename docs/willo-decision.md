@@ -13,7 +13,7 @@ Public URL: `https://nicolasmertens.github.io/willo/`. Languages stay `/mama/`, 
 
 Order: (1) name + birth + child photo (2) then Add to Home Screen (3) open from the icon, then hold 2s for settings. Safari always starts at the child form, even if William is leftover. Share is only after Continue on this page load. Standalone with no mama/papa/klas is the hold coach. No + Taal tile. Extra faces only in settings.
 
-Springboard icon: POST the 180 PNG to the liedjes-logger worker `/kid` (KV, 24h TTL). Point `apple-touch-icon` at that public URL. On first standalone open, DELETE `/kid/:id`. Fallback if the upload fails: data-URL only.
+Springboard icon: POST the 180 PNG to the liedjes-logger worker `/kid` (KV, 24h TTL). Probe GET until it is image/png. Then reload with `k=` + `a2hs=1` so the first HTML paint has `<link rel="apple-touch-icon">` at that URL (iOS ignores data-URLs and late JS). On first standalone open, DELETE `/kid/:id`. If upload fails, stay on the child form. Never point apple-touch-icon at a data URL.
 
 Hold 2s on **blank space** (not a tile) opens settings. PIN first.
 

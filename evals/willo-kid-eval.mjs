@@ -22,7 +22,9 @@ ok("reject short", parseKidId("/kid/nope") === "");
 ok("reject other", parseKidId("/log") === "");
 ok("route post", kidRoute("POST", "/kid").op === "put");
 ok("route get", kidRoute("GET", "/kid/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee.png").op === "get");
+ok("route head", kidRoute("HEAD", "/kid/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee.png").op === "get");
 ok("route del", kidRoute("DELETE", "/kid/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee").op === "del");
+ok("get cors star", src.indexOf('"Access-Control-Allow-Origin": "*"') !== -1);
 ok("png magic", isPng(Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 1])));
 ok("not png", isPng(Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8])) === false);
 ok("ttl 24h", src.indexOf("24 * 60 * 60") !== -1);
@@ -37,6 +39,7 @@ const index = readFileSync(join(root, "index.html"), "utf8");
 ok("index inline reset", index.indexOf("willo_settings_v2") !== -1 && index.indexOf("get(\"reset\") === \"1\"") !== -1);
 ok("index waits then boots", index.indexOf("WilloUI.boot") !== -1);
 ok("index retry is absolute", index.indexOf("https://nicolasmertens.github.io/willo/index.html") !== -1);
+ok("index writes touch icon from k", index.indexOf("document.write('<link rel=\"apple-touch-icon\"") !== -1);
 const sw = readFileSync(join(root, "sw.js"), "utf8");
 ok("sw does not intercept scripts", sw.indexOf("isScript") === -1);
 

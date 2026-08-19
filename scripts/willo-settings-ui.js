@@ -418,9 +418,13 @@
   function surfaceNow() {
     const st = S.load();
     const n = S.LANGS.filter((l) => S.isLangOn(st, l)).length;
+    let showInstall = continuedThisLoad;
+    try {
+      if (S.wantsA2hs(location.search)) showInstall = true;
+    } catch (e) {}
     return S.homeSurface(isStandalone(), n, Object.assign(iosProbe(), {
       hasChild: S.hasChild(st),
-      showInstall: continuedThisLoad,
+      showInstall: showInstall,
     }));
   }
 
@@ -481,6 +485,8 @@
         const s = Math.min(img.width, img.height);
         const sx = (img.width - s) / 2;
         const sy = (img.height - s) / 2;
+        ctx.fillStyle = "#fff7e6";
+        ctx.fillRect(0, 0, size, size);
         ctx.drawImage(img, sx, sy, s, s, 0, 0, size, size);
         c.toBlob((b) => (b ? res(b) : rej(new Error("blob"))), "image/png");
       };
@@ -538,6 +544,47 @@
     return el;
   }
 
+  function setTouchHref(href) {
+    if (!href || String(href).indexOf("data:") === 0) return;
+    const icon = ensureTouchIcon("willo-touch-icon");
+    icon.rel = "apple-touch-icon";
+    icon.setAttribute("sizes", "180x180");
+    icon.href = href;
+    let pre = document.getElementById("willo-touch-icon-pre");
+    if (!pre) {
+      pre = document.createElement("link");
+      pre.id = "willo-touch-icon-pre";
+      pre.rel = "apple-touch-icon-precomposed";
+      pre.setAttribute("sizes", "180x180");
+      document.head.appendChild(pre);
+    }
+    pre.href = href;
+    let fav = document.querySelector("link[rel='icon']");
+    if (!fav) {
+      fav = document.createElement("link");
+      fav.rel = "icon";
+      fav.type = "image/png";
+      document.head.appendChild(fav);
+    }
+    fav.href = href;
+  }
+
+  function kidPublicUrl(id) {
+    return KID_API + "/kid/" + id + ".png";
+  }
+
+  async function probeKid(id) {
+    if (!id) return false;
+    try {
+      const resp = await withTimeout(fetch(kidPublicUrl(id), { method: "GET", cache: "no-store" }), 4000);
+      if (!resp.ok) return false;
+      const t = String(resp.headers.get("content-type") || "");
+      return t.indexOf("png") !== -1;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function saveKidId(id) {
     try { localStorage.setItem(KID_ID_KEY, id || ""); } catch (e) {}
   }
@@ -566,14 +613,20 @@
     return data;
   }
 
-  function stampChildUrl(state) {
+  function stampChildUrl(state, extra) {
     try {
       const u = new URL(location.href);
       u.searchParams.set("n", S.springboardName(state.childName));
       u.searchParams.set("b", state.birth);
       u.searchParams.set("f", "1");
-      history.replaceState({}, "", u.pathname + "?" + u.searchParams.toString());
-    } catch (e) {}
+      if (extra && extra.k) u.searchParams.set("k", extra.k);
+      if (extra && extra.a2hs) u.searchParams.set("a2hs", "1");
+      const next = u.pathname + "?" + u.searchParams.toString();
+      history.replaceState({}, "", next);
+      return next;
+    } catch (e) {
+      return "";
+    }
   }
 
   async function forgetKidIcon() {
@@ -585,7 +638,7 @@
     saveKidId("");
   }
 
-  async function applySpringboard(name, dataUrl) {
+  async function applySpringboard(name, dataUrl, opts) {
     const tags = S.springboardTags(name);
     let title = document.querySelector("meta[name='apple-mobile-web-app-title']");
     if (!title) {
@@ -597,37 +650,23 @@
     document.title = tags.title;
     if (tags.detachManifest) dropStockIcons(tags.stockIconPaths);
     tellWorkerKid(tags.title);
-    if (!dataUrl) return;
-    try {
-      const existing = loadKidId();
-      if (existing) {
-        const icon = ensureTouchIcon("willo-touch-icon");
-        icon.href = KID_API + "/kid/" + existing + ".png";
-        return;
-      }
-      const b180 = await squareBlob(dataUrl, 180);
-      await cacheKidIcon(b180, "kid-icon-180.png");
-      let href = "";
-      try {
-        const up = await uploadKidIcon(b180);
-        href = up.url;
-      } catch (e) {
-        href = await blobToData(b180);
-      }
-      const extra = document.getElementById("willo-touch-icon-file");
-      if (extra) extra.remove();
-      const icon = ensureTouchIcon("willo-touch-icon");
-      icon.href = href;
-      let fav = document.querySelector("link[rel='icon']");
-      if (!fav) {
-        fav = document.createElement("link");
-        fav.rel = "icon";
-        fav.type = "image/png";
-        document.head.appendChild(fav);
-      }
-      fav.href = href;
-      tellWorkerKid(tags.title);
-    } catch (e) {}
+    const allowUpload = !(opts && opts.allowUpload === false);
+    let id = loadKidId() || S.kidIdFromSearch(location.search);
+    if (id && await probeKid(id)) {
+      setTouchHref(kidPublicUrl(id));
+      saveKidId(id);
+      return id;
+    }
+    if (!allowUpload || !dataUrl) return "";
+    const b180 = await squareBlob(dataUrl, 180);
+    try { await cacheKidIcon(b180, "kid-icon-180.png"); } catch (e) {}
+    const extra = document.getElementById("willo-touch-icon-file");
+    if (extra) extra.remove();
+    const up = await uploadKidIcon(b180);
+    if (!up || !up.id || !(await probeKid(up.id))) throw new Error("kid-get");
+    setTouchHref(kidPublicUrl(up.id));
+    tellWorkerKid(tags.title);
+    return up.id;
   }
 
   async function submitChild() {
@@ -650,8 +689,8 @@
     if (go) go.disabled = true;
     r.state.childFace = true;
     S.save(r.state);
-    continuedThisLoad = true;
     stampChildUrl(r.state);
+    let kidId = "";
     try {
       let dataUrl = "";
       if (file) {
@@ -660,14 +699,39 @@
       } else {
         dataUrl = existing;
       }
-      if (dataUrl) {
-        try { await withTimeout(applySpringboard(r.state.childName, dataUrl), 6000); } catch (e) {}
-      }
+      if (!dataUrl) throw new Error("photo");
+      kidId = await withTimeout(applySpringboard(r.state.childName, dataUrl, { allowUpload: true }), 12000);
     } catch (e) {
       if (err) err.textContent = "!";
+      if (go) go.disabled = false;
+      return;
     }
-    if (go) go.disabled = false;
-    renderHome();
+    if (!kidId) {
+      if (err) err.textContent = "!";
+      if (go) go.disabled = false;
+      return;
+    }
+    continuedThisLoad = true;
+    try {
+      const u = new URL(location.href);
+      u.searchParams.set("n", S.springboardName(r.state.childName));
+      u.searchParams.set("b", r.state.birth);
+      u.searchParams.set("f", "1");
+      u.searchParams.set("k", kidId);
+      u.searchParams.set("a2hs", "1");
+      const next = u.pathname + "?" + u.searchParams.toString();
+      const same = S.wantsA2hs(location.search) && S.kidIdFromSearch(location.search) === kidId;
+      if (same) {
+        history.replaceState({}, "", next);
+        if (go) go.disabled = false;
+        renderHome();
+        return;
+      }
+      location.replace(next);
+    } catch (e) {
+      if (go) go.disabled = false;
+      renderHome();
+    }
   }
 
   function paintInstall() {
@@ -914,7 +978,9 @@
     applyFaceImages();
     const st = S.load();
     if (!isStandalone() && S.hasChild(st)) {
-      photoGet("child").then((data) => applySpringboard(st.childName, data));
+      photoGet("child").then((data) => applySpringboard(st.childName, data, {
+        allowUpload: S.wantsA2hs(location.search),
+      }));
     }
     const relayout = () => { if (document.getElementById("install-card") && surfaceNow() === "install") paintInstall(); };
     window.addEventListener("resize", relayout);

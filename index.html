@@ -2,6 +2,23 @@
 <html lang="nl">
 <head>
 <meta charset="utf-8">
+<script>
+(function () {
+  try {
+    var q = new URLSearchParams(location.search);
+    var k = String(q.get("k") || "").toLowerCase();
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(k)) return;
+    var n = String(q.get("n") || "").replace(/[<>&"'`]/g, "").slice(0, 12);
+    var src = "https://liedjes-logger.super-mud-e2ef.workers.dev/kid/" + k + ".png";
+    document.write('<link rel="apple-touch-icon" sizes="180x180" href="' + src + '">');
+    document.write('<link rel="apple-touch-icon-precomposed" sizes="180x180" href="' + src + '">');
+    if (n) {
+      document.title = n;
+      document.write('<meta name="apple-mobile-web-app-title" content="' + n + '">');
+    }
+  } catch (e) {}
+})();
+</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#fff7e6">
 <meta name="mobile-web-app-capable" content="yes">
@@ -86,7 +103,7 @@
   <section id="boot-fallback">
     <p class="stage-kicker">Willo</p>
     <h1>Even laden</h1>
-    <a id="boot-retry" href="https://nicolasmertens.github.io/willo/index.html?v=23">Opnieuw</a>
+    <a id="boot-retry" href="https://nicolasmertens.github.io/willo/index.html?v=24">Opnieuw</a>
   </section>
   <section id="child-card" hidden></section>
   <section id="install-card" hidden></section>
@@ -108,10 +125,10 @@
     }
   } catch (e) {}
   var srcs = [
-    "scripts/willo-hold.js?v=23",
-    "scripts/willo-settings.js?v=23",
-    "scripts/willo-catalog.js?v=23",
-    "scripts/willo-settings-ui.js?v=23"
+    "scripts/willo-hold.js?v=24",
+    "scripts/willo-settings.js?v=24",
+    "scripts/willo-catalog.js?v=24",
+    "scripts/willo-settings-ui.js?v=24"
   ];
   function loadScripts(i) {
     if (i >= srcs.length) {

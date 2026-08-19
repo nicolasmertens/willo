@@ -188,6 +188,29 @@
     return { childName: n, birth: b, childFace: q.get("f") !== "0" };
   }
 
+  const KID_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  function kidIdFromSearch(search) {
+    let q = search;
+    if (typeof search === "string") {
+      if (search.charAt(0) === "?") search = search.slice(1);
+      q = new URLSearchParams(search);
+    }
+    if (!q || typeof q.get !== "function") return "";
+    const k = String(q.get("k") || "").toLowerCase();
+    return KID_ID_RE.test(k) ? k : "";
+  }
+
+  function wantsA2hs(search) {
+    let q = search;
+    if (typeof search === "string") {
+      if (search.charAt(0) === "?") search = search.slice(1);
+      q = new URLSearchParams(search);
+    }
+    if (!q || typeof q.get !== "function") return false;
+    return q.get("a2hs") === "1";
+  }
+
   function mergeBridge(state, bridge) {
     const next = clone(state || defaultState());
     if (!bridge || typeof bridge !== "object") return next;
@@ -441,7 +464,7 @@
   const api = {
     KEY, LANGS, SECTIONS, STAGES,
     homeSurface, homeChrome, navVisibility, hasChild, setChild, springboardName, springboardTags, childCopy,
-    firstPickCopy, holdCopy, holdHintCopy, slimBridge, mergeBridge, fromChildQuery,
+    firstPickCopy, holdCopy, holdHintCopy, slimBridge, mergeBridge, fromChildQuery, kidIdFromSearch, wantsA2hs,
     isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
     defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
