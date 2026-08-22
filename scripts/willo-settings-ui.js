@@ -37,7 +37,7 @@
     return out;
   }
 
-  const LANG_LABEL = { mama: "Mama", papa: "Papa", klas: "Klas" };
+  const LANG_LABEL = S.LANG_LABEL || { mama: "Français", papa: "Nederlands", klas: "English" };
   const KID_API = "https://liedjes-logger.super-mud-e2ef.workers.dev";
   const KID_ID_KEY = "willo_kid_icon_id";
   let sessionOk = false;
@@ -144,7 +144,7 @@
       <div class="willo-hint">${months == null ? "Nog geen leeftijd." : months + " maanden · emmer " + (stage ? stage.id : "?")}</div>
       <h3>Wat speelt hij?</h3>
       ${S.SECTIONS.map((sec) => `<button type="button" class="willo-drill" data-drill="${sec}"><span>${SEC_LABEL[sec] || sec}</span><span>›</span></button>`).join("")}
-      <button type="button" class="willo-drill" data-drill-faces><span>Wie is erbij?</span><span>›</span></button>
+      <button type="button" class="willo-drill" data-drill-faces><span>Talen</span><span>›</span></button>
       <div class="willo-actions">
         <button type="button" data-export>Exporteer</button>
         <button type="button" data-import>Importeer</button>
@@ -160,9 +160,9 @@
     const st = S.load();
     return `
       <button type="button" class="willo-back" data-back>‹ Terug</button>
-      <h2>Wie is erbij?</h2>
-      <p class="willo-hint">Foto erbij, dan aan.</p>
-      ${S.LANGS.map((l) => `<div class="willo-row"><label class="willo-face-lab"><img data-face="${l}" alt="" class="willo-face-dot missing"><input type="file" accept="image/*" data-photo="${l}"></label>${toggle(S.isLangOn(st, l)).replace(">", ` data-lang="${l}">`)}</div>`).join("")}
+      <h2>Talen</h2>
+      <p class="willo-hint">Kies de talen op het beginscherm. Foto kan later.</p>
+      ${S.LANGS.map((l) => `<div class="willo-row"><label class="willo-face-lab"><img data-face="${l}" alt="" class="willo-face-dot missing"><input type="file" accept="image/*" data-photo="${l}"><span>${LANG_LABEL[l] || l}</span></label>${toggle(S.isLangOn(st, l)).replace(">", ` data-lang="${l}">`)}</div>`).join("")}
     `;
   }
 
@@ -184,7 +184,7 @@
       <button type="button" class="willo-back" data-back>‹ Terug</button>
       <h2>${SEC_LABEL[sec] || sec}</h2>
       <div class="willo-row"><label>Alles in ${SEC_LABEL[sec] || sec}</label>${toggle(S.isSectionOn(st, sec)).replace(">", ` data-sec="${sec}">`)}</div>
-      ${anyPack ? rows : `<p class="willo-hint">Zet eerst iemand aan.</p><button type="button" class="willo-drill" data-drill-faces>Wie is erbij? ›</button>`}
+      ${anyPack ? rows : `<p class="willo-hint">Zet eerst een taal aan.</p><button type="button" class="willo-drill" data-drill-faces>Talen ›</button>`}
     `;
   }
 

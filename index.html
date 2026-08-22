@@ -148,7 +148,7 @@
       var ru = new URL(location.href);
       ru.pathname = ru.pathname.replace(/index\.html$/, "") || "/";
       if (ru.pathname.slice(-1) !== "/") ru.pathname += "/";
-      ru.searchParams.set("v", "29");
+      ru.searchParams.set("v", "30");
       retry.href = ru.pathname + ru.search + ru.hash;
     }
   } catch (e) {}
@@ -164,10 +164,10 @@
     }
   } catch (e) {}
   var srcs = [
-    "scripts/willo-hold.js?v=29",
-    "scripts/willo-settings.js?v=29",
-    "scripts/willo-catalog.js?v=29",
-    "scripts/willo-settings-ui.js?v=29"
+    "scripts/willo-hold.js?v=30",
+    "scripts/willo-settings.js?v=30",
+    "scripts/willo-catalog.js?v=30",
+    "scripts/willo-settings-ui.js?v=30"
   ];
   function loadScripts(i) {
     if (i >= srcs.length) {

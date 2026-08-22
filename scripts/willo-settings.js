@@ -2,6 +2,10 @@
 (function (root) {
   const KEY = "willo_settings_v2";
   const LANGS = ["mama", "papa", "klas"];
+  const LANG_LABEL = { mama: "Français", papa: "Nederlands", klas: "English" };
+  function langLabel(id) {
+    return LANG_LABEL[id] || id;
+  }
   const SECTIONS = ["boeken", "games", "liedjes", "verhalen"];
   const STAGES = [
     { id: "0-2", from: 0, to: 2 },
@@ -547,7 +551,7 @@
   }
 
   const api = {
-    KEY, LANGS, SECTIONS, STAGES,
+    KEY, LANGS, LANG_LABEL, langLabel, SECTIONS, STAGES,
     homeSurface, homeChrome, navVisibility, hasChild, setChild, springboardName, springboardTags, childCopy,
     firstPickCopy, holdCopy, holdHintCopy, slimBridge, mergeBridge, fromChildQuery, kidIdFromSearch, wantsA2hs,
     isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
