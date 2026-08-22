@@ -36,15 +36,46 @@ ok("child copy pick", !!S.childCopy("en").pick);
 
 const iphoneUa = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
 const crios = "Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/129.0.0.0 Mobile/15E148 Safari/604.1";
-ok("iphone safari share bottom", S.installShareAt({ ua: iphoneUa, width: 390, height: 844, maxTouchPoints: 5 }) === "bottom-center");
+const criosPhone = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/129.0.0.0 Mobile/15E148 Safari/604.1";
+ok("iphone safari aim none", S.installShareAt({ ua: iphoneUa, width: 390, height: 844, maxTouchPoints: 5 }) === "none");
+ok("iphone safari not bottom share", S.installShareAt({ ua: iphoneUa, width: 390, height: 844, maxTouchPoints: 5 }) !== "bottom-center");
 ok("ipad safari share top", S.installShareAt({ ua: ipadDesktop, width: 1180, height: 820, maxTouchPoints: 5 }) === "top-right");
 ok("ipad portrait still top", S.installShareAt({ ua: ipadDesktop, width: 820, height: 1180, maxTouchPoints: 5 }) === "top-right");
 ok("chrome ipad share top", S.installShareAt({ ua: crios, width: 1180, height: 820, maxTouchPoints: 5 }) === "top-right");
+ok("iphone chrome aim none", S.installShareAt({ ua: criosPhone, width: 390, height: 844, maxTouchPoints: 5 }) === "none");
 ok("browser safari", S.installBrowser(iphoneUa) === "safari");
 ok("browser chrome", S.installBrowser(crios) === "chrome");
 ok("copy nl add", S.installCopy("nl-BE").add === "Zet op beginscherm");
 ok("copy en add", S.installCopy("en-US").add === "Add to Home Screen");
 ok("copy fr add", S.installCopy("fr-FR").add === "Sur l'écran d'accueil");
+ok("copy en view more", S.installCopy("en").more === "View More");
+ok("copy nl view more", S.installCopy("nl").more === "Toon meer");
+ok("copy en open name", S.installCopy("en").open.indexOf("{name}") !== -1);
+ok("copy nl open name", S.installCopy("nl").open.indexOf("{name}") !== -1);
+ok("copy en again", S.installCopy("en").again.toLowerCase().indexOf("again") !== -1);
+ok("copy nl again", S.installCopy("nl").again.toLowerCase().indexOf("opnieuw") !== -1);
+
+const iphoneSteps = S.installSteps({ ua: iphoneUa, width: 390, height: 844, maxTouchPoints: 5 }, "en", "Test2");
+const ipadSteps = S.installSteps({ ua: ipadDesktop, width: 1180, height: 820, maxTouchPoints: 5 }, "en", "Ada");
+const chromeSteps = S.installSteps({ ua: crios, width: 1180, height: 820, maxTouchPoints: 5 }, "en", "Ada");
+ok("iphone extra menu step", iphoneSteps.some((s) => s.id === "page-menu"));
+ok("iphone view more", iphoneSteps.some((s) => s.id === "view-more" && s.label === "View More"));
+ok("iphone share after menu", iphoneSteps[0].id === "page-menu" && iphoneSteps[1].id === "share");
+ok("iphone add label", iphoneSteps.some((s) => s.id === "add" && s.label === "Add to Home Screen"));
+ok("iphone open last", iphoneSteps[iphoneSteps.length - 1].id === "open" && iphoneSteps[iphoneSteps.length - 1].label.indexOf("Test2") !== -1);
+ok("ipad first is share", ipadSteps[0].id === "share" && ipadSteps[0].label === "Share");
+ok("ipad has view more", ipadSteps.some((s) => s.id === "view-more"));
+ok("ipad no page menu", ipadSteps.every((s) => s.id !== "page-menu"));
+ok("chrome first is menu", chromeSteps[0].id === "menu" && chromeSteps[0].label === "Menu");
+ok("chrome no share step", chromeSteps.every((s) => s.id !== "share"));
+ok("chrome no page menu", chromeSteps.every((s) => s.id !== "page-menu"));
+ok("nl iphone view more", S.installSteps({ ua: iphoneUa, width: 390, height: 844, maxTouchPoints: 5 }, "nl", "Test2").some((s) => s.id === "view-more" && s.label === "Toon meer"));
+ok("open icon en", S.openIconLabel("en", "Test2") === "Open Test2 from the Home Screen");
+ok("open icon nl", S.openIconLabel("nl", "Test2").indexOf("Test2") !== -1 && S.openIconLabel("nl", "Test2").indexOf("beginscherm") !== -1);
+ok("coach first steps", S.installCoachMode({}) === "steps");
+ok("coach after hide open", S.installCoachMode({ leftAndReturned: true }) === "open");
+ok("coach again is steps", S.installCoachMode({ leftAndReturned: true, forceSteps: true }) === "steps");
+ok("coach standalone none", S.installCoachMode({ standalone: true, leftAndReturned: true }) === "none");
 
 const now = Date.parse("2026-08-17T12:00:00");
 ok("age william 22", S.ageMonths("2024-09-24", now) === 22);
@@ -172,10 +203,19 @@ ok("a2hs lists stock W path", S.springboardTags("Ada").stockIconPaths.indexOf("a
 ok("applySpringboard drops manifest", ui.indexOf("el.rel === \"manifest\"") !== -1);
 ok("applySpringboard not stock png", ui.indexOf("icon180.href = \"apple-touch-icon.png") === -1);
 ok("applySpringboard no kid-icon file link", ui.indexOf("kid-icon-180.png?v=") === -1);
+ok("install hide heuristic", ui.indexOf("visibilitychange") !== -1 && ui.indexOf("pagehide") !== -1 && ui.indexOf("pageshow") !== -1);
+ok("install again control", ui.indexOf("data-install-again") !== -1);
+ok("install numbered steps", ui.indexOf("data-step=") !== -1 && ui.indexOf("install-n") !== -1);
+ok("install no web share path", ui.indexOf("function paintInstall") !== -1 && !/function paintInstall[\s\S]{0,2500}navigator\.share/.test(ui));
+ok("install drops iphone aim", ui.indexOf('at === "none" ? ""') !== -1);
 
 const index = readFileSync(join(root, "index.html"), "utf8");
 ok("index first paint no manifest", index.indexOf("href=\"manifest.json\"") === -1);
 ok("index first paint no W touch icon", index.indexOf("href=\"apple-touch-icon.png\"") === -1);
+ok("index v25 scripts", index.indexOf("scripts/willo-settings.js?v=25") !== -1);
+ok("index v25 retry", index.indexOf("index.html?v=25") !== -1);
+ok("index no bottom-center aim", index.indexOf("bottom-center") === -1);
+ok("index none card css", index.indexOf('#install-card[data-at="none"]') !== -1);
 
 console.log("checks: " + checks + "  fails: " + fails.length);
 fails.forEach((f) => console.log("FAIL", f));

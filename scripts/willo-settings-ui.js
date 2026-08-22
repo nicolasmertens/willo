@@ -734,26 +734,17 @@
     }
   }
 
-  function paintInstall() {
-    const el = document.getElementById("install-card");
-    if (!el) return;
-    const probe = Object.assign(iosProbe(), { width: window.innerWidth, height: window.innerHeight });
-    const at = S.installShareAt(probe);
-    const browser = S.installBrowser(probe.ua);
-    const copy = S.installCopy(navigator.language || document.documentElement.lang || "en");
-    const step1icon = browser === "safari" ? SVG_SHARE : SVG_DOTS;
-    const step1text = browser === "safari" ? copy.share : copy.menu;
-    el.dataset.at = at;
-    el.dataset.browser = browser;
-    const who = S.springboardName((S.load() || {}).childName) || "";
-    el.innerHTML = `
-      <img class="install-hero" id="install-face" alt="" hidden>
-      <p class="install-who">${who}</p>
-      <div class="install-aim">${step1icon}</div>
-      <div class="install-row">${step1icon}<span>${step1text}</span></div>
-      <div class="install-row">${SVG_ADD}<span>${copy.add}</span></div>
-    `;
-    document.documentElement.lang = (navigator.language || "en").slice(0, 2);
+  function installSessionFlags() {
+    let left = false;
+    let again = false;
+    try {
+      left = sessionStorage.getItem("willo_install_left") === "1";
+      again = sessionStorage.getItem("willo_install_again") === "1";
+    } catch (e) {}
+    return { left: left, again: again };
+  }
+
+  function fillInstallFace() {
     photoGet("child").then((data) => {
       const img = document.getElementById("install-face");
       if (img && data) {
@@ -761,6 +752,59 @@
         img.hidden = false;
       }
     });
+  }
+
+  function paintInstall() {
+    const el = document.getElementById("install-card");
+    if (!el) return;
+    const probe = Object.assign(iosProbe(), { width: window.innerWidth, height: window.innerHeight });
+    const at = S.installShareAt(probe);
+    const browser = S.installBrowser(probe.ua);
+    const loc = navigator.language || document.documentElement.lang || "en";
+    const copy = S.installCopy(loc);
+    const flags = installSessionFlags();
+    const coach = S.installCoachMode({
+      standalone: isStandalone(),
+      leftAndReturned: flags.left,
+      forceSteps: flags.again,
+    });
+    const who = S.springboardName((S.load() || {}).childName) || "";
+    el.dataset.at = at;
+    el.dataset.browser = browser;
+    el.dataset.coach = coach;
+    document.documentElement.lang = String(loc).slice(0, 2);
+    if (coach === "none") return;
+    if (coach === "open") {
+      el.innerHTML = `
+        <img class="install-hero" id="install-face" alt="" hidden>
+        <p class="install-who">${who}</p>
+        <p class="install-open">${S.openIconLabel(loc, who)}</p>
+        <button type="button" class="install-again" data-install-again>${copy.again}</button>
+      `;
+      const again = el.querySelector("[data-install-again]");
+      if (again) bindTap(again, () => {
+        try {
+          sessionStorage.setItem("willo_install_again", "1");
+          sessionStorage.removeItem("willo_install_left");
+        } catch (e) {}
+        paintInstall();
+      });
+      fillInstallFace();
+      return;
+    }
+    const steps = S.installSteps(probe, loc, who);
+    const step1icon = browser === "safari" ? SVG_SHARE : SVG_DOTS;
+    const aim = at === "none" ? "" : `<div class="install-aim">${step1icon}</div>`;
+    const rows = steps.map((s, i) =>
+      `<div class="install-row" data-step="${s.id}"><span class="install-n">${i + 1}</span><span>${s.label}</span></div>`
+    ).join("");
+    el.innerHTML = `
+      <img class="install-hero" id="install-face" alt="" hidden>
+      <p class="install-who">${who}</p>
+      ${aim}
+      ${rows}
+    `;
+    fillInstallFace();
   }
 
   function paintHold() {
@@ -947,6 +991,8 @@
     try { localStorage.removeItem(S.KEY); } catch (e) {}
     try { localStorage.removeItem(KID_ID_KEY); } catch (e) {}
     try { sessionStorage.removeItem("willo_show_install"); } catch (e) {}
+    try { sessionStorage.removeItem("willo_install_left"); } catch (e) {}
+    try { sessionStorage.removeItem("willo_install_again"); } catch (e) {}
     try { document.cookie = "willo_bridge=;path=/;max-age=0;SameSite=Lax"; } catch (e) {}
     try { indexedDB.deleteDatabase("willo-photos"); } catch (e) {}
   }
@@ -985,6 +1031,28 @@
     const relayout = () => { if (document.getElementById("install-card") && surfaceNow() === "install") paintInstall(); };
     window.addEventListener("resize", relayout);
     window.addEventListener("orientationchange", () => setTimeout(relayout, 250));
+    const watchingInstall = () => {
+      if (isStandalone()) return false;
+      if (surfaceNow() === "install") return true;
+      try { return S.wantsA2hs(location.search); } catch (e) { return false; }
+    };
+    const markInstallLeft = () => {
+      if (!watchingInstall()) return;
+      try {
+        sessionStorage.setItem("willo_install_left", "1");
+        sessionStorage.removeItem("willo_install_again");
+      } catch (e) {}
+    };
+    const resumeInstallCoach = () => {
+      if (!watchingInstall()) return;
+      if (surfaceNow() === "install") paintInstall();
+    };
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") markInstallLeft();
+      else resumeInstallCoach();
+    });
+    window.addEventListener("pagehide", markInstallLeft);
+    window.addEventListener("pageshow", resumeInstallCoach);
   }
 
   root.WilloUI = { openUnlock, openAddLang, boot, applyFaceImages, applyLangs, applyCatalog, renderHome, applySpringboard, forgetKidIcon };

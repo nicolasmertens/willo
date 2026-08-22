@@ -33,6 +33,8 @@ const ui = readFileSync(join(root, "scripts/willo-settings-ui.js"), "utf8");
 ok("ui posts kid", ui.indexOf('KID_API + "/kid"') !== -1);
 ok("ui deletes on standalone", ui.indexOf("if (isStandalone()) forgetKidIcon()") !== -1);
 ok("ui hold card", ui.indexOf("paintHold") !== -1);
+ok("ui install steps", ui.indexOf("installSteps") !== -1 && ui.indexOf("data-step=") !== -1);
+ok("ui open from icon", ui.indexOf("openIconLabel") !== -1 && ui.indexOf("data-install-again") !== -1);
 ok("ui reset query", ui.indexOf("get(\"reset\") === \"1\"") !== -1);
 ok("ui wipe settings key", ui.indexOf("localStorage.removeItem(S.KEY)") !== -1);
 const index = readFileSync(join(root, "index.html"), "utf8");

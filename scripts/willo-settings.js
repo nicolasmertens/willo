@@ -57,20 +57,84 @@
 
   function installShareAt(info) {
     info = info || {};
-    const browser = installBrowser(info.ua);
-    if (!installPad(info) && browser === "safari") return "bottom-center";
+    if (!installPad(info)) return "none";
     return "top-right";
   }
 
   function installCopy(lang) {
     const l = String(lang || "en").toLowerCase().slice(0, 2);
     const table = {
-      nl: { share: "Deel", add: "Zet op beginscherm", menu: "Menu" },
-      fr: { share: "Partager", add: "Sur l'écran d'accueil", menu: "Menu" },
-      de: { share: "Teilen", add: "Zum Home-Bildschirm", menu: "Menü" },
-      en: { share: "Share", add: "Add to Home Screen", menu: "Menu" },
+      nl: {
+        share: "Deel",
+        add: "Zet op beginscherm",
+        menu: "Menu",
+        more: "Toon meer",
+        pageMenu: "Paginamenu",
+        open: "Open {name} vanaf het beginscherm",
+        again: "Toon opnieuw hoe ik het toevoeg",
+      },
+      fr: {
+        share: "Partager",
+        add: "Sur l'écran d'accueil",
+        menu: "Menu",
+        more: "Voir plus",
+        pageMenu: "Menu de la page",
+        open: "Ouvre {name} depuis l'écran d'accueil",
+        again: "Montre-moi comment l'ajouter à nouveau",
+      },
+      de: {
+        share: "Teilen",
+        add: "Zum Home-Bildschirm",
+        menu: "Menü",
+        more: "Mehr anzeigen",
+        pageMenu: "Seitenmenü",
+        open: "Öffne {name} vom Home-Bildschirm",
+        again: "Zeig mir nochmal, wie ich es hinzufüge",
+      },
+      en: {
+        share: "Share",
+        add: "Add to Home Screen",
+        menu: "Menu",
+        more: "View More",
+        pageMenu: "Page menu",
+        open: "Open {name} from the Home Screen",
+        again: "Show me how to add it again",
+      },
     };
     return table[l] || table.en;
+  }
+
+  function openIconLabel(lang, name) {
+    const copy = installCopy(lang);
+    const n = springboardName(name) || "Willo";
+    return String(copy.open || "").replace("{name}", n);
+  }
+
+  function installSteps(info, lang, name) {
+    const copy = installCopy(lang);
+    const browser = installBrowser((info && info.ua) || "");
+    const pad = installPad(info);
+    const open = openIconLabel(lang, name);
+    const steps = [];
+    if (browser === "safari") {
+      if (!pad) steps.push({ id: "page-menu", label: copy.pageMenu });
+      steps.push({ id: "share", label: copy.share });
+      steps.push({ id: "view-more", label: copy.more });
+      steps.push({ id: "add", label: copy.add });
+    } else {
+      steps.push({ id: "menu", label: copy.menu });
+      steps.push({ id: "add", label: copy.add });
+    }
+    steps.push({ id: "open", label: open });
+    return steps;
+  }
+
+  function installCoachMode(opts) {
+    opts = opts || {};
+    if (opts.standalone) return "none";
+    if (opts.forceSteps) return "steps";
+    if (opts.leftAndReturned) return "open";
+    return "steps";
   }
 
   function childCopy(lang) {
@@ -466,6 +530,7 @@
     homeSurface, homeChrome, navVisibility, hasChild, setChild, springboardName, springboardTags, childCopy,
     firstPickCopy, holdCopy, holdHintCopy, slimBridge, mergeBridge, fromChildQuery, kidIdFromSearch, wantsA2hs,
     isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
+    installSteps, installCoachMode, openIconLabel,
     defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
     setLang, setSection, setItem, setBirth, setPin, checkPin,
