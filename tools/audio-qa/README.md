@@ -14,7 +14,7 @@ Memory / Which One / soundboard all read those files.
 ## Always open like this
 
 ```bash
-cd ~/dev/code/liedjes
+cd ~/dev/code/willo
 ./tools/audio-qa/open.sh
 ```
 
