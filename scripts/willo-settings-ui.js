@@ -791,13 +791,22 @@
         <button type="button" class="install-again" data-install-again>${copy.again}</button>
       `;
       const again = el.querySelector("[data-install-again]");
-      if (again) bindTap(again, () => {
-        try {
-          sessionStorage.setItem("willo_install_again", "1");
-          sessionStorage.removeItem("willo_install_left");
-        } catch (e) {}
-        paintInstall();
-      });
+      if (again) {
+        const showSteps = (e) => {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          try {
+            sessionStorage.setItem("willo_install_again", "1");
+            sessionStorage.removeItem("willo_install_left");
+          } catch (err) {}
+          paintInstall();
+        };
+        again.onclick = showSteps;
+        again.ontouchend = showSteps;
+        bindTap(again, () => showSteps());
+      }
       fillInstallFace();
       return;
     }

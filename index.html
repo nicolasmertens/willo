@@ -29,6 +29,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@450;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: pan-y; }
+  button, a, [data-install-again] { touch-action: manipulation; }
   html, body { margin: 0; padding: 0; background: #fff7e6; font-family: Figtree, "SF Pro Rounded", "Avenir Next", system-ui, sans-serif; min-height: 100vh; min-height: 100dvh; overscroll-behavior: none; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
   body { padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: max(16px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; }
   body.onboard { background: #16132e; color: #fff6e8; }
@@ -43,9 +44,9 @@
   .grid.home-empty { grid-template-columns: 1fr; max-width: 280px; }
   @media (max-width: 640px) { .grid { grid-template-columns: 1fr; max-width: 480px; } .grid.home-empty { max-width: 280px; } }
 
-  #install-card { position: fixed; z-index: 40; width: min(360px, calc(100vw - 24px)); max-height: min(82dvh, 640px); overflow: auto; background: #211c45; color: #fff6e8; border-radius: 28px; padding: 22px 20px 18px; box-shadow: 0 18px 50px rgba(0,0,0,0.35); border: 1px solid rgba(244,193,78,0.28); }
-  #install-card[data-at="top-right"] { top: calc(env(safe-area-inset-top) + 58px); right: 10px; }
-  #install-card[data-at="none"] { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+  #install-card { position: relative; z-index: 60; width: min(360px, calc(100vw - 24px)); max-height: min(82dvh, 640px); overflow: visible; background: #211c45; color: #fff6e8; border-radius: 28px; padding: 22px 20px 18px; box-shadow: 0 18px 50px rgba(0,0,0,0.35); border: 1px solid rgba(244,193,78,0.28); touch-action: manipulation; }
+  #install-card, #install-card * { touch-action: manipulation; pointer-events: auto; }
+  #install-card[data-at="top-right"] { position: fixed; top: calc(env(safe-area-inset-top) + 58px); right: 10px; }
   #install-card .install-aim { position: absolute; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; color: #f4c14e; }
   #install-card[data-at="top-right"] .install-aim { top: -52px; }
   #install-card[data-browser="safari"][data-at="top-right"] .install-aim { right: 108px; }
@@ -60,7 +61,27 @@
   #install-card .install-through { margin: 0 0 12px; text-align: center; font-weight: 700; font-size: 15px; color: rgba(255,246,232,0.7); }
   #install-card .install-then { margin: 12px 0 4px; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #f4c14e; font-weight: 700; }
   #install-card .install-open { margin: 0 0 8px; text-align: center; font-weight: 700; font-size: 18px; line-height: 1.3; }
-  #install-card .install-again { display: block; width: 100%; border: 0; background: transparent; color: rgba(255,246,232,0.55); font: inherit; font-weight: 700; font-size: 14px; padding: 12px 0 4px; text-align: center; }
+  #install-card .install-again {
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    margin-top: 14px;
+    border: 0;
+    border-radius: 999px;
+    background: #f4c14e;
+    color: #16132e;
+    font: inherit;
+    font-weight: 800;
+    font-size: 16px;
+    padding: 14px 16px;
+    text-align: center;
+    touch-action: manipulation;
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
+  }
   #install-card .install-row { display: flex; align-items: center; gap: 12px; padding: 10px 2px; font-weight: 700; font-size: 17px; }
   #install-card .install-row + .install-row { border-top: 1px solid rgba(255,246,232,0.1); }
   #install-card .install-then + .install-row { border-top: 0; }
@@ -111,7 +132,7 @@
   <section id="boot-fallback">
     <p class="stage-kicker">Willo</p>
     <h1>Even laden</h1>
-    <a id="boot-retry" href="https://nicolasmertens.github.io/willo/index.html?v=27">Opnieuw</a>
+    <a id="boot-retry" href="https://nicolasmertens.github.io/willo/index.html?v=28">Opnieuw</a>
   </section>
   <section id="child-card" hidden></section>
   <section id="install-card" hidden></section>
@@ -133,10 +154,10 @@
     }
   } catch (e) {}
   var srcs = [
-    "scripts/willo-hold.js?v=27",
-    "scripts/willo-settings.js?v=27",
-    "scripts/willo-catalog.js?v=27",
-    "scripts/willo-settings-ui.js?v=27"
+    "scripts/willo-hold.js?v=28",
+    "scripts/willo-settings.js?v=28",
+    "scripts/willo-catalog.js?v=28",
+    "scripts/willo-settings-ui.js?v=28"
   ];
   function loadScripts(i) {
     if (i >= srcs.length) {
