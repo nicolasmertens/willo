@@ -814,22 +814,31 @@
     const copy = S.holdCopy(loc);
     el.innerHTML = `
       <p class="stage-kicker">${copy.kicker}</p>
-      <h1>${copy.title}</h1>
-      <div class="hold-blank" id="hold-pad" aria-label="${copy.title}"></div>
       <p class="hold-hint">${copy.hint}</p>
     `;
-    if (window.WilloHold) {
+    if (!window.WilloHold) return;
+    if (el.dataset.willoHold !== "1") {
+      el.dataset.willoHold = "1";
       WilloHold.attach(el, {
         onHold() { openUnlock(); },
         onTap() {},
       });
     }
-    el.addEventListener("click", (e) => {
-      if ("ontouchstart" in window) return;
-      if (e.detail === 0) return;
-      if (e.target.closest("button")) return;
-      openUnlock();
-    });
+    const body = document.body;
+    if (body.dataset.willoHold !== "1") {
+      body.dataset.willoHold = "1";
+      WilloHold.attach(body, {
+        shouldStart(e) {
+          if (document.body.dataset.stage !== "hold") return false;
+          const t = e && e.target;
+          if (t && t.closest && t.closest("#hold-card")) return false;
+          if (t && t.closest && t.closest(".willo-mask")) return false;
+          return true;
+        },
+        onHold() { openUnlock(); },
+        onTap() {},
+      });
+    }
   }
 
   function openAddLang() {
@@ -914,22 +923,18 @@
     if (blank) {
       blank.hidden = false;
       blank.textContent = S.holdHintCopy(loc);
+      if (window.WilloHold && blank.dataset.willoHold !== "1") {
+        blank.dataset.willoHold = "1";
+        WilloHold.attach(blank, {
+          onHold() { openUnlock(); },
+          onTap() {},
+        });
+      }
     }
     paintHint("");
     grid.querySelectorAll("button.tile").forEach((btn) => {
       const pick = btn.dataset.pick === "1";
-      if (window.WilloHold) {
-        WilloHold.attach(btn, {
-          onTap() {
-            if (pick) enableLang(btn.dataset.label);
-            else if (btn.dataset.href) window.location = btn.dataset.href;
-          },
-          onHold() { openUnlock(); },
-        });
-      }
-      btn.addEventListener("click", (e) => {
-        if ("ontouchstart" in window) return;
-        if (e.detail === 0) return;
+      btn.addEventListener("click", () => {
         if (pick) enableLang(btn.dataset.label);
         else if (btn.dataset.href) window.location = btn.dataset.href;
       });

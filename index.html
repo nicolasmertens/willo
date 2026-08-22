@@ -96,18 +96,18 @@
   #child-card #child-go { margin-top: 8px; width: 100%; border: 0; border-radius: 999px; padding: 16px; font-family: Syne, sans-serif; font-weight: 800; font-size: 18px; background: #f4c14e; color: #16132e; }
   #child-card #child-go:disabled { opacity: 0.45; }
   #child-card .willo-err { color: #ff8b7b; min-height: 1.2em; font-weight: 700; }
-  #hold-card { text-align: center; min-height: 70dvh; width: min(520px, calc(100vw - 32px)); display: flex; flex-direction: column; justify-content: center; }
-  #hold-card .hold-blank { flex: 1; min-height: 36vh; margin: 12px 0; border-radius: 28px; background: rgba(244,193,78,0.06); box-shadow: inset 0 0 0 1px rgba(244,193,78,0.22); }
-  #hold-card .hold-hint { margin: 0; font-size: 16px; font-weight: 600; color: rgba(255,246,232,0.62); }
-  #home-blank { min-height: 28vh; width: 100%; max-width: 900px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700; color: rgba(0,0,0,0.32); padding: 24px 12px; }
+  #hold-card { text-align: center; min-height: 70dvh; width: min(520px, calc(100vw - 32px)); display: flex; flex-direction: column; justify-content: center; touch-action: none; -webkit-touch-callout: none; }
+  #hold-card .hold-hint { margin: 0; font-size: clamp(18px, 4.2vw, 24px); font-weight: 700; line-height: 1.35; color: rgba(255,246,232,0.88); }
+  #home-blank { min-height: 28vh; width: 100%; max-width: 900px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700; color: rgba(0,0,0,0.32); padding: 24px 12px; touch-action: none; -webkit-touch-callout: none; }
   body.onboard #home-blank { display: none !important; }
+  body[data-stage="hold"], body[data-stage="hold"] * { touch-action: none; -webkit-touch-callout: none; }
 </style>
 </head>
 <body>
   <section id="boot-fallback">
     <p class="stage-kicker">Willo</p>
     <h1>Even laden</h1>
-    <a id="boot-retry" href="https://nicolasmertens.github.io/willo/index.html?v=25">Opnieuw</a>
+    <a id="boot-retry" href="https://nicolasmertens.github.io/willo/index.html?v=26">Opnieuw</a>
   </section>
   <section id="child-card" hidden></section>
   <section id="install-card" hidden></section>
@@ -129,10 +129,10 @@
     }
   } catch (e) {}
   var srcs = [
-    "scripts/willo-hold.js?v=25",
-    "scripts/willo-settings.js?v=25",
-    "scripts/willo-catalog.js?v=25",
-    "scripts/willo-settings-ui.js?v=25"
+    "scripts/willo-hold.js?v=26",
+    "scripts/willo-settings.js?v=26",
+    "scripts/willo-catalog.js?v=26",
+    "scripts/willo-settings-ui.js?v=26"
   ];
   function loadScripts(i) {
     if (i >= srcs.length) {

@@ -210,10 +210,10 @@
   function holdCopy(lang) {
     const l = String(lang || "en").toLowerCase().slice(0, 2);
     const table = {
-      nl: { kicker: "Instellingen", title: "Houd hier 2 seconden in", hint: "In de lege ruimte. Niet op een tegel." },
-      fr: { kicker: "Réglages", title: "Reste appuyé ici 2 secondes", hint: "Dans le vide. Pas sur une tuile." },
-      de: { kicker: "Einstellungen", title: "Hier 2 Sekunden halten", hint: "Im leeren Bereich. Nicht auf einer Kachel." },
-      en: { kicker: "Settings", title: "Hold here for 2 seconds", hint: "On the empty space. Not on a tile." },
+      nl: { kicker: "Instellingen", title: "", hint: "Op het beginscherm opent 2 seconden drukken in de lege ruimte de instellingenpagina." },
+      fr: { kicker: "Réglages", title: "", hint: "Sur l'écran d'accueil, rester appuyé 2 secondes dans le vide ouvre la page des réglages." },
+      de: { kicker: "Einstellungen", title: "", hint: "Auf dem Startbildschirm öffnet 2 Sekunden Drücken im leeren Bereich die Einstellungsseite." },
+      en: { kicker: "Settings", title: "", hint: "On the Home Screen, pressing empty space for 2 seconds opens the settings page." },
     };
     return table[l] || table.en;
   }
@@ -222,9 +222,9 @@
     const l = String(lang || "en").toLowerCase().slice(0, 2);
     const table = {
       nl: "Houd 2 seconden in de lege ruimte.",
-      fr: "Reste appuyé 2 secondes sur une tuile pour les réglages.",
-      de: "Kachel 2 Sekunden halten für Einstellungen.",
-      en: "Hold a tile 2 seconds for settings.",
+      fr: "Reste appuyé 2 secondes dans le vide.",
+      de: "Leeren Bereich 2 Sekunden halten.",
+      en: "Press empty space 2 seconds for settings.",
     };
     return table[l] || table.en;
   }

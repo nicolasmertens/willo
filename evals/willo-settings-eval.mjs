@@ -132,7 +132,10 @@ ok("import empty langs stay empty", (() => {
 ok("no plus tile", S.homeChrome(0).showPlus === false);
 ok("no first pick when empty", S.homeChrome(0).firstPick === false);
 ok("hold coach when empty", S.homeChrome(0).holdCoach === true);
-ok("hold copy nl", S.holdCopy("nl").title.indexOf("2") !== -1);
+ok("hold copy nl 2s", S.holdCopy("nl").hint.indexOf("2") !== -1);
+ok("hold copy en Home Screen", S.holdCopy("en").hint.indexOf("Home Screen") !== -1);
+ok("hold copy en 2 seconds", S.holdCopy("en").hint.indexOf("2 seconds") !== -1);
+ok("hold copy en settings", S.holdCopy("en").hint.indexOf("settings") !== -1);
 ok("hold copy omits mama papa klas", ["mama", "papa", "klas"].every((w) => S.holdCopy("nl").hint.toLowerCase().indexOf(w) === -1));
 ok("no first pick after one", S.homeChrome(1).firstPick === false);
 ok("hold hint after one", S.homeChrome(1).holdHint === true);
@@ -212,8 +215,8 @@ ok("install drops iphone aim", ui.indexOf('at === "none" ? ""') !== -1);
 const index = readFileSync(join(root, "index.html"), "utf8");
 ok("index first paint no manifest", index.indexOf("href=\"manifest.json\"") === -1);
 ok("index first paint no W touch icon", index.indexOf("href=\"apple-touch-icon.png\"") === -1);
-ok("index v25 scripts", index.indexOf("scripts/willo-settings.js?v=25") !== -1);
-ok("index v25 retry", index.indexOf("index.html?v=25") !== -1);
+ok("index v26 scripts", index.indexOf("scripts/willo-settings.js?v=26") !== -1);
+ok("index v26 retry", index.indexOf("index.html?v=26") !== -1);
 ok("index no bottom-center aim", index.indexOf("bottom-center") === -1);
 ok("index none card css", index.indexOf('#install-card[data-at="none"]') !== -1);
 
