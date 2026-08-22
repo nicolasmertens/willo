@@ -199,17 +199,15 @@
     if (iosBrowser && !standalone) {
       return opts && opts.showInstall ? "install" : "child";
     }
-    if (!langOnCount) return "hold";
     return "home";
   }
 
   function homeChrome(langOnCount) {
-    const n = Number(langOnCount) || 0;
     return {
       firstPick: false,
       showPlus: false,
-      holdHint: n > 0,
-      holdCoach: n === 0,
+      holdHint: true,
+      holdCoach: false,
     };
   }
 

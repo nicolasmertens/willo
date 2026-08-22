@@ -123,7 +123,7 @@
   #child-card .willo-err { color: #ff8b7b; min-height: 1.2em; font-weight: 700; }
   #hold-card { text-align: center; min-height: 70dvh; width: min(520px, calc(100vw - 32px)); display: flex; flex-direction: column; justify-content: center; touch-action: none; -webkit-touch-callout: none; }
   #hold-card .hold-hint { margin: 0; font-size: clamp(18px, 4.2vw, 24px); font-weight: 700; line-height: 1.35; color: rgba(255,246,232,0.88); }
-  #home-blank { min-height: 28vh; width: 100%; max-width: 900px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700; color: rgba(0,0,0,0.32); padding: 24px 12px; touch-action: none; -webkit-touch-callout: none; }
+  #home-blank { flex: 1; min-height: 40vh; width: 100%; max-width: 900px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700; color: rgba(0,0,0,0.32); padding: 24px 12px; touch-action: none; -webkit-touch-callout: none; }
   body.onboard #home-blank { display: none !important; }
   body[data-stage="hold"], body[data-stage="hold"] * { touch-action: none; -webkit-touch-callout: none; }
 </style>
@@ -148,7 +148,7 @@
       var ru = new URL(location.href);
       ru.pathname = ru.pathname.replace(/index\.html$/, "") || "/";
       if (ru.pathname.slice(-1) !== "/") ru.pathname += "/";
-      ru.searchParams.set("v", "28");
+      ru.searchParams.set("v", "29");
       retry.href = ru.pathname + ru.search + ru.hash;
     }
   } catch (e) {}
@@ -164,10 +164,10 @@
     }
   } catch (e) {}
   var srcs = [
-    "scripts/willo-hold.js?v=28",
-    "scripts/willo-settings.js?v=28",
-    "scripts/willo-catalog.js?v=28",
-    "scripts/willo-settings-ui.js?v=28"
+    "scripts/willo-hold.js?v=29",
+    "scripts/willo-settings.js?v=29",
+    "scripts/willo-catalog.js?v=29",
+    "scripts/willo-settings-ui.js?v=29"
   ];
   function loadScripts(i) {
     if (i >= srcs.length) {

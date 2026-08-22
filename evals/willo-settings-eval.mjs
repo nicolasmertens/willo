@@ -24,9 +24,9 @@ ok("mac safari not ios", S.isIosBrowser({ ua: macSafari, platform: "MacIntel", m
 ok("no child is child form", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5 }) === "child");
 ok("ios tab with child is form until continue", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "child");
 ok("ios tab after continue is install", S.homeSurface(false, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true, showInstall: true }) === "install");
-ok("pwa empty after child is hold", S.homeSurface(true, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "hold");
+ok("pwa empty after child is home", S.homeSurface(true, 0, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "home");
 ok("pwa with lang is home", S.homeSurface(true, 1, { ua: ipadDesktop, maxTouchPoints: 5, hasChild: true }) === "home");
-ok("desktop after child is hold", S.homeSurface(false, 0, { ua: macSafari, maxTouchPoints: 0, hasChild: true }) === "hold");
+ok("desktop after child is home", S.homeSurface(false, 0, { ua: macSafari, maxTouchPoints: 0, hasChild: true }) === "home");
 ok("springboard first name", S.springboardName("William Mertens") === "William");
 ok("hasChild needs face", S.hasChild({ childName: "Ada", birth: "2024-09-24", childFace: false }) === false);
 ok("hasChild ok", S.hasChild({ childName: "Ada", birth: "2024-09-24", childFace: true }));
@@ -141,7 +141,8 @@ ok("import empty langs stay empty", (() => {
 
 ok("no plus tile", S.homeChrome(0).showPlus === false);
 ok("no first pick when empty", S.homeChrome(0).firstPick === false);
-ok("hold coach when empty", S.homeChrome(0).holdCoach === true);
+ok("no hold lecture when empty", S.homeChrome(0).holdCoach === false);
+ok("hold hint when empty home", S.homeChrome(0).holdHint === true);
 ok("hold copy nl 2s", S.holdCopy("nl").hint.indexOf("2") !== -1);
 ok("hold copy en Home Screen", S.holdCopy("en").hint.indexOf("Home Screen") !== -1);
 ok("hold copy en 2 seconds", S.holdCopy("en").hint.indexOf("2 seconds") !== -1);
@@ -219,6 +220,7 @@ ok("applySpringboard no kid-icon file link", ui.indexOf("kid-icon-180.png?v=") =
 ok("install hide heuristic", ui.indexOf("visibilitychange") !== -1 && ui.indexOf("pagehide") !== -1 && ui.indexOf("pageshow") !== -1);
 ok("install again control", ui.indexOf("data-install-again") !== -1);
 ok("install again uses click", ui.indexOf("again.onclick") !== -1 && ui.indexOf("again.ontouchend") !== -1);
+ok("home body hold skips tiles", ui.indexOf('closest("button.tile') !== -1);
 ok("install icon steps not numbers", ui.indexOf("data-step=") !== -1 && ui.indexOf("install-ico") !== -1 && ui.indexOf("install-n") === -1);
 ok("install through copy in ui", ui.indexOf("copy.through") !== -1);
 ok("install safari icon files", ui.indexOf("icons/safari/") !== -1);
@@ -228,7 +230,7 @@ ok("install drops iphone aim", ui.indexOf('at === "none" ? ""') !== -1);
 const index = readFileSync(join(root, "index.html"), "utf8");
 ok("index first paint no manifest", index.indexOf("href=\"manifest.json\"") === -1);
 ok("index first paint no W touch icon", index.indexOf("href=\"apple-touch-icon.png\"") === -1);
-ok("index v28 scripts", index.indexOf("scripts/willo-settings.js?v=28") !== -1);
+ok("index v29 scripts", index.indexOf("scripts/willo-settings.js?v=29") !== -1);
 ok("index retry is /willo/ not index.html", index.indexOf('id="boot-retry" href="https://nicolasmertens.github.io/willo/"') !== -1 && index.indexOf("index.html?v=") === -1);
 ok("index retry keeps query", index.indexOf("retry.href = ru.pathname") !== -1);
 ok("index no bottom-center aim", index.indexOf("bottom-center") === -1);

@@ -956,6 +956,19 @@
         });
       }
     }
+    if (window.WilloHold && document.body.dataset.willoHold !== "1") {
+      document.body.dataset.willoHold = "1";
+      WilloHold.attach(document.body, {
+        shouldStart(e) {
+          if (document.body.dataset.stage !== "home") return false;
+          const t = e && e.target;
+          if (t && t.closest && t.closest("button.tile, .willo-mask, #install-card, #child-card")) return false;
+          return true;
+        },
+        onHold() { openUnlock(); },
+        onTap() {},
+      });
+    }
     paintHint("");
     grid.querySelectorAll("button.tile").forEach((btn) => {
       const pick = btn.dataset.pick === "1";
