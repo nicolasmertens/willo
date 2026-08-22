@@ -418,30 +418,27 @@
     return m ? m[1] : "";
   }
 
+  function catalogIconSrc(t) {
+    const icon = String((t && t.icon) || "");
+    if (!icon) return "";
+    if (icon.charAt(0) === "/") return icon;
+    const pack = String((t && t.pack) || "");
+    return pack ? "/willo/" + pack + "/" + icon : icon;
+  }
+
   function groupItems(section, catalog) {
     const rows = (catalog || []).filter((t) => t && t.section === section);
-    if (section === "games") {
-      const map = {};
-      const order = [];
-      rows.forEach((t) => {
-        const leaf = gameLeaf(t.href) || (t.pack + "-" + t.n);
-        if (!map[leaf]) {
-          map[leaf] = { id: leaf, title: t.title, items: [] };
-          order.push(leaf);
-        }
-        map[leaf].items.push(t);
-      });
-      return order.map((k) => {
-        const g = map[k];
-        const papa = g.items.filter((i) => i.pack === "papa")[0];
-        if (papa) g.title = papa.title;
-        return g;
-      });
-    }
-    return rows.map((t) => ({
-      id: t.pack + ":" + t.n,
-      title: t.title,
-      items: [t],
+    const map = {};
+    LANGS.forEach((l) => { map[l] = []; });
+    rows.forEach((t) => {
+      if (map[t.pack]) map[t.pack].push(t);
+    });
+    const order = ["papa", "mama", "klas"];
+    return order.filter((l) => map[l] && map[l].length).map((l) => ({
+      id: l,
+      pack: l,
+      title: langLabel(l),
+      items: map[l],
     }));
   }
 
@@ -559,7 +556,7 @@
     defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
     setLang, setSection, setItem, setBirth, setPin, checkPin,
-    gameLeaf, groupItems,
+    gameLeaf, groupItems, catalogIconSrc,
     exportPayload, importPayload, load, save,
   };
 

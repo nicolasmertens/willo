@@ -168,16 +168,19 @@
 
   function renderSection(sec) {
     const st = S.load();
-    const groups = S.groupItems(sec, catalog());
+    const groups = S.groupItems(sec, catalog()).filter((g) => S.isLangOn(st, g.pack));
     const anyPack = S.LANGS.some((l) => S.isLangOn(st, l));
     const rows = groups.map((g) => {
       const inner = g.items.map((t) => {
         const track = { n: t.n, _section: t.section, fromMonth: t.fromMonth };
         const on = S.isItemOn(st, track, t.pack);
         const age = t.fromMonth ? "vanaf " + t.fromMonth + " m" : "";
-        return `<div class="willo-row"><label class="willo-face-lab"><img data-face="${t.pack}" alt="" class="willo-face-dot missing"><span>${t.title}${age ? "<small>" + age + "</small>" : ""}</span></label>${toggle(on).replace(">", ` data-item="${t.pack}:${t.section}:${t.n}">`)}</div>`;
+        const src = S.catalogIconSrc(t);
+        const img = src
+          ? `<img class="willo-face-dot" alt="" src="${src}">`
+          : `<span class="willo-face-dot missing"></span>`;
+        return `<div class="willo-row"><label class="willo-face-lab">${img}<span>${t.title}${age ? "<small>" + age + "</small>" : ""}</span></label>${toggle(on).replace(">", ` data-item="${t.pack}:${t.section}:${t.n}">`)}</div>`;
       }).join("");
-      if (g.items.length === 1) return inner;
       return `<h3>${g.title}</h3>` + inner;
     }).join("");
     return `
@@ -939,6 +942,7 @@
     const pickLangs = on;
     grid.classList.toggle("home-empty", pickLangs.length === 1);
     grid.classList.toggle("home-pick", !!chrome.firstPick);
+    document.body.classList.toggle("home-no-tiles", pickLangs.length === 0);
     const tiles = pickLangs.map((l) => `
       <button class="tile" data-href="/willo/${l}/" data-label="${l}" aria-label="${l}">
         <img data-face="${l}" alt="" class="missing">

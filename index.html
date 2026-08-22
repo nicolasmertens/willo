@@ -40,9 +40,11 @@
   #boot-fallback h1 { margin: 0; font-family: Syne, sans-serif; font-size: 36px; }
   #boot-fallback a { color: #16132e; background: #f4c14e; text-decoration: none; font-weight: 800; padding: 16px 28px; border-radius: 999px; display: inline-block; min-height: 48px; line-height: 48px; }
 
-  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; max-width: 900px; }
-  .grid.home-empty { grid-template-columns: 1fr; max-width: 280px; }
-  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; max-width: 480px; } .grid.home-empty { max-width: 280px; } }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: min(92vw, calc((100dvh - 120px) * 3 + 36px), 1100px); max-width: 1100px; }
+  .grid.home-empty { grid-template-columns: 1fr; width: min(280px, 70vw); max-width: 280px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; width: min(480px, 92vw); max-width: 480px; } .grid.home-empty { max-width: 280px; } }
+  body[data-stage="home"] { justify-content: center; }
+  body[data-stage="home"] #home-grid { flex: 0 0 auto; }
 
   #install-card { position: relative; z-index: 60; width: min(360px, calc(100vw - 24px)); max-height: min(82dvh, 640px); overflow: visible; background: #211c45; color: #fff6e8; border-radius: 28px; padding: 22px 20px 18px; box-shadow: 0 18px 50px rgba(0,0,0,0.35); border: 1px solid rgba(244,193,78,0.28); touch-action: manipulation; }
   #install-card, #install-card * { touch-action: manipulation; pointer-events: auto; }
@@ -123,7 +125,8 @@
   #child-card .willo-err { color: #ff8b7b; min-height: 1.2em; font-weight: 700; }
   #hold-card { text-align: center; min-height: 70dvh; width: min(520px, calc(100vw - 32px)); display: flex; flex-direction: column; justify-content: center; touch-action: none; -webkit-touch-callout: none; }
   #hold-card .hold-hint { margin: 0; font-size: clamp(18px, 4.2vw, 24px); font-weight: 700; line-height: 1.35; color: rgba(255,246,232,0.88); }
-  #home-blank { flex: 1; min-height: 40vh; width: 100%; max-width: 900px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 700; color: rgba(0,0,0,0.32); padding: 24px 12px; touch-action: none; -webkit-touch-callout: none; }
+  #home-blank { flex: 0 0 auto; min-height: 0; width: 100%; max-width: 640px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 600; font-size: 14px; color: rgba(0,0,0,0.32); padding: 8px 12px; touch-action: none; -webkit-touch-callout: none; }
+  body.home-no-tiles #home-blank { flex: 1; min-height: 40vh; font-size: 18px; }
   body.onboard #home-blank { display: none !important; }
   body[data-stage="hold"], body[data-stage="hold"] * { touch-action: none; -webkit-touch-callout: none; }
 </style>
@@ -148,7 +151,7 @@
       var ru = new URL(location.href);
       ru.pathname = ru.pathname.replace(/index\.html$/, "") || "/";
       if (ru.pathname.slice(-1) !== "/") ru.pathname += "/";
-      ru.searchParams.set("v", "30");
+      ru.searchParams.set("v", "31");
       retry.href = ru.pathname + ru.search + ru.hash;
     }
   } catch (e) {}
@@ -164,10 +167,10 @@
     }
   } catch (e) {}
   var srcs = [
-    "scripts/willo-hold.js?v=30",
-    "scripts/willo-settings.js?v=30",
-    "scripts/willo-catalog.js?v=30",
-    "scripts/willo-settings-ui.js?v=30"
+    "scripts/willo-hold.js?v=31",
+    "scripts/willo-settings.js?v=31",
+    "scripts/willo-catalog.js?v=31",
+    "scripts/willo-settings-ui.js?v=31"
   ];
   function loadScripts(i) {
     if (i >= srcs.length) {

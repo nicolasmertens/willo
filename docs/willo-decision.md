@@ -17,7 +17,7 @@ Springboard icon: POST the 180 PNG to the liedjes-logger worker `/kid` (KV, 24h 
 
 Hold 2s on **blank space** (not a tile) opens settings. PIN first.
 
-Settings (iOS drill-in): Kind → **Wat speelt hij?** (Spelen / Liedjes / …) → second page with **Alles in Spelen** plus each game. Memory is three switches (one per taal), not one. A papa-only song is one row. **Talen** is Nederlands / Français / English (paths stay `/papa/` `/mama/` `/klas/`). Not “Wie is erbij?”, not Mama/Papa/Klas labels. Photo optional. Home tiles stay faces only (no language words) plus a hold gutter.
+Settings (iOS drill-in): Kind → **Wat speelt hij?** (Spelen / Liedjes / …) → list grouped by **Nederlands / Français / English**, each row a content icon (not the language photo). Memory is one switch per taal, under that taal header. **Talen** is Nederlands / Français / English (paths stay `/papa/` `/mama/` `/klas/`). Not “Wie is erbij?”. Photo optional on Talen only. Home is three large face tiles, centered, hold on the cream around them.
 
 No App Store. Sister gets a clean Add-to-Home-Screen. Delete icon = fresh unless they import the backup file.
 

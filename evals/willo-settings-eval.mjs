@@ -155,14 +155,17 @@ ok("nav shows on lang", S.navVisibility({ langs: { mama: true, papa: false, klas
 ok("krokodil one group", S.groupItems("liedjes", [
   { pack: "papa", section: "liedjes", n: 1, title: "En de krokodil" },
 ]).length === 1);
-ok("memory three packs one group", (() => {
+ok("memory grouped by taal", (() => {
   const g = S.groupItems("games", [
     { pack: "mama", section: "games", n: 1, title: "Mémoire", href: "/willo/mama/games/memory/" },
     { pack: "papa", section: "games", n: 1, title: "Memory", href: "/willo/papa/games/memory/" },
     { pack: "klas", section: "games", n: 1, title: "Memory", href: "/willo/klas/games/memory/" },
   ]);
-  return g.length === 1 && g[0].items.length === 3 && g[0].title === "Memory";
+  return g.length === 3 && g[0].title === "Nederlands" && g[1].title === "Français" && g[2].title === "English"
+    && g[0].items[0].title === "Memory" && g[1].items[0].title === "Mémoire";
 })());
+ok("catalog icon relative", S.catalogIconSrc({ pack: "mama", icon: "liedjes/icons/01.png" }) === "/willo/mama/liedjes/icons/01.png");
+ok("catalog icon absolute", S.catalogIconSrc({ icon: "/willo/eendjes/cover-tile.jpg" }) === "/willo/eendjes/cover-tile.jpg");
 ok("hold hint lege", S.holdHintCopy("nl").indexOf("lege") !== -1);
 ok("child query parses", (() => {
   const b = S.fromChildQuery("v=20&n=William&b=2024-09-24&f=1");
@@ -204,6 +207,7 @@ ok("no plus taal tile", ui.indexOf("Taal toevoegen") === -1);
 ok("settings heading not mama papa klas", ui.indexOf("<h3>Mama, papa, klas</h3>") === -1);
 ok("no wie is erbij", ui.indexOf("Wie is erbij") === -1);
 ok("settings has Talen", ui.indexOf(">Talen<") !== -1 || ui.indexOf("<h2>Talen</h2>") !== -1);
+ok("section uses content icon", ui.indexOf("catalogIconSrc") !== -1);
 ok("lang label papa NL", S.langLabel("papa") === "Nederlands");
 ok("lang label mama FR", S.langLabel("mama") === "Français");
 ok("lang label klas EN", S.langLabel("klas") === "English");
@@ -237,7 +241,8 @@ ok("install drops iphone aim", ui.indexOf('at === "none" ? ""') !== -1);
 const index = readFileSync(join(root, "index.html"), "utf8");
 ok("index first paint no manifest", index.indexOf("href=\"manifest.json\"") === -1);
 ok("index first paint no W touch icon", index.indexOf("href=\"apple-touch-icon.png\"") === -1);
-ok("index v30 scripts", index.indexOf("scripts/willo-settings.js?v=30") !== -1);
+ok("index v31 scripts", index.indexOf("scripts/willo-settings.js?v=31") !== -1);
+ok("home blank not stealing height", index.indexOf("body.home-no-tiles #home-blank") !== -1);
 ok("index retry is /willo/ not index.html", index.indexOf('id="boot-retry" href="https://nicolasmertens.github.io/willo/"') !== -1 && index.indexOf("index.html?v=") === -1);
 ok("index retry keeps query", index.indexOf("retry.href = ru.pathname") !== -1);
 ok("index no bottom-center aim", index.indexOf("bottom-center") === -1);
