@@ -69,7 +69,9 @@
         add: "Zet op beginscherm",
         menu: "Menu",
         more: "Toon meer",
-        pageMenu: "Paginamenu",
+        pageMenu: "Tik dit",
+        through: "Tik deze stappen",
+        then: "Daarna",
         open: "Open {name} vanaf het beginscherm",
         again: "Toon opnieuw hoe ik het toevoeg",
       },
@@ -78,7 +80,9 @@
         add: "Sur l'écran d'accueil",
         menu: "Menu",
         more: "Voir plus",
-        pageMenu: "Menu de la page",
+        pageMenu: "Touche ceci",
+        through: "Passe par ces étapes",
+        then: "Ensuite",
         open: "Ouvre {name} depuis l'écran d'accueil",
         again: "Montre-moi comment l'ajouter à nouveau",
       },
@@ -87,7 +91,9 @@
         add: "Zum Home-Bildschirm",
         menu: "Menü",
         more: "Mehr anzeigen",
-        pageMenu: "Seitenmenü",
+        pageMenu: "Tippe hier",
+        through: "Tippe diese Schritte",
+        then: "Danach",
         open: "Öffne {name} vom Home-Bildschirm",
         again: "Zeig mir nochmal, wie ich es hinzufüge",
       },
@@ -96,7 +102,9 @@
         add: "Add to Home Screen",
         menu: "Menu",
         more: "View More",
-        pageMenu: "Page menu",
+        pageMenu: "Tap this",
+        through: "Tap through these steps",
+        then: "Then",
         open: "Open {name} from the Home Screen",
         again: "Show me how to add it again",
       },
@@ -110,22 +118,37 @@
     return String(copy.open || "").replace("{name}", n);
   }
 
+  function installStepIcon(id) {
+    const map = {
+      "page-menu": "line-3-horizontal",
+      share: "square-and-arrow-up",
+      "view-more": "view-more",
+      add: "plus-square",
+      menu: "ellipsis",
+      open: "open",
+    };
+    return map[id] || "";
+  }
+
   function installSteps(info, lang, name) {
     const copy = installCopy(lang);
     const browser = installBrowser((info && info.ua) || "");
     const pad = installPad(info);
     const open = openIconLabel(lang, name);
     const steps = [];
-    if (browser === "safari") {
-      if (!pad) steps.push({ id: "page-menu", label: copy.pageMenu });
-      steps.push({ id: "share", label: copy.share });
-      steps.push({ id: "view-more", label: copy.more });
-      steps.push({ id: "add", label: copy.add });
-    } else {
-      steps.push({ id: "menu", label: copy.menu });
-      steps.push({ id: "add", label: copy.add });
+    function push(id, label) {
+      steps.push({ id: id, label: label, icon: installStepIcon(id) });
     }
-    steps.push({ id: "open", label: open });
+    if (browser === "safari") {
+      if (!pad) push("page-menu", copy.pageMenu);
+      push("share", copy.share);
+      push("view-more", copy.more);
+      push("add", copy.add);
+    } else {
+      push("menu", copy.menu);
+      push("add", copy.add);
+    }
+    push("open", open);
     return steps;
   }
 
@@ -530,7 +553,7 @@
     homeSurface, homeChrome, navVisibility, hasChild, setChild, springboardName, springboardTags, childCopy,
     firstPickCopy, holdCopy, holdHintCopy, slimBridge, mergeBridge, fromChildQuery, kidIdFromSearch, wantsA2hs,
     isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
-    installSteps, installCoachMode, openIconLabel,
+    installSteps, installStepIcon, installCoachMode, openIconLabel,
     defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
     setLang, setSection, setItem, setBirth, setPin, checkPin,

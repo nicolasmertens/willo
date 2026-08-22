@@ -50,6 +50,10 @@ ok("copy en add", S.installCopy("en-US").add === "Add to Home Screen");
 ok("copy fr add", S.installCopy("fr-FR").add === "Sur l'écran d'accueil");
 ok("copy en view more", S.installCopy("en").more === "View More");
 ok("copy nl view more", S.installCopy("nl").more === "Toon meer");
+ok("copy en through", S.installCopy("en").through === "Tap through these steps");
+ok("copy nl through", S.installCopy("nl").through.indexOf("stappen") !== -1);
+ok("copy en then", S.installCopy("en").then === "Then");
+ok("copy en tap this not page menu", S.installCopy("en").pageMenu === "Tap this");
 ok("copy en open name", S.installCopy("en").open.indexOf("{name}") !== -1);
 ok("copy nl open name", S.installCopy("nl").open.indexOf("{name}") !== -1);
 ok("copy en again", S.installCopy("en").again.toLowerCase().indexOf("again") !== -1);
@@ -63,6 +67,12 @@ ok("iphone view more", iphoneSteps.some((s) => s.id === "view-more" && s.label =
 ok("iphone share after menu", iphoneSteps[0].id === "page-menu" && iphoneSteps[1].id === "share");
 ok("iphone add label", iphoneSteps.some((s) => s.id === "add" && s.label === "Add to Home Screen"));
 ok("iphone open last", iphoneSteps[iphoneSteps.length - 1].id === "open" && iphoneSteps[iphoneSteps.length - 1].label.indexOf("Test2") !== -1);
+ok("iphone page menu uses lines icon", iphoneSteps[0].icon === "line-3-horizontal");
+ok("iphone share uses sf share", iphoneSteps[1].icon === "square-and-arrow-up");
+ok("iphone view more icon", iphoneSteps.some((s) => s.id === "view-more" && s.icon === "view-more"));
+ok("iphone add uses plus square", iphoneSteps.some((s) => s.id === "add" && s.icon === "plus-square"));
+ok("chrome menu uses ellipsis", chromeSteps[0].icon === "ellipsis");
+ok("step icon helper share", S.installStepIcon("share") === "square-and-arrow-up");
 ok("ipad first is share", ipadSteps[0].id === "share" && ipadSteps[0].label === "Share");
 ok("ipad has view more", ipadSteps.some((s) => s.id === "view-more"));
 ok("ipad no page menu", ipadSteps.every((s) => s.id !== "page-menu"));
@@ -177,7 +187,7 @@ ok("merge will not wipe existing", (() => {
 ok("first pick copy not taal", S.firstPickCopy("nl").title.indexOf("Taal") === -1);
 ok("slim bridge has langs", !!S.slimBridge(S.defaultState()).langs);
 
-const { readFileSync } = require("fs");
+const { readFileSync, existsSync } = require("fs");
 const { execFileSync } = require("child_process");
 try {
   execFileSync("node", ["--check", join(root, "scripts/willo-settings-ui.js")], { stdio: "pipe" });
@@ -208,17 +218,25 @@ ok("applySpringboard not stock png", ui.indexOf("icon180.href = \"apple-touch-ic
 ok("applySpringboard no kid-icon file link", ui.indexOf("kid-icon-180.png?v=") === -1);
 ok("install hide heuristic", ui.indexOf("visibilitychange") !== -1 && ui.indexOf("pagehide") !== -1 && ui.indexOf("pageshow") !== -1);
 ok("install again control", ui.indexOf("data-install-again") !== -1);
-ok("install numbered steps", ui.indexOf("data-step=") !== -1 && ui.indexOf("install-n") !== -1);
+ok("install icon steps not numbers", ui.indexOf("data-step=") !== -1 && ui.indexOf("install-ico") !== -1 && ui.indexOf("install-n") === -1);
+ok("install through copy in ui", ui.indexOf("copy.through") !== -1);
+ok("install safari icon files", ui.indexOf("icons/safari/") !== -1);
 ok("install no web share path", ui.indexOf("function paintInstall") !== -1 && !/function paintInstall[\s\S]{0,2500}navigator\.share/.test(ui));
 ok("install drops iphone aim", ui.indexOf('at === "none" ? ""') !== -1);
 
 const index = readFileSync(join(root, "index.html"), "utf8");
 ok("index first paint no manifest", index.indexOf("href=\"manifest.json\"") === -1);
 ok("index first paint no W touch icon", index.indexOf("href=\"apple-touch-icon.png\"") === -1);
-ok("index v26 scripts", index.indexOf("scripts/willo-settings.js?v=26") !== -1);
-ok("index v26 retry", index.indexOf("index.html?v=26") !== -1);
+ok("index v27 scripts", index.indexOf("scripts/willo-settings.js?v=27") !== -1);
+ok("index v27 retry", index.indexOf("index.html?v=27") !== -1);
 ok("index no bottom-center aim", index.indexOf("bottom-center") === -1);
 ok("index none card css", index.indexOf('#install-card[data-at="none"]') !== -1);
+ok("index has icon css", index.indexOf(".install-ico") !== -1 && index.indexOf(".install-through") !== -1);
+ok("sf share png", existsSync(join(root, "icons/safari/square-and-arrow-up.png")));
+ok("sf lines png", existsSync(join(root, "icons/safari/line-3-horizontal.png")));
+ok("view more png", existsSync(join(root, "icons/safari/view-more.png")));
+ok("plus square png", existsSync(join(root, "icons/safari/plus-square.png")));
+ok("ellipsis png", existsSync(join(root, "icons/safari/ellipsis.png")));
 
 console.log("checks: " + checks + "  fails: " + fails.length);
 fails.forEach((f) => console.log("FAIL", f));

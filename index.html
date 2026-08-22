@@ -56,12 +56,16 @@
   #install-card .install-hero { width: 112px; height: 112px; border-radius: 28px; object-fit: cover; display: block; margin: 0 auto 12px; background: #2d2758; box-shadow: 0 0 0 4px #f4c14e; }
   #install-card[data-coach="open"] .install-hero { width: 148px; height: 148px; border-radius: 34px; }
   #install-card .install-hero[hidden] { display: none; }
-  #install-card .install-who { margin: 0 0 14px; text-align: center; font-family: Syne, sans-serif; font-weight: 800; font-size: 28px; letter-spacing: -0.03em; }
+  #install-card .install-who { margin: 0 0 8px; text-align: center; font-family: Syne, sans-serif; font-weight: 800; font-size: 28px; letter-spacing: -0.03em; }
+  #install-card .install-through { margin: 0 0 12px; text-align: center; font-weight: 700; font-size: 15px; color: rgba(255,246,232,0.7); }
+  #install-card .install-then { margin: 12px 0 4px; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #f4c14e; font-weight: 700; }
   #install-card .install-open { margin: 0 0 8px; text-align: center; font-weight: 700; font-size: 18px; line-height: 1.3; }
   #install-card .install-again { display: block; width: 100%; border: 0; background: transparent; color: rgba(255,246,232,0.55); font: inherit; font-weight: 700; font-size: 14px; padding: 12px 0 4px; text-align: center; }
   #install-card .install-row { display: flex; align-items: center; gap: 12px; padding: 10px 2px; font-weight: 700; font-size: 17px; }
   #install-card .install-row + .install-row { border-top: 1px solid rgba(255,246,232,0.1); }
-  #install-card .install-n { flex: 0 0 28px; width: 28px; height: 28px; border-radius: 50%; background: #f4c14e; color: #16132e; font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  #install-card .install-then + .install-row { border-top: 0; }
+  #install-card .install-ico { flex: 0 0 28px; width: 28px; height: 28px; object-fit: contain; display: block; }
+  #install-card .install-ico-face { border-radius: 8px; object-fit: cover; background: #2d2758; box-shadow: 0 0 0 2px #f4c14e; }
   #install-card .install-row svg { width: 28px; height: 28px; flex: 0 0 28px; color: #f4c14e; }
 
   button.tile { display: block; aspect-ratio: 1 / 1; border: 0; border-radius: 26px; overflow: hidden; position: relative; background: #fff; padding: 0; cursor: pointer; font-family: inherit; box-shadow: 0 4px 0 rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08); transition: transform .08s ease, box-shadow .08s ease, filter .08s ease; }
@@ -107,7 +111,7 @@
   <section id="boot-fallback">
     <p class="stage-kicker">Willo</p>
     <h1>Even laden</h1>
-    <a id="boot-retry" href="https://nicolasmertens.github.io/willo/index.html?v=26">Opnieuw</a>
+    <a id="boot-retry" href="https://nicolasmertens.github.io/willo/index.html?v=27">Opnieuw</a>
   </section>
   <section id="child-card" hidden></section>
   <section id="install-card" hidden></section>
@@ -129,10 +133,10 @@
     }
   } catch (e) {}
   var srcs = [
-    "scripts/willo-hold.js?v=26",
-    "scripts/willo-settings.js?v=26",
-    "scripts/willo-catalog.js?v=26",
-    "scripts/willo-settings-ui.js?v=26"
+    "scripts/willo-hold.js?v=27",
+    "scripts/willo-settings.js?v=27",
+    "scripts/willo-catalog.js?v=27",
+    "scripts/willo-settings-ui.js?v=27"
   ];
   function loadScripts(i) {
     if (i >= srcs.length) {

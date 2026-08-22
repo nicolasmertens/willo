@@ -746,12 +746,21 @@
 
   function fillInstallFace() {
     photoGet("child").then((data) => {
-      const img = document.getElementById("install-face");
-      if (img && data) {
+      if (!data) return;
+      document.querySelectorAll("#install-face, #install-open-face").forEach((img) => {
         img.src = data;
         img.hidden = false;
-      }
+      });
     });
+  }
+
+  function installIconImg(step) {
+    if (step.id === "open") {
+      return `<img class="install-ico install-ico-face" id="install-open-face" alt="" hidden>`;
+    }
+    const file = step.icon ? "icons/safari/" + step.icon + ".png?v=27" : "";
+    if (!file) return "";
+    return `<img class="install-ico" alt="" src="${file}">`;
   }
 
   function paintInstall() {
@@ -793,16 +802,23 @@
       return;
     }
     const steps = S.installSteps(probe, loc, who);
+    const chrome = steps.filter((s) => s.id !== "open");
+    const openStep = steps.filter((s) => s.id === "open")[0];
     const step1icon = browser === "safari" ? SVG_SHARE : SVG_DOTS;
     const aim = at === "none" ? "" : `<div class="install-aim">${step1icon}</div>`;
-    const rows = steps.map((s, i) =>
-      `<div class="install-row" data-step="${s.id}"><span class="install-n">${i + 1}</span><span>${s.label}</span></div>`
+    const rows = chrome.map((s) =>
+      `<div class="install-row" data-step="${s.id}">${installIconImg(s)}<span>${s.label}</span></div>`
     ).join("");
+    const then = openStep
+      ? `<p class="install-then">${copy.then}</p><div class="install-row" data-step="open">${installIconImg(openStep)}<span>${openStep.label}</span></div>`
+      : "";
     el.innerHTML = `
       <img class="install-hero" id="install-face" alt="" hidden>
       <p class="install-who">${who}</p>
+      <p class="install-through">${copy.through}</p>
       ${aim}
       ${rows}
+      ${then}
     `;
     fillInstallFace();
   }
