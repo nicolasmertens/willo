@@ -40,7 +40,7 @@ ok("ui wipe settings key", ui.indexOf("localStorage.removeItem(S.KEY)") !== -1);
 const index = readFileSync(join(root, "index.html"), "utf8");
 ok("index inline reset", index.indexOf("willo_settings_v2") !== -1 && index.indexOf("get(\"reset\") === \"1\"") !== -1);
 ok("index waits then boots", index.indexOf("WilloUI.boot") !== -1);
-ok("index retry is absolute", index.indexOf("https://nicolasmertens.github.io/willo/index.html") !== -1);
+ok("index retry is absolute", index.indexOf("https://nicolasmertens.github.io/willo/") !== -1);
 ok("index writes touch icon from k", index.indexOf("document.write('<link rel=\"apple-touch-icon\"") !== -1);
 const sw = readFileSync(join(root, "sw.js"), "utf8");
 ok("sw does not intercept scripts", sw.indexOf("isScript") === -1);

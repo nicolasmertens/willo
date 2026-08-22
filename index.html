@@ -132,7 +132,7 @@
   <section id="boot-fallback">
     <p class="stage-kicker">Willo</p>
     <h1>Even laden</h1>
-    <a id="boot-retry" href="https://nicolasmertens.github.io/willo/index.html?v=28">Opnieuw</a>
+    <a id="boot-retry" href="https://nicolasmertens.github.io/willo/">Opnieuw</a>
   </section>
   <section id="child-card" hidden></section>
   <section id="install-card" hidden></section>
@@ -142,6 +142,16 @@
   <p id="home-hint" hidden></p>
 <script>
 (function () {
+  try {
+    var retry = document.getElementById("boot-retry");
+    if (retry) {
+      var ru = new URL(location.href);
+      ru.pathname = ru.pathname.replace(/index\.html$/, "") || "/";
+      if (ru.pathname.slice(-1) !== "/") ru.pathname += "/";
+      ru.searchParams.set("v", "28");
+      retry.href = ru.pathname + ru.search + ru.hash;
+    }
+  } catch (e) {}
   try {
     if (new URLSearchParams(location.search).get("reset") === "1") {
       try { localStorage.removeItem("willo_settings_v2"); } catch (e) {}
