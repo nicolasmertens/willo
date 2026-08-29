@@ -84,6 +84,19 @@
         "top"
       ],
       "fromMonth": 12
+    },
+    {
+      "n": 8,
+      "title": "Olifantje in het bos",
+      "audio": "liedjes/audio/08.mp3",
+      "icon": "liedjes/icons/08.png",
+      "irev": 1,
+      "face": "#ece4bd",
+      "over": [
+        "right",
+        "top"
+      ],
+      "fromMonth": 12
     }
   ]
 }

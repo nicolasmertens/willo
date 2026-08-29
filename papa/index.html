@@ -216,11 +216,11 @@ document.addEventListener("touchmove", e => { if (e.touches.length > 1) e.preven
 document.addEventListener("contextmenu", e => e.preventDefault());
 document.addEventListener("dblclick", e => e.preventDefault());
 
-const ALL_TRACKS = [{"n": 1, "title": "Alle Eendjes", "href": "/willo/eendjes/", "icon": "/willo/eendjes/cover-tile.jpg", "fromMonth": 10, "_section": "boeken"}, {"n": 2, "title": "Kleine Huppel", "href": "/willo/huppel/", "icon": "/willo/huppel/cover-tile.jpg", "fromMonth": 10, "_section": "boeken"}, {"n": 1, "title": "Memory", "icon": "/willo/klas/games/hero-memory.jpg", "href": "/willo/papa/games/memory/", "_section": "games"}, {"n": 2, "title": "Geluiden", "icon": "/willo/klas/games/hero-sounds.jpg", "href": "/willo/papa/games/soundboard/", "_section": "games"}, {"n": 3, "title": "Welke?", "icon": "/willo/klas/games/hero-pick.jpg", "href": "/willo/papa/games/pick/", "_section": "games"}, {"n": 1, "title": "En de krokodil", "audio": "liedjes/audio/01.mp3", "icon": "liedjes/icons/01.jpg", "irev": 2, "face": "#7cbf2a", "fromMonth": 12, "_section": "liedjes"}, {"n": 2, "title": "De wielen van de bus", "audio": "liedjes/audio/02.mp3", "icon": "liedjes/icons/02.png", "irev": 6, "face": "#f0c01a", "over": ["bottom"], "fromMonth": 12, "_section": "liedjes"}, {"n": 3, "title": "Hansje Pansje Kevertje", "audio": "liedjes/audio/03.mp3", "icon": "liedjes/icons/03.png", "irev": 3, "face": "#7cbf2a", "over": ["right", "bottom"], "fromMonth": 12, "_section": "liedjes"}, {"n": 4, "title": "Ze kunnen zeggen wat ze willen", "audio": "liedjes/audio/04.mp3", "icon": "liedjes/icons/04.png", "irev": 3, "face": "#f0d48a", "over": ["right", "bottom"], "fromMonth": 12, "_section": "liedjes"}, {"n": 5, "title": "Het ABC", "audio": "liedjes/audio/05.mp3", "icon": "liedjes/icons/05.png", "irev": 3, "face": "#2aa8a8", "over": ["left"], "fromMonth": 18, "_section": "liedjes"}, {"n": 6, "title": "Babyhaai", "audio": "liedjes/audio/06.mp3", "icon": "liedjes/icons/06.png", "irev": 5, "face": "#1a6db5", "over": ["top", "left"], "fromMonth": 12, "_section": "liedjes"}, {"n": 7, "title": "Eén kleine vinger", "audio": "liedjes/audio/07.mp3", "icon": "liedjes/icons/07.png", "rev": 2, "irev": 4, "face": "#efc44a", "over": ["top"], "fromMonth": 12, "_section": "liedjes"}];
+const ALL_TRACKS = [{"n": 1, "title": "Alle Eendjes", "href": "/willo/eendjes/", "icon": "/willo/eendjes/cover-tile.jpg", "fromMonth": 10, "_section": "boeken"}, {"n": 2, "title": "Kleine Huppel", "href": "/willo/huppel/", "icon": "/willo/huppel/cover-tile.jpg", "fromMonth": 10, "_section": "boeken"}, {"n": 1, "title": "Memory", "icon": "/willo/klas/games/hero-memory.jpg", "href": "/willo/papa/games/memory/", "_section": "games"}, {"n": 2, "title": "Geluiden", "icon": "/willo/klas/games/hero-sounds.jpg", "href": "/willo/papa/games/soundboard/", "_section": "games"}, {"n": 3, "title": "Welke?", "icon": "/willo/klas/games/hero-pick.jpg", "href": "/willo/papa/games/pick/", "_section": "games"}, {"n": 1, "title": "En de krokodil", "audio": "liedjes/audio/01.mp3", "icon": "liedjes/icons/01.jpg", "irev": 2, "face": "#7cbf2a", "fromMonth": 12, "_section": "liedjes"}, {"n": 2, "title": "De wielen van de bus", "audio": "liedjes/audio/02.mp3", "icon": "liedjes/icons/02.png", "irev": 6, "face": "#f0c01a", "over": ["bottom"], "fromMonth": 12, "_section": "liedjes"}, {"n": 3, "title": "Hansje Pansje Kevertje", "audio": "liedjes/audio/03.mp3", "icon": "liedjes/icons/03.png", "irev": 3, "face": "#7cbf2a", "over": ["right", "bottom"], "fromMonth": 12, "_section": "liedjes"}, {"n": 4, "title": "Ze kunnen zeggen wat ze willen", "audio": "liedjes/audio/04.mp3", "icon": "liedjes/icons/04.png", "irev": 3, "face": "#f0d48a", "over": ["right", "bottom"], "fromMonth": 12, "_section": "liedjes"}, {"n": 5, "title": "Het ABC", "audio": "liedjes/audio/05.mp3", "icon": "liedjes/icons/05.png", "irev": 3, "face": "#2aa8a8", "over": ["left"], "fromMonth": 18, "_section": "liedjes"}, {"n": 6, "title": "Babyhaai", "audio": "liedjes/audio/06.mp3", "icon": "liedjes/icons/06.png", "irev": 5, "face": "#1a6db5", "over": ["top", "left"], "fromMonth": 12, "_section": "liedjes"}, {"n": 7, "title": "Eén kleine vinger", "audio": "liedjes/audio/07.mp3", "icon": "liedjes/icons/07.png", "rev": 2, "irev": 4, "face": "#efc44a", "over": ["top"], "fromMonth": 12, "_section": "liedjes"}, {"n": 8, "title": "Olifantje in het bos", "audio": "liedjes/audio/08.mp3", "icon": "liedjes/icons/08.png", "irev": 1, "face": "#ece4bd", "over": ["right", "top"], "fromMonth": 12, "_section": "liedjes"}];
 const SEED_ORDER = ["liedjes:1", "liedjes:2", "liedjes:3", "liedjes:4", "liedjes:5"];
 const PARENT_HREF = "/willo/";
 const STORAGE_PREFIX = "papa";
-const APP_VERSION = "papa-b2daf3a6";
+const APP_VERSION = "papa-2d8638ca";
 
 const audio = new Audio();
 audio.preload = "none";
@@ -667,7 +667,7 @@ function attachBarButton(btn, opts) {
 
 /** Safari-safe long-press. Fire on the timer while held. Do not wait for touchend. */
 (function (root) {
-  const HOLD_MS = 1800;
+  const HOLD_MS = 2000;
   const DRIFT_PX = 28;
   const MIN_TAP_MS = 65;
 
@@ -679,6 +679,9 @@ function attachBarButton(btn, opts) {
    * Event list: {type: start|move|tick|end|cancel, t, x?, y?}
    * Hold wins if the timer elapses while still holding, even if Safari
    * later sends touchcancel / never sends touchend.
+   *
+   * cancel is not a lift (iOS callout/scroll/pan). Keep holding so a later
+   * tick can still fire. Real lift is type:end. Drift still aborts.
    */
   function decide(events, holdMs, driftPx) {
     holdMs = holdMs == null ? HOLD_MS : holdMs;
@@ -713,8 +716,8 @@ function attachBarButton(btn, opts) {
         if (ev.t - t0 >= MIN_TAP_MS) return "tap";
         return "cancel";
       } else if (ev.type === "cancel") {
+        // iOS cancel ≠ user lift. Do not abort. A later tick may still hold.
         if (holdFired || state === "hold") return "hold";
-        return "cancel";
       }
     }
     if (holdFired || state === "hold") return "hold";
@@ -730,6 +733,7 @@ function attachBarButton(btn, opts) {
     let timer = null;
     let start = null;
     let fired = false;
+    let pointerId = null;
 
     function wipe() {
       if (timer) {
@@ -737,34 +741,35 @@ function attachBarButton(btn, opts) {
         timer = null;
       }
       start = null;
+      pointerId = null;
     }
 
-    el.addEventListener("touchstart", (e) => {
-      if (shouldStart && !shouldStart(e)) return;
-      if (e.touches.length !== 1) {
-        wipe();
-        return;
-      }
-      const t = e.changedTouches[0];
-      e.preventDefault();
+    function arm(x, y) {
       fired = false;
-      start = { x: t.clientX, y: t.clientY, t0: Date.now() };
+      start = { x: x, y: y, t0: Date.now() };
       timer = setTimeout(() => {
         timer = null;
         fired = true;
         if (onHold) onHold();
       }, holdMs);
-    }, { passive: false });
+    }
 
-    el.addEventListener("touchmove", (e) => {
+    function down(x, y, e) {
+      if (shouldStart && !shouldStart(e)) return false;
+      if (start && !fired) return false;
+      if (e && e.preventDefault) e.preventDefault();
+      arm(x, y);
+      return true;
+    }
+
+    function move(x, y) {
       if (!start || fired) return;
-      const t = e.changedTouches[0];
-      if (drifted(start.x, start.y, t.clientX, t.clientY, driftPx)) wipe();
-    }, { passive: true });
+      if (drifted(start.x, start.y, x, y, driftPx)) wipe();
+    }
 
-    el.addEventListener("touchend", (e) => {
+    function up(e) {
       if (fired) {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
         wipe();
         return;
       }
@@ -772,11 +777,71 @@ function attachBarButton(btn, opts) {
       const dur = start ? Date.now() - start.t0 : 0;
       wipe();
       if (had && dur >= MIN_TAP_MS && onTap) onTap(e);
-    }, { passive: false });
+    }
 
-    el.addEventListener("touchcancel", () => {
-      if (!fired) wipe();
-    }, { passive: true });
+    // iOS Safari often sends pointercancel/touchcancel before 2s (callout,
+    // scroll, pan). That is not a lift. Keep the timer. Real lift is
+    // pointerup / touchend / mouseup. Do not wipe() here.
+    function ignoreCancel() {}
+
+    const usePointer = typeof PointerEvent !== "undefined";
+
+    if (usePointer) {
+      el.addEventListener("pointerdown", (e) => {
+        if (e.isPrimary === false) return;
+        if (!down(e.clientX, e.clientY, e)) return;
+        pointerId = e.pointerId;
+        try { if (el.setPointerCapture) el.setPointerCapture(e.pointerId); } catch (err) {}
+      }, { passive: false });
+
+      el.addEventListener("pointermove", (e) => {
+        if (pointerId != null && e.pointerId !== pointerId) return;
+        move(e.clientX, e.clientY);
+      }, { passive: true });
+
+      el.addEventListener("pointerup", (e) => {
+        if (pointerId != null && e.pointerId !== pointerId) return;
+        up(e);
+      }, { passive: false });
+
+      el.addEventListener("pointercancel", ignoreCancel, { passive: true });
+    } else {
+      el.addEventListener("touchstart", (e) => {
+        if (e.touches && e.touches.length !== 1) {
+          wipe();
+          return;
+        }
+        const t = e.changedTouches[0];
+        down(t.clientX, t.clientY, e);
+      }, { passive: false });
+
+      el.addEventListener("touchmove", (e) => {
+        if (!start || fired) return;
+        const t = e.changedTouches[0];
+        move(t.clientX, t.clientY);
+      }, { passive: true });
+
+      el.addEventListener("touchend", (e) => {
+        up(e);
+      }, { passive: false });
+
+      el.addEventListener("touchcancel", ignoreCancel, { passive: true });
+
+      el.addEventListener("mousedown", (e) => {
+        if (e.button !== 0) return;
+        down(e.clientX, e.clientY, e);
+      }, { passive: false });
+
+      const mouseRoot = typeof window !== "undefined" ? window : el;
+      mouseRoot.addEventListener("mousemove", (e) => {
+        move(e.clientX, e.clientY);
+      }, { passive: true });
+      mouseRoot.addEventListener("mouseup", (e) => {
+        if (e.button !== 0 && e.button !== undefined) return;
+        if (!start && !fired) return;
+        up(e);
+      }, { passive: false });
+    }
   }
 
   const api = { HOLD_MS, DRIFT_PX, MIN_TAP_MS, drifted, decide, attach };
@@ -788,6 +853,10 @@ function attachBarButton(btn, opts) {
 (function (root) {
   const KEY = "willo_settings_v2";
   const LANGS = ["mama", "papa", "klas"];
+  const LANG_LABEL = { mama: "Français", papa: "Nederlands", klas: "English" };
+  function langLabel(id) {
+    return LANG_LABEL[id] || id;
+  }
   const SECTIONS = ["boeken", "games", "liedjes", "verhalen"];
   const STAGES = [
     { id: "0-2", from: 0, to: 2 },
@@ -855,7 +924,9 @@ function attachBarButton(btn, opts) {
         add: "Zet op beginscherm",
         menu: "Menu",
         more: "Toon meer",
-        pageMenu: "Paginamenu",
+        pageMenu: "Tik dit",
+        through: "Tik deze stappen",
+        then: "Daarna",
         open: "Open {name} vanaf het beginscherm",
         again: "Toon opnieuw hoe ik het toevoeg",
       },
@@ -864,7 +935,9 @@ function attachBarButton(btn, opts) {
         add: "Sur l'écran d'accueil",
         menu: "Menu",
         more: "Voir plus",
-        pageMenu: "Menu de la page",
+        pageMenu: "Touche ceci",
+        through: "Passe par ces étapes",
+        then: "Ensuite",
         open: "Ouvre {name} depuis l'écran d'accueil",
         again: "Montre-moi comment l'ajouter à nouveau",
       },
@@ -873,7 +946,9 @@ function attachBarButton(btn, opts) {
         add: "Zum Home-Bildschirm",
         menu: "Menü",
         more: "Mehr anzeigen",
-        pageMenu: "Seitenmenü",
+        pageMenu: "Tippe hier",
+        through: "Tippe diese Schritte",
+        then: "Danach",
         open: "Öffne {name} vom Home-Bildschirm",
         again: "Zeig mir nochmal, wie ich es hinzufüge",
       },
@@ -882,7 +957,9 @@ function attachBarButton(btn, opts) {
         add: "Add to Home Screen",
         menu: "Menu",
         more: "View More",
-        pageMenu: "Page menu",
+        pageMenu: "Tap this",
+        through: "Tap through these steps",
+        then: "Then",
         open: "Open {name} from the Home Screen",
         again: "Show me how to add it again",
       },
@@ -896,22 +973,37 @@ function attachBarButton(btn, opts) {
     return String(copy.open || "").replace("{name}", n);
   }
 
+  function installStepIcon(id) {
+    const map = {
+      "page-menu": "line-3-horizontal",
+      share: "square-and-arrow-up",
+      "view-more": "view-more",
+      add: "plus-square",
+      menu: "ellipsis",
+      open: "open",
+    };
+    return map[id] || "";
+  }
+
   function installSteps(info, lang, name) {
     const copy = installCopy(lang);
     const browser = installBrowser((info && info.ua) || "");
     const pad = installPad(info);
     const open = openIconLabel(lang, name);
     const steps = [];
-    if (browser === "safari") {
-      if (!pad) steps.push({ id: "page-menu", label: copy.pageMenu });
-      steps.push({ id: "share", label: copy.share });
-      steps.push({ id: "view-more", label: copy.more });
-      steps.push({ id: "add", label: copy.add });
-    } else {
-      steps.push({ id: "menu", label: copy.menu });
-      steps.push({ id: "add", label: copy.add });
+    function push(id, label) {
+      steps.push({ id: id, label: label, icon: installStepIcon(id) });
     }
-    steps.push({ id: "open", label: open });
+    if (browser === "safari") {
+      if (!pad) push("page-menu", copy.pageMenu);
+      push("share", copy.share);
+      push("view-more", copy.more);
+      push("add", copy.add);
+    } else {
+      push("menu", copy.menu);
+      push("add", copy.add);
+    }
+    push("open", open);
     return steps;
   }
 
@@ -962,17 +1054,15 @@ function attachBarButton(btn, opts) {
     if (iosBrowser && !standalone) {
       return opts && opts.showInstall ? "install" : "child";
     }
-    if (!langOnCount) return "hold";
     return "home";
   }
 
   function homeChrome(langOnCount) {
-    const n = Number(langOnCount) || 0;
     return {
       firstPick: false,
       showPlus: false,
-      holdHint: n > 0,
-      holdCoach: n === 0,
+      holdHint: true,
+      holdCoach: false,
     };
   }
 
@@ -996,10 +1086,10 @@ function attachBarButton(btn, opts) {
   function holdCopy(lang) {
     const l = String(lang || "en").toLowerCase().slice(0, 2);
     const table = {
-      nl: { kicker: "Instellingen", title: "Houd hier 2 seconden in", hint: "In de lege ruimte. Niet op een tegel." },
-      fr: { kicker: "Réglages", title: "Reste appuyé ici 2 secondes", hint: "Dans le vide. Pas sur une tuile." },
-      de: { kicker: "Einstellungen", title: "Hier 2 Sekunden halten", hint: "Im leeren Bereich. Nicht auf einer Kachel." },
-      en: { kicker: "Settings", title: "Hold here for 2 seconds", hint: "On the empty space. Not on a tile." },
+      nl: { kicker: "Instellingen", title: "", hint: "Op het beginscherm opent 2 seconden drukken in de lege ruimte de instellingenpagina." },
+      fr: { kicker: "Réglages", title: "", hint: "Sur l'écran d'accueil, rester appuyé 2 secondes dans le vide ouvre la page des réglages." },
+      de: { kicker: "Einstellungen", title: "", hint: "Auf dem Startbildschirm öffnet 2 Sekunden Drücken im leeren Bereich die Einstellungsseite." },
+      en: { kicker: "Settings", title: "", hint: "On the Home Screen, pressing empty space for 2 seconds opens the settings page." },
     };
     return table[l] || table.en;
   }
@@ -1008,9 +1098,9 @@ function attachBarButton(btn, opts) {
     const l = String(lang || "en").toLowerCase().slice(0, 2);
     const table = {
       nl: "Houd 2 seconden in de lege ruimte.",
-      fr: "Reste appuyé 2 secondes sur une tuile pour les réglages.",
-      de: "Kachel 2 Sekunden halten für Einstellungen.",
-      en: "Hold a tile 2 seconds for settings.",
+      fr: "Reste appuyé 2 secondes dans le vide.",
+      de: "Leeren Bereich 2 Sekunden halten.",
+      en: "Press empty space 2 seconds for settings.",
     };
     return table[l] || table.en;
   }
@@ -1179,30 +1269,27 @@ function attachBarButton(btn, opts) {
     return m ? m[1] : "";
   }
 
+  function catalogIconSrc(t) {
+    const icon = String((t && t.icon) || "");
+    if (!icon) return "";
+    if (icon.charAt(0) === "/") return icon;
+    const pack = String((t && t.pack) || "");
+    return pack ? "/willo/" + pack + "/" + icon : icon;
+  }
+
   function groupItems(section, catalog) {
     const rows = (catalog || []).filter((t) => t && t.section === section);
-    if (section === "games") {
-      const map = {};
-      const order = [];
-      rows.forEach((t) => {
-        const leaf = gameLeaf(t.href) || (t.pack + "-" + t.n);
-        if (!map[leaf]) {
-          map[leaf] = { id: leaf, title: t.title, items: [] };
-          order.push(leaf);
-        }
-        map[leaf].items.push(t);
-      });
-      return order.map((k) => {
-        const g = map[k];
-        const papa = g.items.filter((i) => i.pack === "papa")[0];
-        if (papa) g.title = papa.title;
-        return g;
-      });
-    }
-    return rows.map((t) => ({
-      id: t.pack + ":" + t.n,
-      title: t.title,
-      items: [t],
+    const map = {};
+    LANGS.forEach((l) => { map[l] = []; });
+    rows.forEach((t) => {
+      if (map[t.pack]) map[t.pack].push(t);
+    });
+    const order = ["papa", "mama", "klas"];
+    return order.filter((l) => map[l] && map[l].length).map((l) => ({
+      id: l,
+      pack: l,
+      title: langLabel(l),
+      items: map[l],
     }));
   }
 
@@ -1312,15 +1399,15 @@ function attachBarButton(btn, opts) {
   }
 
   const api = {
-    KEY, LANGS, SECTIONS, STAGES,
+    KEY, LANGS, LANG_LABEL, langLabel, SECTIONS, STAGES,
     homeSurface, homeChrome, navVisibility, hasChild, setChild, springboardName, springboardTags, childCopy,
     firstPickCopy, holdCopy, holdHintCopy, slimBridge, mergeBridge, fromChildQuery, kidIdFromSearch, wantsA2hs,
     isIosBrowser, installBrowser, installPad, installShareAt, installCopy,
-    installSteps, installCoachMode, openIconLabel,
+    installSteps, installStepIcon, installCoachMode, openIconLabel,
     defaultState, hashPin, ageMonths, stageFor, itemKey,
     isLangOn, isSectionOn, isItemOn,
     setLang, setSection, setItem, setBirth, setPin, checkPin,
-    gameLeaf, groupItems,
+    gameLeaf, groupItems, catalogIconSrc,
     exportPayload, importPayload, load, save,
   };
 
@@ -1369,7 +1456,7 @@ window.WILLO_CATALOG = [{"pack": "mama", "section": "games", "n": 1, "title": "M
     return out;
   }
 
-  const LANG_LABEL = { mama: "Mama", papa: "Papa", klas: "Klas" };
+  const LANG_LABEL = S.LANG_LABEL || { mama: "Français", papa: "Nederlands", klas: "English" };
   const KID_API = "https://liedjes-logger.super-mud-e2ef.workers.dev";
   const KID_ID_KEY = "willo_kid_icon_id";
   let sessionOk = false;
@@ -1476,7 +1563,7 @@ window.WILLO_CATALOG = [{"pack": "mama", "section": "games", "n": 1, "title": "M
       <div class="willo-hint">${months == null ? "Nog geen leeftijd." : months + " maanden · emmer " + (stage ? stage.id : "?")}</div>
       <h3>Wat speelt hij?</h3>
       ${S.SECTIONS.map((sec) => `<button type="button" class="willo-drill" data-drill="${sec}"><span>${SEC_LABEL[sec] || sec}</span><span>›</span></button>`).join("")}
-      <button type="button" class="willo-drill" data-drill-faces><span>Wie is erbij?</span><span>›</span></button>
+      <button type="button" class="willo-drill" data-drill-faces><span>Talen</span><span>›</span></button>
       <div class="willo-actions">
         <button type="button" data-export>Exporteer</button>
         <button type="button" data-import>Importeer</button>
@@ -1492,31 +1579,34 @@ window.WILLO_CATALOG = [{"pack": "mama", "section": "games", "n": 1, "title": "M
     const st = S.load();
     return `
       <button type="button" class="willo-back" data-back>‹ Terug</button>
-      <h2>Wie is erbij?</h2>
-      <p class="willo-hint">Foto erbij, dan aan.</p>
-      ${S.LANGS.map((l) => `<div class="willo-row"><label class="willo-face-lab"><img data-face="${l}" alt="" class="willo-face-dot missing"><input type="file" accept="image/*" data-photo="${l}"></label>${toggle(S.isLangOn(st, l)).replace(">", ` data-lang="${l}">`)}</div>`).join("")}
+      <h2>Talen</h2>
+      <p class="willo-hint">Kies de talen op het beginscherm. Foto kan later.</p>
+      ${S.LANGS.map((l) => `<div class="willo-row"><label class="willo-face-lab"><img data-face="${l}" alt="" class="willo-face-dot missing"><input type="file" accept="image/*" data-photo="${l}"><span>${LANG_LABEL[l] || l}</span></label>${toggle(S.isLangOn(st, l)).replace(">", ` data-lang="${l}">`)}</div>`).join("")}
     `;
   }
 
   function renderSection(sec) {
     const st = S.load();
-    const groups = S.groupItems(sec, catalog());
+    const groups = S.groupItems(sec, catalog()).filter((g) => S.isLangOn(st, g.pack));
     const anyPack = S.LANGS.some((l) => S.isLangOn(st, l));
     const rows = groups.map((g) => {
       const inner = g.items.map((t) => {
         const track = { n: t.n, _section: t.section, fromMonth: t.fromMonth };
         const on = S.isItemOn(st, track, t.pack);
         const age = t.fromMonth ? "vanaf " + t.fromMonth + " m" : "";
-        return `<div class="willo-row"><label class="willo-face-lab"><img data-face="${t.pack}" alt="" class="willo-face-dot missing"><span>${t.title}${age ? "<small>" + age + "</small>" : ""}</span></label>${toggle(on).replace(">", ` data-item="${t.pack}:${t.section}:${t.n}">`)}</div>`;
+        const src = S.catalogIconSrc(t);
+        const img = src
+          ? `<img class="willo-face-dot" alt="" src="${src}">`
+          : `<span class="willo-face-dot missing"></span>`;
+        return `<div class="willo-row"><label class="willo-face-lab">${img}<span>${t.title}${age ? "<small>" + age + "</small>" : ""}</span></label>${toggle(on).replace(">", ` data-item="${t.pack}:${t.section}:${t.n}">`)}</div>`;
       }).join("");
-      if (g.items.length === 1) return inner;
       return `<h3>${g.title}</h3>` + inner;
     }).join("");
     return `
       <button type="button" class="willo-back" data-back>‹ Terug</button>
       <h2>${SEC_LABEL[sec] || sec}</h2>
       <div class="willo-row"><label>Alles in ${SEC_LABEL[sec] || sec}</label>${toggle(S.isSectionOn(st, sec)).replace(">", ` data-sec="${sec}">`)}</div>
-      ${anyPack ? rows : `<p class="willo-hint">Zet eerst iemand aan.</p><button type="button" class="willo-drill" data-drill-faces>Wie is erbij? ›</button>`}
+      ${anyPack ? rows : `<p class="willo-hint">Zet eerst een taal aan.</p><button type="button" class="willo-drill" data-drill-faces>Talen ›</button>`}
     `;
   }
 
@@ -2078,12 +2168,21 @@ window.WILLO_CATALOG = [{"pack": "mama", "section": "games", "n": 1, "title": "M
 
   function fillInstallFace() {
     photoGet("child").then((data) => {
-      const img = document.getElementById("install-face");
-      if (img && data) {
+      if (!data) return;
+      document.querySelectorAll("#install-face, #install-open-face").forEach((img) => {
         img.src = data;
         img.hidden = false;
-      }
+      });
     });
+  }
+
+  function installIconImg(step) {
+    if (step.id === "open") {
+      return `<img class="install-ico install-ico-face" id="install-open-face" alt="" hidden>`;
+    }
+    const file = step.icon ? "icons/safari/" + step.icon + ".png?v=27" : "";
+    if (!file) return "";
+    return `<img class="install-ico" alt="" src="${file}">`;
   }
 
   function paintInstall() {
@@ -2114,27 +2213,43 @@ window.WILLO_CATALOG = [{"pack": "mama", "section": "games", "n": 1, "title": "M
         <button type="button" class="install-again" data-install-again>${copy.again}</button>
       `;
       const again = el.querySelector("[data-install-again]");
-      if (again) bindTap(again, () => {
-        try {
-          sessionStorage.setItem("willo_install_again", "1");
-          sessionStorage.removeItem("willo_install_left");
-        } catch (e) {}
-        paintInstall();
-      });
+      if (again) {
+        const showSteps = (e) => {
+          if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+          try {
+            sessionStorage.setItem("willo_install_again", "1");
+            sessionStorage.removeItem("willo_install_left");
+          } catch (err) {}
+          paintInstall();
+        };
+        again.onclick = showSteps;
+        again.ontouchend = showSteps;
+        bindTap(again, () => showSteps());
+      }
       fillInstallFace();
       return;
     }
     const steps = S.installSteps(probe, loc, who);
+    const chrome = steps.filter((s) => s.id !== "open");
+    const openStep = steps.filter((s) => s.id === "open")[0];
     const step1icon = browser === "safari" ? SVG_SHARE : SVG_DOTS;
     const aim = at === "none" ? "" : `<div class="install-aim">${step1icon}</div>`;
-    const rows = steps.map((s, i) =>
-      `<div class="install-row" data-step="${s.id}"><span class="install-n">${i + 1}</span><span>${s.label}</span></div>`
+    const rows = chrome.map((s) =>
+      `<div class="install-row" data-step="${s.id}">${installIconImg(s)}<span>${s.label}</span></div>`
     ).join("");
+    const then = openStep
+      ? `<p class="install-then">${copy.then}</p><div class="install-row" data-step="open">${installIconImg(openStep)}<span>${openStep.label}</span></div>`
+      : "";
     el.innerHTML = `
       <img class="install-hero" id="install-face" alt="" hidden>
       <p class="install-who">${who}</p>
+      <p class="install-through">${copy.through}</p>
       ${aim}
       ${rows}
+      ${then}
     `;
     fillInstallFace();
   }
@@ -2146,22 +2261,31 @@ window.WILLO_CATALOG = [{"pack": "mama", "section": "games", "n": 1, "title": "M
     const copy = S.holdCopy(loc);
     el.innerHTML = `
       <p class="stage-kicker">${copy.kicker}</p>
-      <h1>${copy.title}</h1>
-      <div class="hold-blank" id="hold-pad" aria-label="${copy.title}"></div>
       <p class="hold-hint">${copy.hint}</p>
     `;
-    if (window.WilloHold) {
+    if (!window.WilloHold) return;
+    if (el.dataset.willoHold !== "1") {
+      el.dataset.willoHold = "1";
       WilloHold.attach(el, {
         onHold() { openUnlock(); },
         onTap() {},
       });
     }
-    el.addEventListener("click", (e) => {
-      if ("ontouchstart" in window) return;
-      if (e.detail === 0) return;
-      if (e.target.closest("button")) return;
-      openUnlock();
-    });
+    const body = document.body;
+    if (body.dataset.willoHold !== "1") {
+      body.dataset.willoHold = "1";
+      WilloHold.attach(body, {
+        shouldStart(e) {
+          if (document.body.dataset.stage !== "hold") return false;
+          const t = e && e.target;
+          if (t && t.closest && t.closest("#hold-card")) return false;
+          if (t && t.closest && t.closest(".willo-mask")) return false;
+          return true;
+        },
+        onHold() { openUnlock(); },
+        onTap() {},
+      });
+    }
   }
 
   function openAddLang() {
@@ -2237,6 +2361,7 @@ window.WILLO_CATALOG = [{"pack": "mama", "section": "games", "n": 1, "title": "M
     const pickLangs = on;
     grid.classList.toggle("home-empty", pickLangs.length === 1);
     grid.classList.toggle("home-pick", !!chrome.firstPick);
+    document.body.classList.toggle("home-no-tiles", pickLangs.length === 0);
     const tiles = pickLangs.map((l) => `
       <button class="tile" data-href="/willo/${l}/" data-label="${l}" aria-label="${l}">
         <img data-face="${l}" alt="" class="missing">
@@ -2246,22 +2371,31 @@ window.WILLO_CATALOG = [{"pack": "mama", "section": "games", "n": 1, "title": "M
     if (blank) {
       blank.hidden = false;
       blank.textContent = S.holdHintCopy(loc);
+      if (window.WilloHold && blank.dataset.willoHold !== "1") {
+        blank.dataset.willoHold = "1";
+        WilloHold.attach(blank, {
+          onHold() { openUnlock(); },
+          onTap() {},
+        });
+      }
+    }
+    if (window.WilloHold && document.body.dataset.willoHold !== "1") {
+      document.body.dataset.willoHold = "1";
+      WilloHold.attach(document.body, {
+        shouldStart(e) {
+          if (document.body.dataset.stage !== "home") return false;
+          const t = e && e.target;
+          if (t && t.closest && t.closest("button.tile, .willo-mask, #install-card, #child-card")) return false;
+          return true;
+        },
+        onHold() { openUnlock(); },
+        onTap() {},
+      });
     }
     paintHint("");
     grid.querySelectorAll("button.tile").forEach((btn) => {
       const pick = btn.dataset.pick === "1";
-      if (window.WilloHold) {
-        WilloHold.attach(btn, {
-          onTap() {
-            if (pick) enableLang(btn.dataset.label);
-            else if (btn.dataset.href) window.location = btn.dataset.href;
-          },
-          onHold() { openUnlock(); },
-        });
-      }
-      btn.addEventListener("click", (e) => {
-        if ("ontouchstart" in window) return;
-        if (e.detail === 0) return;
+      btn.addEventListener("click", () => {
         if (pick) enableLang(btn.dataset.label);
         else if (btn.dataset.href) window.location = btn.dataset.href;
       });

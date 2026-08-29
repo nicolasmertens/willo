@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Tiny eval: liedjes tiles stay 154px, never smash, pop cannot overlap."""
+import json
 import re
 import sys
 from pathlib import Path
@@ -58,13 +59,23 @@ else:
     if "assignOverflow" not in tmpl and "/*__OVERFLOW_ASSIGN__*/" not in tmpl:
         fails.append("template missing overflow assigner hook")
 
-# 4. papa house: 6 overflow pngs + croc jpg
-if tracks.count(".png") < 6:
-    fails.append("papa-liedjes should have 6 overflow png icons")
+# 4. papa house: overflow pngs + croc jpg; every track has a face
+papa_tracks = json.loads(tracks).get("tracks", [])
+pngs = [t for t in papa_tracks if str(t.get("icon", "")).endswith(".png")]
+if len(pngs) < 7:
+    fails.append("papa-liedjes should have 7 overflow png icons")
 if '"liedjes/icons/01.jpg"' not in tracks:
     fails.append("crocodile lead must stay 01.jpg")
-if tracks.count('"face"') < 7:
-    fails.append("every papa liedje needs a face color")
+missing_face = [t.get("title") or t.get("n") for t in papa_tracks if not t.get("face")]
+if missing_face:
+    fails.append("papa liedje missing face: " + ",".join(map(str, missing_face)))
+olifant = next((t for t in papa_tracks if t.get("title") == "Olifantje in het bos"), None)
+if not olifant:
+    fails.append("missing Olifantje in het bos")
+elif not str(olifant.get("icon", "")).endswith(".png"):
+    fails.append("Olifantje tile must be overflow png")
+elif "top" not in (olifant.get("over") or []):
+    fails.append("Olifantje tree should overflow top")
 
 print(f"checks: 8  fails: {len(fails)}")
 for f in fails:

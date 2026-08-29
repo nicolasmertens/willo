@@ -34,7 +34,7 @@ FIXTURES = [
         ["bottom"], ["top"], ["right", "top"],
     ]},
     {"name": "pref-blocked-stays-in", "n": 2, "cols": 2, "prefs": [["right"], ["left"]]},
-    {"name": "papa-3col-with-croc", "n": 7, "cols": 3, "prefs": [
+    {"name": "papa-3col-with-croc", "n": 8, "cols": 3, "prefs": [
         None,
         ["right", "left"],
         ["right", "bottom"],
@@ -42,14 +42,16 @@ FIXTURES = [
         ["left"],
         ["top", "left"],
         ["right", "top"],
+        ["right", "top"],
     ]},
-    {"name": "papa-4col-with-croc", "n": 7, "cols": 4, "prefs": [
+    {"name": "papa-4col-with-croc", "n": 8, "cols": 4, "prefs": [
         None,
         ["right", "left"],
         ["right", "bottom"],
         ["right", "bottom"],
         ["left"],
         ["top", "left"],
+        ["right", "top"],
         ["right", "top"],
     ]},
 ]
