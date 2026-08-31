@@ -30,6 +30,7 @@
       "title": "Il y avait de gros crocodiles",
       "audio": "liedjes/audio/03.mp3",
       "icon": "liedjes/icons/03.jpg",
+      "rev": 2,
       "irev": 2,
       "face": "#e6c31a",
       "fromMonth": 12
