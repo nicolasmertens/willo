@@ -12,7 +12,7 @@
 //   GET  /       health probe
 
 const REPO_OWNER = "nicolasmertens";
-const REPO_NAME = "liedjes";
+const REPO_NAME = "willo";
 const ALLOWED_ORIGIN = "https://nicolasmertens.github.io";
 const MAX_EVENTS_PER_BATCH = 5000;
 const MAX_BODY_BYTES = 1_000_000; // 1 MB
