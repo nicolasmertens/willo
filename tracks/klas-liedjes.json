@@ -99,13 +99,6 @@
       "fromMonth": 12
     },
     {
-      "n": 12,
-      "title": "Twinkle Twinkle Little Star",
-      "audio": "liedjes/audio/12.mp3",
-      "icon": "liedjes/icons/12.jpg",
-      "fromMonth": 12
-    },
-    {
       "n": 13,
       "title": "We Are The Dinosaurs",
       "audio": "liedjes/audio/13.mp3",
@@ -134,10 +127,10 @@
       "fromMonth": 12
     },
     {
-      "n": 17,
+      "n": 18,
       "title": "Itsy Bitsy Spider",
-      "audio": "liedjes/audio/17.mp3",
-      "icon": "liedjes/icons/17.jpg",
+      "audio": "liedjes/audio/18.mp3",
+      "icon": "liedjes/icons/18.jpg",
       "fromMonth": 12
     }
   ]
