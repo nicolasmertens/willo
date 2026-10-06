@@ -97,6 +97,48 @@
       "icon": "liedjes/icons/11.jpg",
       "rev": 2,
       "fromMonth": 12
+    },
+    {
+      "n": 12,
+      "title": "Twinkle Twinkle Little Star",
+      "audio": "liedjes/audio/12.mp3",
+      "icon": "liedjes/icons/12.jpg",
+      "fromMonth": 12
+    },
+    {
+      "n": 13,
+      "title": "We Are The Dinosaurs",
+      "audio": "liedjes/audio/13.mp3",
+      "icon": "liedjes/icons/13.jpg",
+      "fromMonth": 12
+    },
+    {
+      "n": 14,
+      "title": "The Goldfish",
+      "audio": "liedjes/audio/14.mp3",
+      "icon": "liedjes/icons/14.jpg",
+      "fromMonth": 12
+    },
+    {
+      "n": 15,
+      "title": "Hop Little Bunnies",
+      "audio": "liedjes/audio/15.mp3",
+      "icon": "liedjes/icons/15.jpg",
+      "fromMonth": 12
+    },
+    {
+      "n": 16,
+      "title": "One Little Finger Part 2",
+      "audio": "liedjes/audio/16.mp3",
+      "icon": "liedjes/icons/16.jpg",
+      "fromMonth": 12
+    },
+    {
+      "n": 17,
+      "title": "Itsy Bitsy Spider",
+      "audio": "liedjes/audio/17.mp3",
+      "icon": "liedjes/icons/17.jpg",
+      "fromMonth": 12
     }
   ]
 }
